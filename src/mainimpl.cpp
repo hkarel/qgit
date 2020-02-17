@@ -2263,7 +2263,8 @@ void MainImpl::closeEvent(QCloseEvent* ce) {
 
 void MainImpl::ActClose_activated() {
 
-    close();
+    //close();
+    tabBar_tabCloseRequested(tabWdg->currentIndex());
 }
 
 void MainImpl::ActExit_activated() {

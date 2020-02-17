@@ -223,7 +223,7 @@
     <string>Exit</string>
    </property>
    <property name="shortcut">
-    <string>Ctrl+Q</string>
+    <string>Q</string>
    </property>
   </action>
   <action name="ActAbout">
@@ -352,7 +352,7 @@
     <string>Close</string>
    </property>
    <property name="shortcut">
-    <string>Q</string>
+    <string>Alt+W</string>
    </property>
   </action>
   <action name="ActMailApplyPatch">
