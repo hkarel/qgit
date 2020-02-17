@@ -139,6 +139,7 @@ const QString APP_KEY         = "qgit4";
 const QString GIT_DIR_KEY     = "msysgit_exec_dir";
 const QString EXT_DIFF_KEY    = "external_diff_viewer";
 const QString EXT_EDITOR_KEY  = "external_editor";
+const QString ICON_SIZE_INDEX = "icon_size_index";
 const QString REC_REP_KEY     = "recent_open_repos";
 const QString STD_FNT_KEY     = "standard_font";
 const QString TYPWRT_FNT_KEY  = "typewriter_font";

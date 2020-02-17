@@ -95,6 +95,25 @@ MainImpl::MainImpl(const QString& cd, QWidget* p) : QMainWindow(p) {
 	}
     QGit::STD_FONT.fromString(font);
 
+    int iconSizeIndex = settings.value(ICON_SIZE_INDEX, 0).toInt();
+    switch (iconSizeIndex) {
+    case 1:
+        toolBar->setIconSize(QSize(16, 16));
+        break;
+    case 2:
+        toolBar->setIconSize(QSize(24, 24));
+        break;
+    case 3:
+        toolBar->setIconSize(QSize(32, 32));
+        break;
+    case 4:
+        toolBar->setIconSize(QSize(48, 48));
+        break;
+    case 5:
+        toolBar->setIconSize(QSize(64, 64));
+        break;
+    }
+
     // set-up typewriter (fixed width) font
     font = settings.value(TYPWRT_FNT_KEY).toString();
     if (font.isEmpty()) { // choose a sensible default

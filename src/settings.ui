@@ -6,8 +6,8 @@
    <rect>
     <x>0</x>
     <y>0</y>
-    <width>513</width>
-    <height>377</height>
+    <width>603</width>
+    <height>494</height>
    </rect>
   </property>
   <property name="sizePolicy">
@@ -33,7 +33,7 @@
    <item>
     <widget class="QTabWidget" name="tabDialog">
      <property name="currentIndex">
-      <number>5</number>
+      <number>0</number>
      </property>
      <widget class="QWidget" name="General">
       <attribute name="title">
@@ -188,6 +188,46 @@
            <property name="spacing">
             <number>4</number>
            </property>
+           <item row="3" column="1">
+            <widget class="QLineEdit" name="lineEditExternalEditor">
+             <property name="toolTip">
+              <string>Set path of the external editor</string>
+             </property>
+            </widget>
+           </item>
+           <item row="6" column="0">
+            <widget class="QLabel" name="textLabelCodecs">
+             <property name="toolTip">
+              <string>Select text codec to use. You need to refresh the view (F5) after a codec change</string>
+             </property>
+             <property name="text">
+              <string>Te&amp;xt codec</string>
+             </property>
+             <property name="wordWrap">
+              <bool>false</bool>
+             </property>
+             <property name="buddy">
+              <cstring>comboBoxCodecs</cstring>
+             </property>
+            </widget>
+           </item>
+           <item row="5" column="0">
+            <widget class="QLabel" name="textLabelIconSize">
+             <property name="text">
+              <string>Icon size</string>
+             </property>
+            </widget>
+           </item>
+           <item row="0" column="1">
+            <widget class="QLineEdit" name="lineEditTypeWriterFont">
+             <property name="toolTip">
+              <string>Typewriter (fixed width) font used by patch and file viewers</string>
+             </property>
+             <property name="readOnly">
+              <bool>true</bool>
+             </property>
+            </widget>
+           </item>
            <item row="1" column="2">
             <widget class="QPushButton" name="pushButtonExtDiff">
              <property name="maximumSize">
@@ -204,29 +244,6 @@
              </property>
              <property name="shortcut">
               <string/>
-             </property>
-            </widget>
-           </item>
-           <item row="0" column="1">
-            <widget class="QLineEdit" name="lineEditTypeWriterFont">
-             <property name="toolTip">
-              <string>Typewriter (fixed width) font used by patch and file viewers</string>
-             </property>
-             <property name="readOnly">
-              <bool>true</bool>
-             </property>
-            </widget>
-           </item>
-           <item row="0" column="0">
-            <widget class="QLabel" name="textLabelTypewriterFont">
-             <property name="text">
-              <string>&amp;Fixed width font</string>
-             </property>
-             <property name="wordWrap">
-              <bool>false</bool>
-             </property>
-             <property name="buddy">
-              <cstring>lineEditTypeWriterFont</cstring>
              </property>
             </widget>
            </item>
@@ -250,10 +267,73 @@
              </property>
             </widget>
            </item>
-           <item row="3" column="1">
-            <widget class="QLineEdit" name="lineEditExternalEditor">
+           <item row="5" column="1">
+            <widget class="QComboBox" name="comboBoxIconSize">
+             <property name="currentIndex">
+              <number>0</number>
+             </property>
+             <item>
+              <property name="text">
+               <string>Default</string>
+              </property>
+             </item>
+             <item>
+              <property name="text">
+               <string>16x16</string>
+              </property>
+             </item>
+             <item>
+              <property name="text">
+               <string>24x24</string>
+              </property>
+             </item>
+             <item>
+              <property name="text">
+               <string>32x32</string>
+              </property>
+             </item>
+             <item>
+              <property name="text">
+               <string>48x48</string>
+              </property>
+             </item>
+             <item>
+              <property name="text">
+               <string>64x64</string>
+              </property>
+             </item>
+            </widget>
+           </item>
+           <item row="0" column="0">
+            <widget class="QLabel" name="textLabelTypewriterFont">
+             <property name="text">
+              <string>&amp;Fixed width font</string>
+             </property>
+             <property name="wordWrap">
+              <bool>false</bool>
+             </property>
+             <property name="buddy">
+              <cstring>lineEditTypeWriterFont</cstring>
+             </property>
+            </widget>
+           </item>
+           <item row="6" column="1">
+            <widget class="QComboBox" name="comboBoxCodecs">
+             <property name="sizePolicy">
+              <sizepolicy hsizetype="Preferred" vsizetype="Fixed">
+               <horstretch>1</horstretch>
+               <verstretch>0</verstretch>
+              </sizepolicy>
+             </property>
              <property name="toolTip">
-              <string>Set path of the external editor</string>
+              <string>Select text codec to use. You need to refresh the view (F5) after a codec change</string>
+             </property>
+            </widget>
+           </item>
+           <item row="4" column="1">
+            <widget class="QLabel" name="labelEditorHint">
+             <property name="text">
+              <string>Use %1 to denote files to edit.</string>
              </property>
             </widget>
            </item>
@@ -270,22 +350,10 @@
              </property>
             </widget>
            </item>
-           <item row="3" column="2">
-            <widget class="QPushButton" name="pushButtonExtEditor">
-             <property name="maximumSize">
-              <size>
-               <width>40</width>
-               <height>16777215</height>
-              </size>
-             </property>
-             <property name="toolTip">
-              <string>Browse directories</string>
-             </property>
+           <item row="2" column="1">
+            <widget class="QLabel" name="labelDiffHint">
              <property name="text">
-              <string>...</string>
-             </property>
-             <property name="shortcut">
-              <string/>
+              <string>Use %1 and %2 to denote files to diff.</string>
              </property>
             </widget>
            </item>
@@ -308,78 +376,22 @@
              </property>
             </widget>
            </item>
-           <item row="2" column="1">
-            <widget class="QLabel" name="labelDiffHint">
-             <property name="text">
-              <string>Use %1 and %2 to denote files to diff.</string>
-             </property>
-            </widget>
-           </item>
-           <item row="4" column="1">
-            <widget class="QLabel" name="labelEditorHint">
-             <property name="text">
-              <string>Use %1 to denote files to edit.</string>
-             </property>
-            </widget>
-           </item>
-          </layout>
-         </item>
-         <item>
-          <spacer>
-           <property name="orientation">
-            <enum>Qt::Vertical</enum>
-           </property>
-           <property name="sizeHint" stdset="0">
-            <size>
-             <width>20</width>
-             <height>20</height>
-            </size>
-           </property>
-          </spacer>
-         </item>
-         <item>
-          <layout class="QHBoxLayout">
-           <property name="spacing">
-            <number>4</number>
-           </property>
-           <property name="leftMargin">
-            <number>0</number>
-           </property>
-           <property name="topMargin">
-            <number>0</number>
-           </property>
-           <property name="rightMargin">
-            <number>0</number>
-           </property>
-           <property name="bottomMargin">
-            <number>0</number>
-           </property>
-           <item>
-            <widget class="QLabel" name="textLabelCodecs">
-             <property name="toolTip">
-              <string>Select text codec to use. You need to refresh the view (F5) after a codec change</string>
-             </property>
-             <property name="text">
-              <string>Te&amp;xt codec</string>
-             </property>
-             <property name="wordWrap">
-              <bool>false</bool>
-             </property>
-             <property name="buddy">
-              <cstring>comboBoxCodecs</cstring>
-             </property>
-            </widget>
-           </item>
-           <item>
-            <widget class="QComboBox" name="comboBoxCodecs">
-             <property name="sizePolicy">
-              <sizepolicy hsizetype="Preferred" vsizetype="Fixed">
-               <horstretch>1</horstretch>
-               <verstretch>0</verstretch>
-              </sizepolicy>
+           <item row="3" column="2">
+            <widget class="QPushButton" name="pushButtonExtEditor">
+             <property name="maximumSize">
+              <size>
+               <width>40</width>
+               <height>16777215</height>
+              </size>
              </property>
              <property name="toolTip">
-              <string>Select text codec to use. You need to refresh the view (F5) after a codec change</string>
+              <string>Browse directories</string>
+             </property>
+             <property name="text">
+              <string>...</string>
+             </property>
+             <property name="shortcut">
+              <string/>
              </property>
             </widget>
            </item>
@@ -1182,8 +1194,8 @@
    <slot>checkBoxNumbers_toggled(bool)</slot>
    <hints>
     <hint type="sourcelabel">
-     <x>26</x>
-     <y>47</y>
+     <x>46</x>
+     <y>60</y>
     </hint>
     <hint type="destinationlabel">
      <x>20</x>
@@ -1198,8 +1210,8 @@
    <slot>lineEditFormatPatchExtraOptions_textChanged(QString)</slot>
    <hints>
     <hint type="sourcelabel">
-     <x>160</x>
-     <y>301</y>
+     <x>101</x>
+     <y>73</y>
     </hint>
     <hint type="destinationlabel">
      <x>20</x>
@@ -1214,8 +1226,8 @@
    <slot>checkBoxDiffCache_toggled(bool)</slot>
    <hints>
     <hint type="sourcelabel">
-     <x>28</x>
-     <y>49</y>
+     <x>52</x>
+     <y>67</y>
     </hint>
     <hint type="destinationlabel">
      <x>20</x>
@@ -1230,8 +1242,8 @@
    <slot>lineEditExcludePerDir_textChanged(QString)</slot>
    <hints>
     <hint type="sourcelabel">
-     <x>90</x>
-     <y>301</y>
+     <x>96</x>
+     <y>69</y>
     </hint>
     <hint type="destinationlabel">
      <x>20</x>
@@ -1246,8 +1258,8 @@
    <slot>lineEditExcludeFile_textChanged(QString)</slot>
    <hints>
     <hint type="sourcelabel">
-     <x>90</x>
-     <y>277</y>
+     <x>96</x>
+     <y>65</y>
     </hint>
     <hint type="destinationlabel">
      <x>20</x>
@@ -1262,8 +1274,8 @@
    <slot>checkBoxSign_toggled(bool)</slot>
    <hints>
     <hint type="sourcelabel">
-     <x>26</x>
-     <y>69</y>
+     <x>46</x>
+     <y>62</y>
     </hint>
     <hint type="destinationlabel">
      <x>20</x>
@@ -1278,8 +1290,8 @@
    <slot>lineEditTemplate_textChanged(QString)</slot>
    <hints>
     <hint type="sourcelabel">
-     <x>91</x>
-     <y>277</y>
+     <x>96</x>
+     <y>67</y>
     </hint>
     <hint type="destinationlabel">
      <x>20</x>
@@ -1294,8 +1306,8 @@
    <slot>lineEditCommitExtraOptions_textChanged(QString)</slot>
    <hints>
     <hint type="sourcelabel">
-     <x>91</x>
-     <y>301</y>
+     <x>96</x>
+     <y>70</y>
     </hint>
     <hint type="destinationlabel">
      <x>20</x>
@@ -1310,8 +1322,8 @@
    <slot>checkBoxRelativeDate_toggled(bool)</slot>
    <hints>
     <hint type="sourcelabel">
-     <x>33</x>
-     <y>54</y>
+     <x>55</x>
+     <y>82</y>
     </hint>
     <hint type="destinationlabel">
      <x>20</x>
@@ -1326,8 +1338,8 @@
    <slot>checkBoxRangeSelectDialog_toggled(bool)</slot>
    <hints>
     <hint type="sourcelabel">
-     <x>33</x>
-     <y>78</y>
+     <x>77</x>
+     <y>150</y>
     </hint>
     <hint type="destinationlabel">
      <x>20</x>
@@ -1342,8 +1354,8 @@
    <slot>checkBoxReopenLastRepo_toggled(bool)</slot>
    <hints>
     <hint type="sourcelabel">
-     <x>33</x>
-     <y>102</y>
+     <x>77</x>
+     <y>192</y>
     </hint>
     <hint type="destinationlabel">
      <x>20</x>
@@ -1358,8 +1370,24 @@
    <slot>checkBoxOpenInEditor_toggled(bool)</slot>
    <hints>
     <hint type="sourcelabel">
-     <x>33</x>
-     <y>102</y>
+     <x>77</x>
+     <y>234</y>
+    </hint>
+    <hint type="destinationlabel">
+     <x>20</x>
+     <y>20</y>
+    </hint>
+   </hints>
+  </connection>
+  <connection>
+   <sender>comboBoxIconSize</sender>
+   <signal>activated(int)</signal>
+   <receiver>settingsBase</receiver>
+   <slot>comboBoxIconSize_activated(int)</slot>
+   <hints>
+    <hint type="sourcelabel">
+     <x>434</x>
+     <y>736</y>
     </hint>
     <hint type="destinationlabel">
      <x>20</x>
@@ -1374,8 +1402,8 @@
    <slot>comboBoxCodecs_activated(int)</slot>
    <hints>
     <hint type="sourcelabel">
-     <x>112</x>
-     <y>320</y>
+     <x>434</x>
+     <y>736</y>
     </hint>
     <hint type="destinationlabel">
      <x>20</x>
@@ -1390,8 +1418,8 @@
    <slot>checkBoxCommitVerify_toggled(bool)</slot>
    <hints>
     <hint type="sourcelabel">
-     <x>28</x>
-     <y>71</y>
+     <x>52</x>
+     <y>68</y>
     </hint>
     <hint type="destinationlabel">
      <x>20</x>
@@ -1406,8 +1434,8 @@
    <slot>checkBoxCommitSign_toggled(bool)</slot>
    <hints>
     <hint type="sourcelabel">
-     <x>28</x>
-     <y>49</y>
+     <x>52</x>
+     <y>67</y>
     </hint>
     <hint type="destinationlabel">
      <x>20</x>
@@ -1422,8 +1450,8 @@
    <slot>checkBoxCommitUseDefMsg_toggled(bool)</slot>
    <hints>
     <hint type="sourcelabel">
-     <x>47</x>
-     <y>101</y>
+     <x>81</x>
+     <y>68</y>
     </hint>
     <hint type="destinationlabel">
      <x>20</x>
@@ -1438,8 +1466,8 @@
    <slot>checkBoxCommitSign_toggled(bool)</slot>
    <hints>
     <hint type="sourcelabel">
-     <x>28</x>
-     <y>49</y>
+     <x>52</x>
+     <y>67</y>
     </hint>
     <hint type="destinationlabel">
      <x>20</x>
@@ -1454,8 +1482,8 @@
    <slot>lineEditExternalDiffViewer_textChanged(QString)</slot>
    <hints>
     <hint type="sourcelabel">
-     <x>175</x>
-     <y>227</y>
+     <x>497</x>
+     <y>484</y>
     </hint>
     <hint type="destinationlabel">
      <x>20</x>
@@ -1470,8 +1498,8 @@
    <slot>lineEditExternalEditor_textChanged(QString)</slot>
    <hints>
     <hint type="sourcelabel">
-     <x>175</x>
-     <y>227</y>
+     <x>497</x>
+     <y>573</y>
     </hint>
     <hint type="destinationlabel">
      <x>20</x>
@@ -1486,8 +1514,8 @@
    <slot>pushButtonExtDiff_clicked()</slot>
    <hints>
     <hint type="sourcelabel">
-     <x>487</x>
-     <y>230</y>
+     <x>1146</x>
+     <y>485</y>
     </hint>
     <hint type="destinationlabel">
      <x>20</x>
@@ -1502,8 +1530,8 @@
    <slot>pushButtonExtEditor_clicked()</slot>
    <hints>
     <hint type="sourcelabel">
-     <x>468</x>
-     <y>250</y>
+     <x>1146</x>
+     <y>574</y>
     </hint>
     <hint type="destinationlabel">
      <x>256</x>
@@ -1518,8 +1546,8 @@
    <slot>pushButtonFont_clicked()</slot>
    <hints>
     <hint type="sourcelabel">
-     <x>487</x>
-     <y>201</y>
+     <x>1146</x>
+     <y>436</y>
     </hint>
     <hint type="destinationlabel">
      <x>20</x>
@@ -1534,8 +1562,8 @@
    <slot>comboBoxUserSrc_activated(int)</slot>
    <hints>
     <hint type="sourcelabel">
-     <x>440</x>
-     <y>206</y>
+     <x>96</x>
+     <y>67</y>
     </hint>
     <hint type="destinationlabel">
      <x>256</x>
@@ -1550,8 +1578,8 @@
    <slot>checkBoxMsgOnNewSHA_toggled(bool)</slot>
    <hints>
     <hint type="sourcelabel">
-     <x>45</x>
-     <y>91</y>
+     <x>75</x>
+     <y>68</y>
     </hint>
     <hint type="destinationlabel">
      <x>225</x>
@@ -1566,8 +1594,8 @@
    <slot>checkBoxLogDiffTab_toggled(bool)</slot>
    <hints>
     <hint type="sourcelabel">
-     <x>45</x>
-     <y>47</y>
+     <x>65</x>
+     <y>65</y>
     </hint>
     <hint type="destinationlabel">
      <x>225</x>
@@ -1582,8 +1610,8 @@
    <slot>checkBoxSmartLabels_toggled(bool)</slot>
    <hints>
     <hint type="sourcelabel">
-     <x>45</x>
-     <y>69</y>
+     <x>65</x>
+     <y>67</y>
     </hint>
     <hint type="destinationlabel">
      <x>225</x>
@@ -1598,8 +1626,8 @@
    <slot>lineEditApplyPatchExtraOptions_textChanged(QString)</slot>
    <hints>
     <hint type="sourcelabel">
-     <x>160</x>
-     <y>275</y>
+     <x>101</x>
+     <y>69</y>
     </hint>
     <hint type="destinationlabel">
      <x>221</x>
@@ -1614,8 +1642,8 @@
    <slot>comboBoxGitConfigSource_activated(int)</slot>
    <hints>
     <hint type="sourcelabel">
-     <x>463</x>
-     <y>54</y>
+     <x>101</x>
+     <y>61</y>
     </hint>
     <hint type="destinationlabel">
      <x>159</x>
@@ -1630,8 +1658,8 @@
    <slot>treeWidgetGitConfig_itemChanged(QTreeWidgetItem*, int)</slot>
    <hints>
     <hint type="sourcelabel">
-     <x>236</x>
-     <y>172</y>
+     <x>102</x>
+     <y>74</y>
     </hint>
     <hint type="destinationlabel">
      <x>147</x>
@@ -1646,8 +1674,8 @@
    <slot>accept()</slot>
    <hints>
     <hint type="sourcelabel">
-     <x>256</x>
-     <y>451</y>
+     <x>268</x>
+     <y>801</y>
     </hint>
     <hint type="destinationlabel">
      <x>256</x>

@@ -77,6 +77,8 @@ SettingsImpl::SettingsImpl(QWidget* p, Git* g, int defTab) : QDialog(p), git(g) 
     lineEditTypeWriterFont->setText(TYPE_WRITER_FONT.toString());
     lineEditTypeWriterFont->setCursorPosition(0); // font description could be long
 
+    comboBoxIconSize->setCurrentIndex(set.value(ICON_SIZE_INDEX, 0).toInt());
+
     setupCodecsCombo();
     checkBoxDiffCache_toggled(checkBoxDiffCache->isChecked());
     tabDialog->setCurrentIndex(defTab);
@@ -214,6 +216,11 @@ void SettingsImpl::setupCodecsCombo() {
     comboBoxCodecs->setCurrentIndex(idx);
     if (idx == 0) // signal activated() will not fire in this case
         comboBoxCodecs_activated(0);
+}
+
+void SettingsImpl::comboBoxIconSize_activated(int i) {
+
+    writeSetting(ICON_SIZE_INDEX, i);
 }
 
 void SettingsImpl::comboBoxCodecs_activated(int idx) {
