@@ -71,9 +71,9 @@ Product {
             "consoleimpl.cpp",
             "consoleimpl.h",
             "console.ui",
+            "customaction.ui",
             "customactionimpl.cpp",
             "customactionimpl.h",
-            "customaction.ui",
             "fileview.cpp",
             "fileview.h",
             "fileview.ui",
@@ -94,6 +94,7 @@ Product {
             "settingsimpl.cpp",
             "settingsimpl.h",
             "settings.ui",
+            "tabwidget.h",
         ]
     }
 

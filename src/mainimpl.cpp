@@ -116,10 +116,10 @@ MainImpl::MainImpl(const QString& cd, QWidget* p) : QMainWindow(p) {
     tabWdg->addTab(rv->tabPage(), "&Rev list");
 
 	// hide close button for rev list tab
-	QTabBar* const tabBar = tabWdg->tabBar();
-	tabBar->setTabButton(0, QTabBar::RightSide, NULL);
-	tabBar->setTabButton(0, QTabBar::LeftSide, NULL);
-	connect(tabWdg, SIGNAL(tabCloseRequested(int)), SLOT(tabBar_tabCloseRequested(int)));
+    QTabBar* const tabBar = tabWdg->tabBar();
+    tabBar->setTabButton(0, QTabBar::RightSide, NULL);
+    tabBar->setTabButton(0, QTabBar::LeftSide, NULL);
+    chk_connect_a(tabWdg, SIGNAL(tabCloseRequested(int)), this, SLOT(tabBar_tabCloseRequested(int)));
 
     // set-up file names loading progress bar
     pbFileNamesLoading = new QProgressBar(statusBar());

@@ -61,7 +61,7 @@
         </property>
        </column>
       </widget>
-      <widget class="QTabWidget" name="tabWdg">
+      <widget class="TabWidget" name="tabWdg">
        <property name="tabsClosable">
         <bool>true</bool>
        </property>
@@ -879,6 +879,11 @@
    <class>TreeView</class>
    <extends>QTreeWidget</extends>
    <header>treeview.h</header>
+  </customwidget>
+  <customwidget>
+   <class>TabWidget</class>
+   <extends>QTabWidget</extends>
+   <header>tabwidget.h</header>
   </customwidget>
  </customwidgets>
  <resources>
