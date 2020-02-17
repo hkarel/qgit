@@ -62,7 +62,6 @@ signals:
     void closeAllWindows();
     void closeAllTabs();
     void changeFont(const QFont&);
-    void closeTabButtonEnabled(bool);
     void typeWriterFontChanged();
     void flagChanged(uint);
 
@@ -96,7 +95,7 @@ protected slots:
     void changesCommitted(bool);
     void lineEditSHA_returnPressed();
     void lineEditFilter_returnPressed();
-    void pushButtonCloseTab_clicked();
+	void tabBar_tabCloseRequested(int index);
     void ActBack_activated();
     void ActForward_activated();
     void ActFind_activated();
@@ -148,6 +147,7 @@ private:
     void updateRevVariables(const QString& sha);
     void setupShortcuts();
     int currentTabType(Domain** t);
+	int tabType(Domain** t, int index);
     void filterList(bool isOn, bool onlyHighlight);
     bool isMatch(const QString& sha, const QString& f, int cn, const QMap<QString,bool>& sm);
     void highlightAbbrevSha(const QString& abbrevSha);
@@ -188,6 +188,7 @@ private:
     // we are sure is correct.
     QString curDir;
     QString startUpDir;
+	QString startUpFile;
     QString textToFind;
     QRegExp shortLogRE;
     QRegExp longLogRE;

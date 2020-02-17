@@ -62,6 +62,9 @@
        </column>
       </widget>
       <widget class="QTabWidget" name="tabWdg">
+       <property name="tabsClosable">
+        <bool>true</bool>
+       </property>
        <widget class="QWidget" name="TabWdg">
         <attribute name="title">
          <string>Tab&amp;Wdg</string>
@@ -864,6 +867,9 @@
    </property>
    <property name="toolTip">
     <string>Checkout selected revision</string>
+   </property>
+   <property name="shortcut">
+    <string>Ctrl+Shift+C</string>
    </property>
   </action>
  </widget>

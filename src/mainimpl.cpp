@@ -115,14 +115,11 @@ MainImpl::MainImpl(const QString& cd, QWidget* p) : QMainWindow(p) {
     rv = new RevsView(this, git, true); // set has main domain
     tabWdg->addTab(rv->tabPage(), "&Rev list");
 
-    // set-up tab corner widget ('close tab' button)
-    QToolButton* ct = new QToolButton(tabWdg);
-    ct->setIcon(QIcon(QString::fromUtf8(":/icons/resources/tab_remove.png")));
-    ct->setToolTip("Close tab");
-    ct->setEnabled(false);
-    tabWdg->setCornerWidget(ct);
-    chk_connect_a(ct, SIGNAL(clicked()), this, SLOT(pushButtonCloseTab_clicked()));
-    chk_connect_a(this, SIGNAL(closeTabButtonEnabled(bool)), ct, SLOT(setEnabled(bool)));
+	// hide close button for rev list tab
+	QTabBar* const tabBar = tabWdg->tabBar();
+	tabBar->setTabButton(0, QTabBar::RightSide, NULL);
+	tabBar->setTabButton(0, QTabBar::LeftSide, NULL);
+	connect(tabWdg, SIGNAL(tabCloseRequested(int)), SLOT(tabBar_tabCloseRequested(int)));
 
     // set-up file names loading progress bar
     pbFileNamesLoading = new QProgressBar(statusBar());
@@ -186,6 +183,21 @@ MainImpl::MainImpl(const QString& cd, QWidget* p) : QMainWindow(p) {
         startUpDir = (cd.isEmpty() ? QDir::current().absolutePath() : cd);
     }
 
+	// handle --view-file=* or --view-file * argument
+	QStringList arglist = qApp->arguments();
+	// Remove first argument which is the path of the current executable
+	arglist.removeFirst();
+	bool retainNext = false;
+	foreach (QString arg, arglist) {
+		if (retainNext) {
+			retainNext = false;
+			startUpFile = arg;
+		} else if (arg == "--view-file")
+			retainNext = true;
+		else if (arg.startsWith("--view-file="))
+			startUpFile = arg.mid(12);
+	}
+
     // MainImpl c'tor is called before to enter event loop,
     // but some stuff requires event loop to init properly
     QTimer::singleShot(10, this, SLOT(initWithEventLoopActive()));
@@ -196,6 +208,14 @@ void MainImpl::initWithEventLoopActive() {
     git->checkEnvironment();
     setRepository(startUpDir);
     startUpDir = ""; // one shot
+
+	// handle --view-file=* or --view-file * argument
+	if (!startUpFile.isEmpty()) {
+		rv->st.setSha("HEAD");
+		rv->st.setFileName(startUpFile);
+		openFileTab();
+		startUpFile = QString(); // one shot
+	}
 }
 
 void MainImpl::saveCurrentGeometry() {
@@ -590,10 +610,10 @@ void MainImpl::treeView_doubleClicked(QTreeWidgetItem* item, int) {
     }
 }
 
-void MainImpl::pushButtonCloseTab_clicked() {
+void MainImpl::tabBar_tabCloseRequested(int index) {
 
     Domain* t;
-    switch (currentTabType(&t)) {
+	switch (tabType(&t, index)) {
     case TAB_REV:
         break;
     case TAB_PATCH:
@@ -605,7 +625,7 @@ void MainImpl::pushButtonCloseTab_clicked() {
         ActViewFileNewTab->setEnabled(ActViewFile->isEnabled() && firstTab<FileView>());
         break;
     default:
-        dbs("ASSERT in pushButtonCloseTab_clicked: unknown current page");
+		dbs("ASSERT in tabBar_tabCloseRequested: unknown current page");
         break;
     }
 }
@@ -1003,8 +1023,13 @@ bool MainImpl::event(QEvent* e) {
 
 int MainImpl::currentTabType(Domain** t) {
 
+	return tabType(t, tabWdg->currentIndex());
+}
+
+int MainImpl::tabType(Domain** t, int index) {
+
     *t = NULL;
-    QWidget* curPage = tabWdg->currentWidget();
+	QWidget* curPage = tabWdg->widget(index);
     if (curPage == rv->tabPage()) {
         *t = rv;
         return TAB_REV;
@@ -1075,15 +1100,12 @@ void MainImpl::tabWdg_currentChanged(int w) {
     switch (currentTabType(&t)) {
     case TAB_REV:
         static_cast<RevsView*>(t)->tab()->listViewLog->setFocus();
-        emit closeTabButtonEnabled(false);
         break;
     case TAB_PATCH:
         static_cast<PatchView*>(t)->tab()->textEditDiff->setFocus();
-        emit closeTabButtonEnabled(true);
         break;
     case TAB_FILE:
         static_cast<FileView*>(t)->tab()->histListView->setFocus();
-        emit closeTabButtonEnabled(true);
         break;
     default:
         dbs("ASSERT in tabWdg_currentChanged: unknown current page");
@@ -2161,7 +2183,7 @@ void MainImpl::ActAbout_activated() {
     static const char* aboutMsg =
     "<p><b>QGit version " PACKAGE_VERSION "</b></p>"
 	"<p>Copyright (c) 2005, 2007, 2008 Marco Costalba<br>"
-	"Copyright (c) 2011-2018 <a href='mailto:tibirna@kde.org'>Cristian Tibirna</a></p>"
+	"Copyright (c) 2011-2019 <a href='mailto:tibirna@kde.org'>Cristian Tibirna</a></p>"
     "<p>Use and redistribute under the terms of the<br>"
     "<a href=\"http://www.gnu.org/licenses/old-licenses/gpl-2.0.html\">GNU General Public License Version 2</a></p>"
     "<p>Contributors:<br>"
@@ -2195,6 +2217,9 @@ void MainImpl::ActAbout_activated() {
 	"<nobr>2016-2018 <a href='mailto:rhaschke@techfak.uni-bielefeld.de'>Robert Haschke</a>,</nobr> "
 	"<nobr>2018 <a href='mailto:filipe.rinaldi@gmail.com'>Filipe Rinaldi</a>,</nobr> "
 	"<nobr>2018 <a href='mailto:balbusm@gmail.com'>Mateusz Balbus</a>,</nobr> "
+	"<nobr>2019 <a href='mailto:sebastian@pipping.org'>Sebastian Pipping</a>,</nobr> "
+	"<nobr>2019 <a href='mailto:mvf@gmx.eu'>Matthias von Faber</a>,</nobr> "
+	"<nobr>2019 <a href='mailto:Kevin@tigcc.ticalc.org'>Kevin Kofler</a></nobr> "
 
 	"</p>"
 
