@@ -869,7 +869,7 @@
     <string>Checkout selected revision</string>
    </property>
    <property name="shortcut">
-    <string>Ctrl+Shift+C</string>
+    <string>Ctrl+C</string>
    </property>
   </action>
  </widget>
