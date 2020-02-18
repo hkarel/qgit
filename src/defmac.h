@@ -49,59 +49,37 @@
     ClassName & operator = ( const ClassName & ) = delete;
 
 
-/**
-  The chk_connect macro is used to check the result returned by the function
-  QObject::connect() in debug mode, it looks like on assert() function.
-  However, in the release mode, unlike the assert() function - test expression
-  is not removed.
-  To use the macro in the code need include <assert.h>
-*/
 #ifndef NDEBUG
+#define QCONNECT_ASSERT(COND_) Q_ASSERT(COND_)
+#else
+#define QCONNECT_ASSERT(COND_) COND_
+#endif
+
+/**
+  The chk_connect macro is used to check result returned by the function
+  QObject::connect() in debug mode,  it looks like on assert() function.
+  However, in the release mode, unlike assert() function, test expression
+  is not removed.
+*/
 #define chk_connect(SOURCE_, SIGNAL_, DEST_, SLOT_, CONNECT_TYPE_) \
-            Q_ASSERT(QObject::connect(SOURCE_, SIGNAL_, DEST_, SLOT_, CONNECT_TYPE_));
+    QCONNECT_ASSERT(QObject::connect(SOURCE_, SIGNAL_, DEST_, SLOT_, CONNECT_TYPE_));
 
-// It corresponds to the connection Qt::AutoConnection
 #define chk_connect_a(SOURCE_, SIGNAL_, DEST_, SLOT_) \
-            Q_ASSERT(QObject::connect(SOURCE_, SIGNAL_, DEST_, SLOT_, \
-                        Qt::ConnectionType(Qt::AutoConnection | Qt::UniqueConnection)));
+    QCONNECT_ASSERT(QObject::connect(SOURCE_, SIGNAL_, DEST_, SLOT_, \
+    Qt::ConnectionType(Qt::AutoConnection | Qt::UniqueConnection)));
 
-// It corresponds to the connection Qt::DirectConnection
 #define chk_connect_d(SOURCE_, SIGNAL_, DEST_, SLOT_) \
-            Q_ASSERT(QObject::connect(SOURCE_, SIGNAL_, DEST_, SLOT_, \
-                        Qt::ConnectionType(Qt::DirectConnection | Qt::UniqueConnection)));
+    QCONNECT_ASSERT(QObject::connect(SOURCE_, SIGNAL_, DEST_, SLOT_, \
+    Qt::ConnectionType(Qt::DirectConnection | Qt::UniqueConnection)));
 
-// It corresponds to the connection Qt::QueuedConnection
 #define chk_connect_q(SOURCE_, SIGNAL_, DEST_, SLOT_) \
-            Q_ASSERT(QObject::connect(SOURCE_, SIGNAL_, DEST_, SLOT_, \
-                        Qt::ConnectionType(Qt::QueuedConnection | Qt::UniqueConnection)));
+    QCONNECT_ASSERT(QObject::connect(SOURCE_, SIGNAL_, DEST_, SLOT_, \
+    Qt::ConnectionType(Qt::QueuedConnection | Qt::UniqueConnection)));
 
-// It corresponds to the connection Qt::BlockingQueuedConnection
 #define chk_connect_bq(SOURCE_, SIGNAL_, DEST_, SLOT_) \
-            Q_ASSERT(QObject::connect(SOURCE_, SIGNAL_, DEST_, SLOT_, \
-                        Qt::ConnectionType(Qt::BlockingQueuedConnection | Qt::UniqueConnection)));
+    QCONNECT_ASSERT(QObject::connect(SOURCE_, SIGNAL_, DEST_, SLOT_, \
+    Qt::ConnectionType(Qt::BlockingQueuedConnection | Qt::UniqueConnection)));
 
-#else //NDEBUG
-#define chk_connect(SOURCE_, SIGNAL_, DEST_, SLOT_, CONNECT_TYPE_) \
-            QObject::connect(SOURCE_, SIGNAL_, DEST_, SLOT_, CONNECT_TYPE_);
-
-// It corresponds to the connection Qt::AutoConnection
-#define chk_connect_a(SOURCE_, SIGNAL_, DEST_, SLOT_) \
-            QObject::connect(SOURCE_, SIGNAL_, DEST_, SLOT_, \
-                Qt::ConnectionType(Qt::AutoConnection | Qt::UniqueConnection));
-
-// It corresponds to the connection Qt::DirectConnection
-#define chk_connect_d(SOURCE_, SIGNAL_, DEST_, SLOT_) \
-            QObject::connect(SOURCE_, SIGNAL_, DEST_, SLOT_, \
-                Qt::ConnectionType(Qt::DirectConnection | Qt::UniqueConnection));
-
-// It corresponds to the connection Qt::QueuedConnection
-#define chk_connect_q(SOURCE_, SIGNAL_, DEST_, SLOT_) \
-            QObject::connect(SOURCE_, SIGNAL_, DEST_, SLOT_, \
-                Qt::ConnectionType(Qt::QueuedConnection | Qt::UniqueConnection));
-
-// It corresponds to the connection Qt::BlockingQueuedConnection
-#define chk_connect_bq(SOURCE_, SIGNAL_, DEST_, SLOT_) \
-            QObject::connect(SOURCE_, SIGNAL_, DEST_, SLOT_, \
-                Qt::ConnectionType(Qt::BlockingQueuedConnection | Qt::UniqueConnection));
-
-#endif //NDEBUG
+#if defined(__MINGW32__) || defined(__MINGW64__)
+#define MINGW
+#endif
