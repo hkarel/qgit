@@ -1,10 +1,10 @@
 import qbs
-import QbsFunctions
 
 Product {
+    targetName: "qgit"
+
     type: "application"
     destinationDirectory: "./bin"
-    targetName: "qgit"
 
     Depends { name: "cpp" }
     Depends { name: "Qt"; submodules: ["core"] }
@@ -16,6 +16,8 @@ Product {
         name: "Qt.widgets";
         condition: Qt.core.versionMajor >= 5
     }
+
+    cpp.defines: project.cppDefines
 
     cpp.cxxFlags: {
         var cxx = [
@@ -153,8 +155,10 @@ Product {
         "qgit.cpp",
     ]
 
-    //property var test: {
-    //    console.info("=== Qt.core.version ===");
-    //    console.info(Qt.core.version);
-    //}
+//    property var test: {
+//        console.info("=== Qt.core.version ===");
+//        console.info(Qt.core.version);
+//        console.info("=== VERSION_PROJECT ===");
+//        console.info(project.projectVersion[0]);
+//    }
 }

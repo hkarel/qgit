@@ -2200,7 +2200,7 @@ void MainImpl::ActMarkDiffToSha_activated()
 void MainImpl::ActAbout_activated() {
 
     static const char* aboutMsg =
-    "<p><b>QGit version " PACKAGE_VERSION "</b></p>"
+    "<p><b>QGit version " VERSION_PROJECT " (Gitrev:&nbsp;" GIT_REVISION ") </b></p>"
 	"<p>Copyright (c) 2005, 2007, 2008 Marco Costalba<br>"
 	"Copyright (c) 2011-2019 <a href='mailto:tibirna@kde.org'>Cristian Tibirna</a></p>"
     "<p>Use and redistribute under the terms of the<br>"
@@ -2239,10 +2239,9 @@ void MainImpl::ActAbout_activated() {
 	"<nobr>2019 <a href='mailto:sebastian@pipping.org'>Sebastian Pipping</a>,</nobr> "
 	"<nobr>2019 <a href='mailto:mvf@gmx.eu'>Matthias von Faber</a>,</nobr> "
 	"<nobr>2019 <a href='mailto:Kevin@tigcc.ticalc.org'>Kevin Kofler</a></nobr> "
-
 	"</p>"
-
     "<p>This version was compiled against Qt " QT_VERSION_STR "</p>";
+
     QMessageBox::about(this, "About QGit", QString::fromLatin1(aboutMsg));
 }
 
