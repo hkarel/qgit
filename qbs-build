@@ -1,0 +1,183 @@
+#!/bin/bash
+
+set -u
+
+jobs=$(nproc)
+mem_size=$(free -m | sed '2!d' | sed 's/  */ /g' | cut -d' ' -f2)
+[ "$mem_size" -lt 2100 ] && jobs=4
+echo "jobs: $jobs"
+
+rebuild=
+print_help=
+build_mode=release
+need_packages=
+
+#build_products=
+build_deb_package=
+
+install_qgit=
+remove_qgit=
+
+# Directory of this script
+script_dir=$(dirname $(readlink -f $0))
+echo "script_dir: $script_dir"
+
+# Defining host parameters
+if [ ! -e $script_dir/setup/os_detect ]; then
+    echo "Error: os_detect script not found"
+    exit 1
+fi
+. $script_dir/setup/os_detect
+
+
+function display_help()
+{
+cat << EOF
+Usage: ${0##*/} [OPTION]
+  -h   display this help and exit
+  -r   full rebuild of project
+  -d   build in 'debug' mode
+  -D   build deb packages
+  -i   install qgit
+  -R   remove installation qgit and exit
+
+EOF
+}
+
+# Positional parameter processing:
+#    http://wiki.bash-hackers.org/scripting/posparams
+while test -n ${1:-""}
+do
+    case "$1" in
+        -h)
+            print_help=yes
+            shift
+            ;;
+        -r)
+            rebuild=yes
+            shift
+            ;;
+        -d)
+            build_mode=debug
+            shift
+            ;;
+        -D)
+            build_deb_package=yes
+            shift
+            ;;
+        -i)
+            install_qgit=yes
+            shift
+            ;;
+        -R)
+            remove_qgit=yes
+            shift
+            ;;
+
+        -*)
+            echo "Error: Unknown option: $1" >&2
+            exit 1
+            ;;
+        *)  # No more options
+            break
+            ;;
+    esac
+done
+
+if [ "$print_help" = "yes" ]; then
+    display_help
+    exit 0
+fi
+
+if [ "$remove_qgit" = "yes" ]; then
+    echo -e "\nRemove QGit..."
+
+    set +e
+    res=$(dpkg -l | grep -P '^ii\s+qgit ')
+    set -e
+    if [ -z "$res" ]; then
+        echo "Nothing to remove, QGit... not installed"
+    else
+        sudo dpkg -r qgit
+        echo "QGit... was removed"
+    fi
+fi
+[ "$remove_qgit" = "yes" ] && exit 0;
+
+function check_need_package()
+{
+    dpkg -s $1 &> /dev/null
+    [ "$?" -ne 0 ] && need_packages="$need_packages $1"
+}
+
+need_packages=
+check_need_package 'qt4-default'
+
+if [ "$build_deb_package" = "yes" -o "$install_qgit" = "yes" ]; then
+    # Required packages
+    check_need_package 'fakeroot'
+    check_need_package 'md5deep'
+    check_need_package 'debconf'
+    check_need_package 'debhelper'
+    check_need_package 'lintian'
+
+    if [ "$os_id" = "ubuntu" -a "$os_ver" \> "15.10" ]; then
+        check_need_package 'hashdeep'
+    fi
+fi
+
+if [ -n "$need_packages" ]; then
+    echo "Error: Need to install packages:$need_packages"
+    echo "    Use: sudo apt-get install $need_packages"
+    exit 1
+fi
+
+if [ ! -x /usr/bin/md5deep ]; then
+    if [ ! -L /usr/local/bin/md5deep ]; then
+        echo "Need create symlink for md5deep"
+        sudo ln -sf /usr/bin/hashdeep /usr/local/bin/md5deep
+    fi
+fi
+
+git_branch=$(git status -b -s | head -n1 | sed 's/\./ /' | cut -d' ' -f2 | sed 's/\//_/g')
+build_subdir=${build_mode}-${git_branch}
+build_dir=./build/$build_subdir
+
+[ "$rebuild" = "yes"  ] && rm -rf $build_dir
+
+set -e
+qbs build \
+    --file qgit.qbs \
+    --build-directory ./build \
+    --command-echo-mode command-line \
+    --jobs $jobs \
+    --no-install \
+    qbs.buildVariant:$build_mode \
+    config:$build_subdir \
+    profile:qgit
+
+not_exit=
+if [ "$build_deb_package" = "yes" -o "$install_qgit" = "yes" ]; then
+    not_exit=yes
+fi
+[ "$not_exit" != "yes" ] && exit 0
+
+#
+# Creating a deb-package
+#
+package_vers=$(head -n1 VERSION)
+echo "package_vers: $package_vers"
+
+#package_date=$(date +%Y%m%d%H%M)
+package_date=$(date +%Y%m%d)
+echo "package_date: $package_date"
+
+gitrev=$(git log -1 --pretty=%h)
+echo "gitrev: $gitrev"
+
+#
+# Build a deb-package for QGit
+#
+if [ "$build_deb_package" = "yes" -o "$install_qgit" = "yes" ]; then
+    . $script_dir/setup/deb-qgit
+fi
