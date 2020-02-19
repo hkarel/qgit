@@ -5,6 +5,7 @@ Makefile*
 *~
 bin
 build
+packages
 *kde*
 Doxy*
 qgit4.tag

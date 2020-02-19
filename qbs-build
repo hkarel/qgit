@@ -175,9 +175,99 @@ echo "package_date: $package_date"
 gitrev=$(git log -1 --pretty=%h)
 echo "gitrev: $gitrev"
 
-#
-# Build a deb-package for QGit
-#
-if [ "$build_deb_package" = "yes" -o "$install_qgit" = "yes" ]; then
-    . $script_dir/setup/deb-qgit
+if [ "$build_deb_package" != "yes" -a "$install_qgit" != "yes" ]; then
+    exit 0
 fi
+
+#
+# Generating deb-package
+#
+package_dir=$script_dir/build/${build_subdir}/deb/qgit
+echo -e "\npackage_dir: $package_dir"
+
+#package_name="qgit-${package_vers}-${package_date}git${gitrev}-${os_id}${os_ver}-${os_arch}.deb"
+package_name="qgit-${package_vers}-${package_date}git${gitrev}-${os_arch}.deb"
+echo "package_name: $package_name"
+
+rm -rf $package_dir
+
+mkdir -p $package_dir/DEBIAN
+mkdir -p $package_dir/usr/bin
+mkdir -p $package_dir/usr/share/applications
+mkdir -p $package_dir/usr/share/icons/hicolor/48x48/apps
+
+cp $script_dir/setup/deb/qgit/DEBIAN/*           $package_dir/DEBIAN
+cp $script_dir/qgit.desktop                      $package_dir/usr/share/applications
+cp $script_dir/src/resources/qgit.png            $package_dir/usr/share/icons/hicolor/48x48/apps
+cp $build_dir/bin/qgit                           $package_dir/usr/bin
+
+chmod -R go-w        $package_dir
+chmod    u=rwx,go=rx $package_dir/DEBIAN/post*
+#chmod   u=rwx,go=rx $package_dir/DEBIAN/pre*
+chmod    u=rwx,go=rx $package_dir//usr/bin/qgit
+
+# if [ "$build_mode" = "release" ]; then
+#     set +e
+#     echo "Removing debug info ... "
+#     for f in $(find $package_dir/opt/aisexpert/lib -type f); do strip_debug_info $f; done
+#     for f in $(find $package_dir/opt/aisexpert/bin -type f); do strip_debug_info $f; done
+#     set -e
+# fi
+
+# Packet size
+installed_size=$(du -s $package_dir | sed -r 's/([0-9]+).*/\1/')
+echo "installed_size: $installed_size"
+
+packet_depends=$(cat << EOS
+    libc6, libstdc++6, libqtcore4, libqtgui4, git
+EOS
+)
+
+os_arch_control=$os_arch
+[ "${os_arch:0:3}" = "arm" ] && os_arch_control=armhf
+sed -e "s/%VERSION%/${package_vers}-${package_date}git${gitrev}/" \
+    -e "s/%ARCHITECTURE%/${os_arch_control}/" \
+    -e "s/%INSTALLED_SIZE%/${installed_size}/" \
+    -e "s/%DEPENDS%/${packet_depends}/" \
+    -i $package_dir/DEBIAN/control
+
+# Deb-package checksums
+cd $package_dir
+md5deep -rl -o f usr >> DEBIAN/md5sums
+chmod  0644 DEBIAN/md5sums
+cd $script_dir
+
+# Creating deb-package
+fakeroot dpkg-deb --build $package_dir ${build_dir}/$package_name
+
+# Check deb-package
+echo "Start 'lintian'"
+set +e
+lintian --suppress-tags \
+hardening-no-relro,\
+binary-or-shlib-defines-rpath,\
+dir-or-file-in-opt,\
+bad-package-name,\
+package-not-lowercase,\
+systemd-service-file-outside-lib,\
+maintainer-script-calls-systemctl,\
+file-in-etc-not-marked-as-conffile,\
+maintainer-script-ignores-errors,\
+maintainer-script-empty,\
+file-in-unusual-dir \
+${build_dir}/$package_name
+set -e
+
+if [ "$build_deb_package" = "yes" ]; then
+    cd $script_dir
+    mkdir -p packages
+    echo "Copying the file $package_name to directory ./packages"
+    cp -f ${build_dir}/$package_name ./packages
+fi
+
+if [ "$install_qgit" = "yes" ]; then
+    echo "Install QGit..."
+    sudo dpkg -i ${build_dir}/$package_name
+    echo "QGit installation is complete"
+fi
+
