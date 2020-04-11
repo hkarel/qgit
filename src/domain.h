@@ -34,6 +34,7 @@ private:
 class StateInfo {
 public:
     StateInfo() { clear(); }
+    StateInfo(const StateInfo&) = default;
     StateInfo& operator=(const StateInfo& newState);
     bool operator==(const StateInfo& newState) const;
     bool operator!=(const StateInfo& newState) const;
@@ -82,6 +83,7 @@ private:
     class S {
     public:
         S() { clear(); }
+        S(const S&) = default;
         void clear();
         bool operator==(const S& newState) const;
         bool operator!=(const S& newState) const;
@@ -118,7 +120,7 @@ public:
     StateInfo st;
 
 signals:
-    void updateRequested(StateInfo newSt);
+    void updateRequested(const StateInfo& newSt);
     void cancelDomainProcesses();
 
 public slots:
@@ -126,7 +128,7 @@ public slots:
 
 protected slots:
     virtual void on_contextMenu(const QString&, int);
-    void on_updateRequested(StateInfo newSt);
+    void on_updateRequested(const StateInfo& newSt);
     void on_deleteWhenDone();
 
 protected:

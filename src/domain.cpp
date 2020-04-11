@@ -192,7 +192,7 @@ void Domain::linkDomain(Domain* d) {
     d->linked = true;
 }
 
-void Domain::on_updateRequested(StateInfo newSt) {
+void Domain::on_updateRequested(const StateInfo& newSt) {
 
     st = newSt;
     UPDATE();
@@ -252,7 +252,7 @@ void Domain::update(bool fromMaster, bool force) {
 
     if (linked && !fromMaster) {
         // in this case let the update to fall down from master domain
-        StateInfo tmp(st);
+        StateInfo tmp {st};
         st.rollBack(); // we don't want to filter out next update sent from master
         emit updateRequested(tmp);
         return;

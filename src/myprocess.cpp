@@ -140,12 +140,12 @@ void MyProcess::on_readyReadStandardError() {
     if (canceling)
         return;
 
-	if (receiver) {
-		QByteArray err = readAllStandardError();
+    if (receiver) {
+        QByteArray err = readAllStandardError();
         QTextCodec* tc = QTextCodec::codecForLocale();
         accError += tc->toUnicode(err);
-		emit procDataReady(err); // redirect to stdout
-	} else
+        emit procDataReady(err); // redirect to stdout
+    } else
         dbs("ASSERT in myReadFromStderr: NULL receiver");
 }
 
