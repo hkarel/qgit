@@ -111,12 +111,12 @@ function check_need_package()
 }
 
 need_packages=
-check_need_package 'qt4-default'
+check_need_package 'qt5-default'
 
 if [ "$build_deb_package" = "yes" -o "$install_qgit" = "yes" ]; then
     # Required packages
     check_need_package 'fakeroot'
-    check_need_package 'md5deep'
+   #check_need_package 'md5deep'
     check_need_package 'debconf'
     check_need_package 'debhelper'
     check_need_package 'lintian'
@@ -185,8 +185,11 @@ fi
 package_dir=$script_dir/build/${build_subdir}/deb/qgit
 echo -e "\npackage_dir: $package_dir"
 
-#package_name="qgit-${package_vers}-${package_date}git${gitrev}-${os_id}${os_ver}-${os_arch}.deb"
-package_name="qgit-${package_vers}-${package_date}git${gitrev}-${os_arch}.deb"
+if [ "$os_id" = "ubuntu" -a "$os_ver" \> "18.10" ]; then
+    package_name="qgit-${package_vers}-${package_date}git${gitrev}-${os_id}${os_ver}-${os_arch}.deb"
+else
+    package_name="qgit-${package_vers}-${package_date}git${gitrev}-${os_arch}.deb"
+fi
 echo "package_name: $package_name"
 
 rm -rf $package_dir
@@ -218,10 +221,17 @@ chmod    u=rwx,go=rx $package_dir//usr/bin/qgit
 installed_size=$(du -s $package_dir | sed -r 's/([0-9]+).*/\1/')
 echo "installed_size: $installed_size"
 
-packet_depends=$(cat << EOS
-    libc6, libstdc++6, libqtcore4, libqtgui4, git
-EOS
-)
+if [ "$os_id" = "ubuntu" -a "$os_ver" \> "18.10" ]; then
+	packet_depends=$(cat <<-EOS
+		libc6, libstdc++6, libqt5core5a, libqt5gui5, libqt5widgets5, git
+	EOS
+	)
+else
+	packet_depends=$(cat <<-EOS
+		libc6, libstdc++6, libqtcore4, libqtgui4, git
+	EOS
+	)
+fi
 
 os_arch_control=$os_arch
 [ "${os_arch:0:3}" = "arm" ] && os_arch_control=armhf
