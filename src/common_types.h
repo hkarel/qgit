@@ -7,8 +7,8 @@ class ShaString : public QString {
 public:
     ShaString() = default;
     ShaString(const ShaString&) = default;
-    ShaString& operator= (const ShaString&) = default;
     ShaString(const QString& s) : QString(s) {}
+    ShaString& operator= (const ShaString&) = default;
     ShaString& operator= (const QString& s) {
 
         QString::operator= (s);
