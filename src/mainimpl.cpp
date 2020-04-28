@@ -53,6 +53,11 @@ MainImpl::MainImpl(const QString& cd, QWidget* p) : QMainWindow(p) {
     setAttribute(Qt::WA_DeleteOnClose);
     setupUi(this);
 
+    // Add alternative shortcut for 'Amend' action
+    QList<QKeySequence> actAmendShort;
+    actAmendShort << QKeySequence("@") << QKeySequence("\"");
+    ActAmend->setShortcuts(actAmendShort);
+
     // manual setup widgets not buildable with Qt designer
     lineEditSHA = new QLineEdit(NULL);
     lineEditFilter = new QLineEdit(NULL);
