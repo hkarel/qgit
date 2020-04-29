@@ -206,88 +206,81 @@ void initMimePix() {
     if (!mimePixMap.empty()) // only once
         return;
 
-    QPixmap* pm = new QPixmap(QString::fromUtf8(":/icons/resources/folder.png"));
-    mimePixMap.insert("#folder_closed", pm);
-    pm = new QPixmap(QString::fromUtf8(":/icons/resources/folder_open.png"));
-    mimePixMap.insert("#folder_open", pm);
-    pm = new QPixmap(QString::fromUtf8(":/icons/resources/misc.png"));
+    QPixmap* pm = new QPixmap(u8":/icons/resources/misc.png");
     mimePixMap.insert("#default", pm);
-    pm = new QPixmap(QString::fromUtf8(":/icons/resources/source_c.png"));
+
+    pm = new QPixmap(u8":/icons/resources/folder.png");
+    mimePixMap.insert("#folder_closed", pm);
+
+    pm = new QPixmap(u8":/icons/resources/folder_open.png");
+    mimePixMap.insert("#folder_open", pm);
+
+    pm = new QPixmap(u8":/icons/resources/source_c.png");
     mimePixMap.insert("c", pm);
-    pm = new QPixmap(QString::fromUtf8(":/icons/resources/source_cpp.png"));
+
+    pm = new QPixmap(u8":/icons/resources/source_cpp.png");
     mimePixMap.insert("cpp", pm);
-    pm = new QPixmap(QString::fromUtf8(":/icons/resources/source_h.png"));
+
+    pm = new QPixmap(u8":/icons/resources/source_h.png");
     mimePixMap.insert("h", pm);
-    pm = new QPixmap(*pm);
     mimePixMap.insert("hpp", pm);
-    pm = new QPixmap(QString::fromUtf8(":/icons/resources/txt.png"));
+
+    pm = new QPixmap(u8":/icons/resources/txt.png");
     mimePixMap.insert("txt", pm);
-    pm = new QPixmap(QString::fromUtf8(":/icons/resources/shellscript.png"));
+
+    pm = new QPixmap(u8":/icons/resources/shellscript.png");
     mimePixMap.insert("sh", pm);
-    pm = new QPixmap(QString::fromUtf8(":/icons/resources/source_pl.png"));
+
+    pm = new QPixmap(u8":/icons/resources/source_pl.png");
     mimePixMap.insert("perl", pm);
-    pm = new QPixmap(*pm);
-    mimePixMap.insert("pl", pm);
-    pm = new QPixmap(QString::fromUtf8(":/icons/resources/source_py.png"));
+    mimePixMap.insert("pl",   pm);
+
+    pm = new QPixmap(u8":/icons/resources/source_py.png");
     mimePixMap.insert("py", pm);
-    pm = new QPixmap(QString::fromUtf8(":/icons/resources/source_java.png"));
+
+    pm = new QPixmap(u8":/icons/resources/source_java.png");
     mimePixMap.insert("java", pm);
-    pm = new QPixmap(*pm);
-    mimePixMap.insert("jar", pm);
-    pm = new QPixmap(QString::fromUtf8(":/icons/resources/tar.png"));
+    mimePixMap.insert("jar",  pm);
+
+    pm = new QPixmap(u8":/icons/resources/tar.png");
     mimePixMap.insert("tar", pm);
-    pm = new QPixmap(*pm);
-    mimePixMap.insert("gz", pm);
-    pm = new QPixmap(*pm);
+    mimePixMap.insert("gz",  pm);
     mimePixMap.insert("tgz", pm);
-    pm = new QPixmap(*pm);
     mimePixMap.insert("zip", pm);
-    pm = new QPixmap(*pm);
-    mimePixMap.insert("bz", pm);
-    pm = new QPixmap(*pm);
+    mimePixMap.insert("bz",  pm);
     mimePixMap.insert("bz2", pm);
-    pm = new QPixmap(QString::fromUtf8(":/icons/resources/html.png"));
+
+    pm = new QPixmap(u8":/icons/resources/html.png");
     mimePixMap.insert("html", pm);
-    pm = new QPixmap(*pm);
-    mimePixMap.insert("xml", pm);
-    pm = new QPixmap(QString::fromUtf8(":/icons/resources/image.png"));
-    mimePixMap.insert("bmp", pm);
-    pm = new QPixmap(*pm);
-    mimePixMap.insert("gif", pm);
-    pm = new QPixmap(*pm);
-    mimePixMap.insert("jpg", pm);
-    pm = new QPixmap(*pm);
+    mimePixMap.insert("xml",  pm);
+
+    pm = new QPixmap(u8":/icons/resources/image.png");
+    mimePixMap.insert("bmp",  pm);
+    mimePixMap.insert("gif",  pm);
+    mimePixMap.insert("jpg",  pm);
     mimePixMap.insert("jpeg", pm);
-    pm = new QPixmap(*pm);
-    mimePixMap.insert("png", pm);
-    pm = new QPixmap(*pm);
-    mimePixMap.insert("pbm", pm);
-    pm = new QPixmap(*pm);
-    mimePixMap.insert("pgm", pm);
-    pm = new QPixmap(*pm);
-    mimePixMap.insert("ppm", pm);
-    pm = new QPixmap(*pm);
-    mimePixMap.insert("svg", pm);
-    pm = new QPixmap(*pm);
+    mimePixMap.insert("png",  pm);
+    mimePixMap.insert("pbm",  pm);
+    mimePixMap.insert("pgm",  pm);
+    mimePixMap.insert("ppm",  pm);
+    mimePixMap.insert("svg",  pm);
     mimePixMap.insert("tiff", pm);
-    pm = new QPixmap(*pm);
-    mimePixMap.insert("xbm", pm);
-    pm = new QPixmap(*pm);
-    mimePixMap.insert("xpm", pm);
+    mimePixMap.insert("xbm",  pm);
+    mimePixMap.insert("xpm",  pm);
 }
 
 void freeMimePix() {
 
-    qDeleteAll(mimePixMap);
+    // Do not release the map, the operating system will free elements
+    // when application destroyed.
+    // qDeleteAll(mimePixMap);
 }
 
 const QPixmap* mimePix(const QString& fileName) {
 
     const QString& ext = fileName.section('.', -1, -1).toLower();
-    if (mimePixMap.contains(ext))
-        return mimePixMap.value(ext);
-
-    return mimePixMap.value("#default");
+    auto it = mimePixMap.find(ext);
+    return (it != mimePixMap.end()) ? it.value() : mimePixMap["#default"];
 }
 
 // geometry settings helers
