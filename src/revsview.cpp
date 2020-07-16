@@ -43,8 +43,9 @@ RevsView::RevsView(MainImpl* mi, Git* g, bool isMain) : Domain(mi, g, isMain) {
     chk_connect_a(m(), SIGNAL(typeWriterFontChanged()),
                   tab()->textEditDiff, SLOT(typeWriterFontChanged()));
 
-    chk_connect_a(m(), SIGNAL(flagChanged(uint)),
-                  sb, SLOT(flagChanged(uint)));
+    chk_connect_a(m(), SIGNAL(flagChanged(uint)), sb, SLOT(flagChanged(uint)));
+                  
+    chk_connect_a(m(), SIGNAL(flagChanged(uint)), this, SLOT(on_flagChanged(uint)));
 
     chk_connect_a(git, SIGNAL(newRevsAdded(const FileHistory*, const QVector<ShaString>&)),
                   this, SLOT(on_newRevsAdded(const FileHistory*, const QVector<ShaString>&)));
@@ -232,6 +233,17 @@ void RevsView::on_updateRevDesc() {
 
     const QString& d = m()->getRevisionDesc(st.sha());
     tab()->textBrowserDesc->setHtml(d);
+}
+
+void RevsView::on_flagChanged(uint flag) {
+
+	if (flag == QGit::ENABLE_DRAGNDROP_F) {
+		if (QGit::testFlag(QGit::ENABLE_DRAGNDROP_F)) {
+			tab()->listViewLog->setSelectionMode(QAbstractItemView::ExtendedSelection);
+		} else {
+			tab()->listViewLog->setSelectionMode(QAbstractItemView::SingleSelection);
+		}
+	}
 }
 
 bool RevsView::doUpdate(bool force) {
