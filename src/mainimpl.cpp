@@ -267,7 +267,11 @@ void MainImpl::highlightAbbrevSha(const QString& abbrevSha) {
 
 void MainImpl::lineEditSHA_returnPressed() {
 
-    QString sha = git->getRefSha(lineEditSHA->text());
+    QString text = lineEditSHA->text().trimmed();
+    if (text.isEmpty())
+        return;
+
+    QString sha = git->getRefSha(text);
     if (!sha.isEmpty()) // good, we can resolve to an unique sha
     {
         rv->st.setSha(sha);

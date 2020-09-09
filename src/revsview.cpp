@@ -317,19 +317,23 @@ bool RevsView::doUpdate(bool force) {
 void RevsView::updateLineEditSHA(bool clear) {
 
     QLineEdit* l = m()->lineEditSHA;
+    const QString sha = st.sha();
 
-    if (clear)
+    if (clear) {
         l->setText(""); // clears history
-
-    else if (l->text() != st.sha()) {
+    }
+    else if (sha == "0000000000000000000000000000000000000000") {
+        l->clear();
+    }
+    else if (l->text() != sha) {
 
         if (l->text().isEmpty())
-            l->setText(st.sha()); // first rev clears history
+            l->setText(sha); // first rev clears history
         else {
             // setText() clears undo/redo history so
             // we use clear() + insert() instead
             l->clear();
-            l->insert(st.sha());
+            l->insert(sha);
         }
     }
     m()->ActBack->setEnabled(l->isUndoAvailable());
