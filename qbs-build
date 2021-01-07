@@ -12,8 +12,7 @@ print_help=
 build_mode=release
 need_packages=
 
-#build_products=
-build_deb_package=
+build_package=
 
 install_qgit=
 remove_qgit=
@@ -62,7 +61,7 @@ do
             shift
             ;;
         -D)
-            build_deb_package=yes
+            build_package=yes
             shift
             ;;
         -i)
@@ -116,10 +115,9 @@ check_need_package 'qtbase5-dev'
 check_need_package 'qtbase5-dev-tools'
 check_need_package 'qtbase5-private-dev'
 
-if [ "$build_deb_package" = "yes" -o "$install_qgit" = "yes" ]; then
+if [ "$build_package" = "yes" -o "$install_qgit" = "yes" ]; then
     # Required packages
     check_need_package 'fakeroot'
-   #check_need_package 'md5deep'
     check_need_package 'debconf'
     check_need_package 'debhelper'
     check_need_package 'lintian'
@@ -160,7 +158,7 @@ qbs build \
     profile:qgit
 
 not_exit=
-if [ "$build_deb_package" = "yes" -o "$install_qgit" = "yes" ]; then
+if [ "$build_package" = "yes" -o "$install_qgit" = "yes" ]; then
     not_exit=yes
 fi
 [ "$not_exit" != "yes" ] && exit 0
@@ -178,7 +176,7 @@ echo "package_date: $package_date"
 gitrev=$(git log -1 --pretty=%h)
 echo "gitrev: $gitrev"
 
-if [ "$build_deb_package" != "yes" -a "$install_qgit" != "yes" ]; then
+if [ "$build_package" != "yes" -a "$install_qgit" != "yes" ]; then
     exit 0
 fi
 
@@ -271,7 +269,7 @@ file-in-unusual-dir \
 ${build_dir}/$package_name
 set -e
 
-if [ "$build_deb_package" = "yes" ]; then
+if [ "$build_package" = "yes" ]; then
     cd $script_dir
     mkdir -p packages
     echo "Copying the file $package_name to directory ./packages"
