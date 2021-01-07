@@ -15,6 +15,7 @@
 #include <QShortcut>
 #include <QDrag>
 #include <QUrl>
+#include <QSettings>
 #include "FileHistory.h"
 #include "defmac.h"
 #include "domain.h"
@@ -116,6 +117,12 @@ void ListView::setupGeometry() {
         QGit::restoreGeometrySetting(QGit::REV_GEOM_KEY, &v);
         hideColumn(ANN_ID_COL);
     }
+
+    const QString settingsKey = git->isMainHistory(fh) ? QGit::REV_COLS_KEY : QGit::FILE_COLS_KEY;
+    QSettings settings;
+    QVariant v = settings.value(settingsKey);
+    if (v.isValid())
+        hv->restoreState(v.toByteArray());
 }
 
 void ListView::saveGeometry()
@@ -124,6 +131,10 @@ void ListView::saveGeometry()
         QGit::HeaderVect v {1, header()};
         QGit::saveGeometrySetting(QGit::REV_GEOM_KEY, &v);
     }
+
+    const QString settingsKey = git->isMainHistory(fh) ? QGit::REV_COLS_KEY : QGit::FILE_COLS_KEY;
+    QSettings settings;
+    settings.setValue(settingsKey, header()->saveState());
 }
 
 void ListView::scrollToNextHighlighted(int direction) {

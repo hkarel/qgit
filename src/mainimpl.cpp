@@ -468,7 +468,6 @@ void MainImpl::setRepository(const QString& newDir, bool refresh, bool keepSelec
             dbs("ASSERT in setRepository: different dir with no range select");
 
         // now we can clear all our data
-        setWindowTitle(curDir + " - QGit");
         bool complete = !refresh || !keepSelection;
         rv->clear(complete);
         if (archiveChanged)
@@ -479,19 +478,25 @@ void MainImpl::setRepository(const QString& newDir, bool refresh, bool keepSelec
         updateContextActions("", "", false, false);
         ActCommit_setEnabled(false);
 
-        if (ActFilterTree->isChecked())
-            setWindowTitle(windowTitle() + " - FILTER ON < " +
-                           passedArgs->join(" ") + " >");
-
         // tree name should be set before init because in case of
         // StGIT archives the first revs are sent before init returns
         QString n(curDir);
         treeView->setTreeName(n.prepend('/').section('/', -1, -1));
 
+		QString curBranch;
+
         bool quit;
         bool ok = git->init(curDir, !refresh, passedArgs, overwriteArgs, &quit); // blocking call
         if (quit)
             goto exit;
+
+		curBranch = git->getCurrentBranchName();
+		if (curBranch.length()) curBranch = " [" + curBranch + "]";
+		setWindowTitle(curDir + curBranch + " - QGit");
+
+		if (ActFilterTree->isChecked())
+            setWindowTitle(windowTitle() + " - FILTER ON < " +
+                           passedArgs->join(" ") + " >");
 
         updateCommitMenu(ok && git->isStGITStack());
         ActCheckWorkDir->setChecked(testFlag(DIFF_INDEX_F)); // could be changed in Git::init()
@@ -2248,9 +2253,11 @@ void MainImpl::ActAbout_activated() {
 	"<nobr>2018 <a href='mailto:balbusm@gmail.com'>Mateusz Balbus</a>,</nobr> "
 	"<nobr>2019 <a href='mailto:sebastian@pipping.org'>Sebastian Pipping</a>,</nobr> "
 	"<nobr>2019-2020 <a href='mailto:mvf@gmx.eu'>Matthias von Faber</a>,</nobr> "
-	"<nobr>2019 <a href='mailto:Kevin@tigcc.ticalc.org'>Kevin Kofler</a></nobr> "
-	"<nobr>2020 <a href='mailto:cortexspam-github@yahoo.fr'>Matthieu Muffato</a></nobr> "
-	"<nobr>2020 <a href='mailto:brent@mbari.org'>Brent Roman</a></nobr> "
+    "<nobr>2019 <a href='mailto:Kevin@tigcc.ticalc.org'>Kevin Kofler</a>,</nobr> "
+    "<nobr>2020 <a href='mailto:cortexspam-github@yahoo.fr'>Matthieu Muffato</a>,</nobr> "
+    "<nobr>2020 <a href='mailto:brent@mbari.org'>Brent Roman</a>,</nobr> "
+    "<nobr>2020 <a href='mailto:jjm@keelhaul.demon.co.uk'>Jonathan Marten</a>,</nobr> "
+    "<nobr>2020 <a href='mailto:yyc1992@gmail.com'>Yichao Yu</a></nobr> "
 	"</p>"
     "<p>This version was compiled against Qt " QT_VERSION_STR "</p>";
 
