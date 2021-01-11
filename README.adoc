@@ -1,6 +1,23 @@
 qgit, a git GUI viewer
 ======================
 
+**The main differences from the original version** (https://github.com/tibirna/qgit)
+
+ - Improved Unicode support
+
+ - Redesigned git-project caching mechanism
+
+ - Significantly accelerated tree building for large projects
+
+ - Building the project using C++11
+
+ - Build the project using the QBS system
+
+ - Added the bash-script for creating a deb-package
+
+ - Minor refinements/enhancements in the user interface
+
+
 With qgit you will be able to browse revisions history, view patch content
 and changed files, graphically following different development branches.
 
