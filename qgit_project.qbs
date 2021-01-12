@@ -2,7 +2,7 @@ import qbs
 import "qbs/imports/QbsUtl/qbsutl.js" as QbsUtl
 
 Project {
-    name: "QGit"
+    name: "QGit (Project)"
     minimumQbsVersion: "1.12.0"
     qbsSearchPaths: ["qbs"]
 
@@ -43,18 +43,19 @@ Project {
         return def;
     }
 
-//    property var cxxFlags: [
-//        //"-std=c++11",
-//        "-ggdb3",
-//        //"-Winline",
-//        "-Wall",
-//        "-Wextra",
-//        "-Wno-unused-parameter",
-//        "-Wno-variadic-macros",
-//    ]
-//    property string cxxLanguageVersion: "c++11"
+    property var cxxFlags: [
+        "-ggdb3",
+        //"-Winline",
+        "-Wall",
+        "-Wextra",
+        "-Wno-unused-parameter",
+        "-Wno-variadic-macros",
+    ]
+    property string cxxLanguageVersion: "c++17"
 
     references: [
-        "src/src.qbs",
+        "src/shared/shared.qbs",
+        "src/yaml/yaml.qbs",
+        "src/qgit.qbs",
     ]
 }

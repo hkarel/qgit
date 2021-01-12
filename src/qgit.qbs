@@ -1,6 +1,7 @@
 import qbs
 
 Product {
+    name: "QGit"
     targetName: "qgit"
 
     type: "application"
@@ -18,19 +19,14 @@ Product {
     }
 
     cpp.defines: project.cppDefines
-
     cpp.cxxFlags: {
-        var cxx = [
-            "-std=c++11",
-            "-Wall",
-            "-Wextra",
+        var cxx = project.cxxFlags.concat([
             "-Wno-non-virtual-dtor",
             "-Wno-long-long",
             "-pedantic",
-        ];
-        if (qbs.buildVariant === "debug")
-            cxx.push("-ggdb3");
-        else
+        ]);
+
+        if (qbs.buildVariant !== "debug")
             cxx.push("-s");
 
         if (project.conversionWarnEnabled)
@@ -38,6 +34,7 @@ Product {
 
         return cxx;
     }
+    cpp.cxxLanguageVersion: project.cxxLanguageVersion
 
     cpp.includePaths: [
         "./",
@@ -104,7 +101,7 @@ Product {
         name: "others"
         files: [
             "../exception_manager.txt",
-            "../README.adoc",
+            "../README.md",
             "../README_WIN.txt",
             "../qgit_inno_setup.iss",
             "helpgen.sh",
