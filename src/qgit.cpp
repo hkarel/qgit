@@ -4,10 +4,21 @@
     Copyright: See COPYING file that comes with this distribution
 
 */
-#include <QSettings>
 #include "common.h"
-#include "defmac.h"
 #include "mainimpl.h"
+
+#include "shared/defmac.h"
+#include "shared/utils.h"
+#include "shared/logger/logger.h"
+#include "shared/logger/config.h"
+#include "shared/config/appl_conf.h"
+#include "shared/config/logger_conf.h"
+#include "shared/qt/logger_operators.h"
+#include "shared/qt/version_number.h"
+
+#include <QSettings>
+
+#define APPLICATION_NAME "QGit"
 
 #if defined(_MSC_VER) && defined(NDEBUG)
     #pragma comment(linker,"/entry:mainCRTStartup")
@@ -16,7 +27,20 @@
 
 using namespace QGit;
 
-int main(int argc, char* argv[]) {
+int main(int argc, char* argv[])
+{
+    alog::logger().start();
+
+#ifdef NDEBUG
+    alog::logger().addSaverStdOut(alog::Level::Info, true);
+#else
+    alog::logger().addSaverStdOut(alog::Level::Debug);
+#endif
+
+    log_info << log_format(
+        "'%?' is running (version: %?; gitrev: %?)",
+        APPLICATION_NAME, productVersion().toString(), GIT_REVISION);
+    alog::logger().flush();
 
     QApplication app(argc, argv);
 #if QT_VERSION >= QT_VERSION_CHECK(5,6,0)
@@ -40,5 +64,11 @@ int main(int argc, char* argv[]) {
     bool ret = app.exec();
 
     freeMimePix();
+
+    log_info << log_format("'%?' is stopped", APPLICATION_NAME);
+    alog::logger().flush();
+    alog::logger().waitingFlush();
+    alog::logger().stop();
+
     return ret;
 }

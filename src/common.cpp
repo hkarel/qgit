@@ -8,8 +8,9 @@
 */
 
 #include "common.h"
-#include "break_point.h"
 #include <QTextDocument>
+
+#include "shared/break_point.h"
 
 static inline uint hexVal(const QChar* ch) {
 

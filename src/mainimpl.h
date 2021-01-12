@@ -4,17 +4,18 @@
     Copyright: See COPYING file that comes with this distribution
 
 */
-#ifndef MAINIMPL_H
-#define MAINIMPL_H
+#pragma once
+
+#include "exceptionmanager.h"
+#include "common.h"
+#include "consoleimpl.h"
+#include "ui_mainview.h"
+
+#include "shared/defmac.h"
 
 #include <QProcess>
 #include <QRegExp>
 #include <QDir>
-#include "exceptionmanager.h"
-#include "common.h"
-#include "defmac.h"
-#include "consoleimpl.h"
-#include "ui_mainview.h"
 
 class QAction;
 class QCloseEvent;
@@ -248,6 +249,3 @@ private slots:
 
 private:
 };
-
-
-#endif

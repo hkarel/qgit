@@ -6,13 +6,15 @@
     Copyright: See COPYING file that comes with this distribution
 
 */
-#include <QDir>
-#include <QTemporaryFile>
-#include "defmac.h"
 #include "FileHistory.h"
 #include "git.h"
 #include "dataloader.h"
-#include "break_point.h"
+
+#include "shared/defmac.h"
+#include "shared/break_point.h"
+
+#include <QDir>
+#include <QTemporaryFile>
 
 #define GUI_UPDATE_INTERVAL 500
 #define READ_BLOCK_SIZE     65535

@@ -4,14 +4,16 @@
     Copyright: See COPYING file that comes with this distribution
 
 */
+#include "revsview.h"
+#include "smartbrowse.h"
+
+#include "shared/defmac.h"
+
 #include <QContextMenuEvent>
 #include <QMenu>
 #include <QPainter>
 #include <QScrollBar>
 #include <QWheelEvent>
-#include "defmac.h"
-#include "revsview.h"
-#include "smartbrowse.h"
 
 #define GO_UP   1
 #define GO_DOWN 2

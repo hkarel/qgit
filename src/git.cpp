@@ -6,6 +6,18 @@
     Copyright: See COPYING file that comes with this distribution
 
 */
+#include "FileHistory.h"
+#include "annotate.h"
+#include "cache.h"
+#include "dataloader.h"
+#include "git.h"
+#include "lanes.h"
+#include "myprocess.h"
+#include "rangeselectimpl.h"
+
+#include "shared/defmac.h"
+#include "shared/break_point.h"
+
 #include <QApplication>
 #include <QDir>
 #include <QFile>
@@ -17,16 +29,6 @@
 #include <QTextCodec>
 #include <QTextDocument>
 #include <QTextStream>
-#include "FileHistory.h"
-#include "annotate.h"
-#include "cache.h"
-#include "defmac.h"
-#include "dataloader.h"
-#include "git.h"
-#include "lanes.h"
-#include "myprocess.h"
-#include "rangeselectimpl.h"
-#include "break_point.h"
 
 #define SHOW_MSG(x) QApplication::postEvent(parent(), new MessageEvent(x)); EM_PROCESS_EVENTS_NO_INPUT;
 

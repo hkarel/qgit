@@ -10,7 +10,8 @@
 #include <QDataStream>
 #include <QDir>
 #include "cache.h"
-#include "break_point.h"
+
+#include "shared/break_point.h"
 
 using namespace QGit;
 

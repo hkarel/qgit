@@ -1,6 +1,8 @@
 #include "inputdialog.h"
 #include "common.h"
-#include "defmac.h"
+
+#include "shared/defmac.h"
+
 #include <QLineEdit>
 #include <QTextEdit>
 #include <QComboBox>

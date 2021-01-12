@@ -7,10 +7,11 @@
 
 #pragma once
 
-#include "defmac.h"
 #include "common_types.h"
-#include <QSplitter>
+#include "shared/defmac.h"
+
 #include <QHeaderView>
+#include <QSplitter>
 
 /*
    QVariant does not support size_t type used in Qt containers, this is

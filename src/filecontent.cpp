@@ -4,6 +4,15 @@
     Copyright: See COPYING file that comes with this distribution
 
 */
+#include "domain.h"
+#include "myprocess.h"
+#include "mainimpl.h"
+#include "git.h"
+#include "annotate.h"
+#include "filecontent.h"
+
+#include "shared/defmac.h"
+
 #include <QListWidget>
 #include <QSyntaxHighlighter>
 #include <QTextCharFormat>
@@ -14,13 +23,6 @@
 #include <QClipboard>
 #include <QTemporaryFile>
 #include <QAbstractTextDocumentLayout>
-#include "defmac.h"
-#include "domain.h"
-#include "myprocess.h"
-#include "mainimpl.h"
-#include "git.h"
-#include "annotate.h"
-#include "filecontent.h"
 
 class FileHighlighter : public QSyntaxHighlighter {
 public:

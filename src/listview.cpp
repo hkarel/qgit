@@ -6,6 +6,14 @@
     Copyright: See COPYING file that comes with this distribution
 
 */
+#include "FileHistory.h"
+#include "domain.h"
+#include "mainimpl.h"
+#include "git.h"
+#include "listview.h"
+
+#include "shared/defmac.h"
+
 #include <QApplication>
 #include <QHeaderView>
 #include <QMimeData>
@@ -16,12 +24,6 @@
 #include <QDrag>
 #include <QUrl>
 #include <QSettings>
-#include "FileHistory.h"
-#include "defmac.h"
-#include "domain.h"
-#include "mainimpl.h"
-#include "git.h"
-#include "listview.h"
 
 void getTagMarkParams(QString &name, QStyleOptionViewItem& o,
                       const int type, const bool isCurrent);

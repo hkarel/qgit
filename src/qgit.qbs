@@ -8,6 +8,8 @@ Product {
     destinationDirectory: "./bin"
 
     Depends { name: "cpp" }
+    Depends { name: "SharedLib" }
+    Depends { name: "Yaml" }
     Depends { name: "Qt"; submodules: ["core"] }
     Depends {
         name: "Qt.gui";
@@ -122,7 +124,6 @@ Product {
         "dataloader.h",
         "domain.cpp",
         "domain.h",
-        "defmac.h",
         "exceptionmanager.cpp",
         "exceptionmanager.h",
         "filecontent.cpp",

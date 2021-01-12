@@ -3,14 +3,16 @@
 
     Copyright: See COPYING file that comes with this distribution
 */
+#include "domain.h"
+#include "revdesc.h"
+
+#include "shared/defmac.h"
+
 #include <QApplication>
 #include <QMenu>
 #include <QContextMenuEvent>
 #include <QRegExp>
 #include <QClipboard>
-#include "defmac.h"
-#include "domain.h"
-#include "revdesc.h"
 
 RevDesc::RevDesc(QWidget* p) : QTextBrowser(p), d(NULL) {
 

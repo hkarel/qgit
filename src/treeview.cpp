@@ -6,13 +6,15 @@
     Copyright: See COPYING file that comes with this distribution
 
 */
-#include <QApplication>
-#include <QTreeWidgetItemIterator>
 #include "git.h"
-#include "defmac.h"
 #include "domain.h"
 #include "mainimpl.h"
 #include "treeview.h"
+
+#include "shared/defmac.h"
+
+#include <QApplication>
+#include <QTreeWidgetItemIterator>
 
 QString FileItem::fullName() const {
 

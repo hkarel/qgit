@@ -8,14 +8,14 @@
 */
 
 #include "FileHistory.h"
+#include "lanes.h"
+#include "git.h"
+
+#include "shared/defmac.h"
 
 #include <QApplication>
 #include <QDateTime>
 #include <QFontMetrics>
-
-#include "defmac.h"
-#include "lanes.h"
-#include "git.h"
 
 using namespace QGit;
 

@@ -3,6 +3,12 @@
 
     Copyright: See COPYING file that comes with this distribution
 */
+#include "git.h"
+#include "domain.h"
+#include "filelist.h"
+
+#include "shared/defmac.h"
+
 #include <QDrag>
 #include <QApplication>
 #include <QMimeData>
@@ -10,10 +16,6 @@
 #include <QMimeData>
 #include <QMouseEvent>
 #include <QPainter>
-#include "defmac.h"
-#include "git.h"
-#include "domain.h"
-#include "filelist.h"
 
 FileList::FileList(QWidget* p) : QListWidget(p), d(NULL), git(NULL), st(NULL) {}
 

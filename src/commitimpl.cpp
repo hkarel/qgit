@@ -17,10 +17,11 @@
 #include <QKeyEvent>
 #include "exceptionmanager.h"
 #include "common.h"
-#include "defmac.h"
 #include "git.h"
 #include "settingsimpl.h"
 #include "commitimpl.h"
+
+#include "shared/defmac.h"
 
 using namespace QGit;
 

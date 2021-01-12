@@ -20,7 +20,9 @@ Product {
         "./",
         "./shared",
     ]
-    cpp.includePaths: exportIncludePaths;
+    cpp.includePaths: exportIncludePaths.concat([
+        //"./shared",
+    ]);
 
     // This declaration is needed to suppress Qt warnings
     cpp.systemIncludePaths: Qt.core.cpp.includePaths

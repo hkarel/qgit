@@ -6,13 +6,15 @@
     Copyright: See COPYING file that comes with this distribution
 
 */
-#include <QApplication>
-#include <QTime>
 #include "exceptionmanager.h"
 #include "common.h"
-#include "defmac.h"
 #include "domain.h"
 #include "myprocess.h"
+
+#include "shared/defmac.h"
+
+#include <QApplication>
+#include <QTime>
 
 MyProcess::MyProcess(QObject *go, Git* g, const QString& wd, bool err) : QProcess(g) {
 

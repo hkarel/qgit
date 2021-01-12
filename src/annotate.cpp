@@ -9,10 +9,11 @@
 #include <QApplication>
 #include <QTimer>
 #include "FileHistory.h"
-#include "defmac.h"
 #include "git.h"
 #include "myprocess.h"
 #include "annotate.h"
+
+#include "shared/defmac.h"
 
 #define MAX_AUTHOR_LEN 16
 
