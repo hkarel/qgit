@@ -14,6 +14,10 @@
 #include "git.h"
 #include "settingsimpl.h"
 
+#include "shared/logger/logger.h"
+#include "shared/logger/format.h"
+#include "shared/qt/logger_operators.h"
+
 /*
 By default, there are two entries in the search path:
 
@@ -94,7 +98,7 @@ void SettingsImpl::userInfo() {
 */
     git->userInfo(_uInfo);
     if (_uInfo.count() % 3 != 0) {
-        dbs("ASSERT in SettingsImpl::userInfo(), bad info returned");
+        log_error << "bad info returned";
         return;
     }
     bool found = false;
@@ -144,7 +148,7 @@ void SettingsImpl::readGitConfig(const QString& source) {
         QString value = s.split("=").at(1);
 
         if (paths.isEmpty() || value.isEmpty()) {
-            dbp("SettingsImpl::readGitConfig Unable to parse line %1", s);
+            log_error << log_format("Unable to parse line %?", s);
             continue;
         }
         QString name(paths.first());
@@ -166,7 +170,9 @@ void SettingsImpl::treeWidgetGitConfig_itemChanged(QTreeWidgetItem* item, int i)
 
     if (populatingGitConfig)
         return;
-    dbs(item->text(0));dbs(item->text(1));dbp("column %1", i);
+    //dbs(item->text(0));
+    //dbs(item->text(1));
+    //dbp("column %1", i);
 }
 
 void SettingsImpl::comboBoxUserSrc_activated(int i) {
@@ -211,7 +217,7 @@ void SettingsImpl::setupCodecsCombo() {
     QRegExp re("*" + curCodec + "*", Qt::CaseInsensitive, QRegExp::Wildcard);
     int idx = codecs.indexOf(re);
     if (idx == -1) {
-        dbp("ASSERT: codec <%1> not available, using local codec", curCodec);
+        log_warn << log_format("Codec <%?> not available, using local codec", curCodec);
         idx = 0;
     }
     comboBoxCodecs->setCurrentIndex(idx);

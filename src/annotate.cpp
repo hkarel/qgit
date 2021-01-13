@@ -14,6 +14,9 @@
 #include "annotate.h"
 
 #include "shared/defmac.h"
+#include "shared/logger/logger.h"
+#include "shared/logger/format.h"
+#include "shared/qt/logger_operators.h"
 
 #define MAX_AUTHOR_LEN 16
 
@@ -138,7 +141,7 @@ void Annotate::doAnnotate(const ShaString& ss) {
 
     const Rev* r = git->revLookup(ss, fh); // historyRevs
     if (r == NULL) {
-        dbp("ASSERT doAnnotate: no revision %1", sha);
+        log_warn << log_format("No revision %?", sha);
         isError = true;
         return;
     }
@@ -154,7 +157,7 @@ void Annotate::doAnnotate(const ShaString& ss) {
     FileAnnotation* pa = getFileAnnotation(parSha);
 
     if (!pa || !pa->isValid) {
-        dbp("ASSERT in doAnnotate: annotation for %1 not valid", parSha);
+        log_warn << log_format("Annotation for %? not valid", parSha);
         isError = true;
         return;
     }
@@ -191,7 +194,7 @@ FileAnnotation* Annotate::getFileAnnotation(const QString& sha) {
 
     AnnotateHistory::iterator it = ah.find(sha);
     if (it == ah.end()) {
-        dbp("ASSERT getFileAnnotation: no revision %1", sha);
+        log_warn << log_format("No revision %?", sha);
         isError = true;
         return NULL;
     }
@@ -292,7 +295,7 @@ bool Annotate::setAnnotation(const QString& diff, const QString& author, const Q
             // diff lines start from 1, 0 is empty file,
             // instead QValueList::at() starts from 0
             if (num < 0 || num > prevAnn.size()) {
-                dbp("ASSERT setAnnotation: start line number is %1", num);
+                log_warn << log_format("Start line number is %?", num);
                 isError = true;
                 return false;
             }
@@ -306,8 +309,7 @@ bool Annotate::setAnnotation(const QString& diff, const QString& author, const Q
             break;
         case '-':
             if (curLineNum > prevAnn.size()) {
-                dbp("ASSERT setAnnotation: remove end of "
-                    "file, diff is %1", diff);
+                log_warn << log_format("Remove end of file, diff is %?", diff);
                 isError = true;
                 return false;
             } else {
@@ -324,11 +326,11 @@ bool Annotate::setAnnotation(const QString& diff, const QString& author, const Q
             // fall through
         default:
             if (curLineNum > prevAnn.size()) {
-                dbp("ASSERT setAnnotation: end of "
-                    "file reached, diff is %1", diff);
+                log_warn << log_format("End of file reached, diff is %?", diff);
                 isError = true;
                 return false;
-            } else {
+            }
+            else {
                 newAnn.append(*cur);
                 ++cur;
                 ++curLineNum;
@@ -633,13 +635,14 @@ const QString Annotate::getAncestor(const QString& sha, int* shaIdx) {
                 break;
         }
         if (fileSha.isEmpty()) {
-            dbp("ASSERT in getAncestor: empty file from %1", sha);
+            log_warn << log_format("Empty file from %?", sha);
             return "";
         }
         EM_REMOVE(exAnnCanceled);
         annotateActivity = false;
 
-    } catch(int i) {
+    }
+    catch(int i) {
 
         EM_REMOVE(exAnnCanceled);
         annotateActivity = false;
@@ -648,9 +651,10 @@ const QString Annotate::getAncestor(const QString& sha, int* shaIdx) {
             EM_THROW_PENDING;
             return "";
         }
-        const QString info("Exception \'" + EM_DESC(i) + "\' "
-                           "not handled in Annotation lookup...re-throw");
-        dbs(info);
+        log_warn << log_format("Exception '%?' not handled"
+                               ". It will be re-throw", EM_DESC(i));
+        alog::logger().flush();
+        alog::logger().waitingFlush();
         throw;
     }
     // NOTE: more then one revision could have the same file sha as our
@@ -670,7 +674,7 @@ const QString Annotate::getAncestor(const QString& sha, int* shaIdx) {
     if (git->getAllRefSha(Git::UN_APPLIED).contains(sha))
         return histRevOrder.first();
 
-    dbp("ASSERT in getAncestor: ancestor of %1 not found", sha);
+    log_warn << log_format("Ancestor of %? not found", sha);
     return "";
 }
 
@@ -708,7 +712,7 @@ const QString Annotate::computeRanges(const QString& sha, int paraFrom, int para
     ranges.clear();
 
     if (!valid || canceled || sha.isEmpty()) {
-        dbp("ASSERT in computeRanges: annotation from %1 not valid", sha);
+        log_warn << log_format("Annotation from %? not valid", sha);
         return "";
     }
     // paragraphs start from 0 but ranges from 1
@@ -735,7 +739,7 @@ const QString Annotate::computeRanges(const QString& sha, int paraFrom, int para
     // going back in history, to oldest following first parent lane
     const QString oldest(histRevOrder.last()); // causes a detach!
     const Rev* curRev = git->revLookup(ancestor, fh); // historyRevs
-    QString curRevSha(curRev->sha());
+    QString curRevSha {curRev->sha()};
     while (curRevSha != oldest && !isDirectDescendant) {
 
         const QString& diff(getPatch(curRevSha));
@@ -743,10 +747,10 @@ const QString Annotate::computeRanges(const QString& sha, int paraFrom, int para
             if (curRev->parentsCount() == 0)  // is initial
                 break;
 
-            dbp("ASSERT in rangeFilter 1: diff for %1 not found", curRevSha);
+            log_warn << log_format("Diff for %? not found", curRevSha);
             return "";
         }
-        RangeInfo r(ranges[curRevSha]);
+        RangeInfo r {ranges[curRevSha]};
         updateRange(&r, diff, true);
 
         // special case for modified flag. Mark always the 'after patch' revision
@@ -795,19 +799,19 @@ const QString Annotate::computeRanges(const QString& sha, int paraFrom, int para
                 ranges.insert(sha, RangeInfo());
                 continue;
             }
-            const QString& diff(getPatch(sha));
+            const QString& diff {getPatch(sha)};
             if (diff.isEmpty()) {
-                dbp("ASSERT in rangeFilter 2: diff for %1 not found", sha);
+                log_warn << log_format("Diff for %? not found", sha);
                 return "";
             }
-            QString parSha(curRev->parent(0));
+            QString parSha {curRev->parent(0)};
 
             if (!ranges.contains(parSha)) {
 
                 if (isDirectDescendant) // we must be in a parallel lane, no need
-                    continue;       // to compute range info, simply go on
+                    continue;           // to compute range info, simply go on
 
-                dbp("ASSERT in rangeFilter: range info for %1 not found", parSha);
+                log_warn << log_format("Range info for %? not found", parSha);
                 return "";
             }
             RangeInfo r(ranges[parSha]);

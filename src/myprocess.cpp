@@ -12,6 +12,9 @@
 #include "myprocess.h"
 
 #include "shared/defmac.h"
+#include "shared/logger/logger.h"
+#include "shared/logger/format.h"
+#include "shared/qt/logger_operators.h"
 
 #include <QApplication>
 #include <QTime>
@@ -147,8 +150,9 @@ void MyProcess::on_readyReadStandardError() {
         QTextCodec* tc = QTextCodec::codecForLocale();
         accError += tc->toUnicode(err);
         emit procDataReady(err); // redirect to stdout
-    } else
-        dbs("ASSERT in myReadFromStderr: NULL receiver");
+    }
+    else
+        log_warn << "NULL receiver";
 }
 
 void MyProcess::on_finished(int exitCode, QProcess::ExitStatus exitStatus) {
@@ -223,7 +227,7 @@ const QStringList MyProcess::splitArgList(const QString& cmd) {
         ++i;
 
     if (i == sepList.length()) {
-        dbs("ASSERT no unique separator found.");
+        log_warn << "No unique separator found";
         return QStringList();
     }
     const QChar& sepChar(sepList[i]);

@@ -12,6 +12,9 @@
 #include "cache.h"
 
 #include "shared/break_point.h"
+#include "shared/logger/logger.h"
+#include "shared/logger/format.h"
+#include "shared/qt/logger_operators.h"
 
 using namespace QGit;
 
@@ -20,22 +23,26 @@ bool Cache::save(const QString& gitDir, const RevFileMap& rfm,
 
     //break_point
 
-    if (gitDir.isEmpty() || rfm.isEmpty())
+    if (gitDir.isEmpty() || rfm.isEmpty()) {
+        log_error << "Unable save cache-file";
         return false;
+    }
 
     QString path(gitDir + C_DAT_FILE);
     QString tmpPath(path + BAK_EXT);
 
     QDir dir;
     if (!dir.exists(gitDir)) {
-        dbs("Git directory not found, unable to save cache");
+        log_error << "Git directory not found, unable to save cache";
         return false;
     }
     QFile f(tmpPath);
-    if (!f.open(QIODevice::WriteOnly | QIODevice::Unbuffered))
+    if (!f.open(QIODevice::WriteOnly | QIODevice::Unbuffered)) {
+        log_error << "Failed open file: " << tmpPath;
         return false;
+    }
 
-    dbs("Saving cache. Please wait...");
+    log_info << "Saving cache. Please wait...";
 
     // compress in memory before write to file
     QByteArray data;
@@ -70,20 +77,22 @@ bool Cache::save(const QString& gitDir, const RevFileMap& rfm,
     for (int i = 0; i < rfvCount; ++i)
         stream << *(rfv.at(i));
 
-    dbs("Compressing data...");
+    log_info << "Compressing data...";
+
     f.write(qCompress(data, 1)); // no need to encode with compressed data
     f.close();
 
     // rename C_DAT_FILE + BAK_EXT -> C_DAT_FILE
     if (dir.exists(path)) {
         if (!dir.remove(path)) {
-            dbs("access denied to " + path);
+            log_error << log_format("Access denied to %?", path);
             dir.remove(tmpPath);
             return false;
         }
     }
     dir.rename(tmpPath, path);
-    dbs("Done.");
+
+    log_info << "Cache saved";
     return true;
 }
 
@@ -92,11 +101,15 @@ bool Cache::load(const QString& gitDir, RevFileMap& rfm, StrVect& dirs, StrVect&
     // check for cache file
     QString path(gitDir + C_DAT_FILE);
     QFile f(path);
-    if (!f.exists())
+    if (!f.exists()) {
+        log_error << "Unable to load file-cache";
         return true; // no cache file is not an error
+    }
 
-    if (!f.open(QIODevice::ReadOnly | QIODevice::Unbuffered))
+    if (!f.open(QIODevice::ReadOnly | QIODevice::Unbuffered)) {
+        log_error << "Failed open file: " << path;
         return false;
+    }
 
     QDataStream stream(qUncompress(f.readAll()));
     stream.setVersion(QDataStream::Qt_4_8);
@@ -106,6 +119,7 @@ bool Cache::load(const QString& gitDir, RevFileMap& rfm, StrVect& dirs, StrVect&
     stream >> magic;
     stream >> version;
     if (magic != C_MAGIC || version != C_VERSION) {
+        log_error << "Unable to load file-cache. File version failed";
         f.close();
         return false;
     }

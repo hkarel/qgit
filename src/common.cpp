@@ -11,6 +11,9 @@
 #include <QTextDocument>
 
 #include "shared/break_point.h"
+#include "shared/logger/logger.h"
+#include "shared/logger/format.h"
+#include "shared/qt/logger_operators.h"
 
 static inline uint hexVal(const QChar* ch) {
 
@@ -404,7 +407,7 @@ bool writeToFile(const QString& fileName, const QString& data, bool setExecutabl
 
     QFile file(fileName);
     if (!file.open(QIODevice::WriteOnly)) {
-        dbp("ERROR: unable to write file %1", fileName);
+        log_error << log_format("Unable to write file %?", fileName);
         return false;
     }
     QString data2(data);
@@ -428,7 +431,7 @@ bool writeToFile(const QString& fileName, const QByteArray& data, bool setExecut
 
     QFile file(fileName);
     if (!file.open(QIODevice::WriteOnly)) {
-        dbp("ERROR: unable to write file %1", fileName);
+        log_error << log_format("Unable to write file %?", fileName);
         return false;
     }
     QDataStream stream(&file);
@@ -447,7 +450,7 @@ bool readFromFile(const QString& fileName, QString& data) {
     data = "";
     QFile file(fileName);
     if (!file.open(QIODevice::ReadOnly)) {
-        dbp("ERROR: unable to read file %1", fileName);
+        log_error << log_format("Unable to read file %?", fileName);
         return false;
     }
     QTextStream stream(&file);
@@ -641,7 +644,7 @@ int Rev::parse(const QString& str, int start, int orderIdx, bool withDiff) {
     comStart = ++idx;
     idx = str.indexOf(QChar('\n'), idx); // committer line end
     if (idx == -1) {
-        dbs("ASSERT in indexData: unexpected end of data");
+        log_error << "Unexpected end of data";
         return error;
     }
 
@@ -649,7 +652,7 @@ int Rev::parse(const QString& str, int start, int orderIdx, bool withDiff) {
     autStart = ++idx;
     idx = str.indexOf(QChar('\n'), idx); // author line end
     if (idx == -1) {
-        dbs("ASSERT in indexData: unexpected end of data");
+        log_error << "Unexpected end of data";
         return error;
     }
     _committer = mid(str, comStart, autStart - comStart - 1);
@@ -658,7 +661,7 @@ int Rev::parse(const QString& str, int start, int orderIdx, bool withDiff) {
     autDateStart = ++idx;
     idx = str.indexOf(QChar('\n'), idx); // author date end without '\n'
     if (idx == -1) {
-        dbs("ASSERT in indexData: unexpected end of data");
+        log_error << "Unexpected end of data";
         return error;
     }
     _author = mid(str, autStart, autDateStart - autStart - 1);

@@ -8,6 +8,9 @@
 #include "smartbrowse.h"
 
 #include "shared/defmac.h"
+#include "shared/logger/logger.h"
+#include "shared/logger/format.h"
+#include "shared/qt/logger_operators.h"
 
 #include <QContextMenuEvent>
 #include <QMenu>
@@ -201,7 +204,7 @@ void SmartBrowse::linkActivated(const QString& text) {
         rv->tab()->listViewLog->on_keyDown();
         break;
     default:
-        dbp("ASSERT in SmartBrowse::linkActivated, key %1 not known", text);
+        log_warn << log_format("Key %? not known", text);
     }
 }
 

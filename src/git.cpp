@@ -17,6 +17,9 @@
 
 #include "shared/defmac.h"
 #include "shared/break_point.h"
+#include "shared/logger/logger.h"
+#include "shared/logger/format.h"
+#include "shared/qt/logger_operators.h"
 
 #include <QApplication>
 #include <QDir>
@@ -30,7 +33,7 @@
 #include <QTextDocument>
 #include <QTextStream>
 
-#define SHOW_MSG(x) QApplication::postEvent(parent(), new MessageEvent(x)); EM_PROCESS_EVENTS_NO_INPUT;
+#define SHOW_MSG(x) {QApplication::postEvent(parent(), new MessageEvent(x)); EM_PROCESS_EVENTS_NO_INPUT;}
 
 #define GIT_LOG_FORMAT "%m%HX%PX%n%cn<%ce>%n%an<%ae>%n%at%n%s%n"
 
@@ -90,8 +93,9 @@ void Git::checkEnvironment() {
             MainExecErrorEvent* e = new MainExecErrorEvent(cmd, errorDesc);
             QApplication::postEvent(parent(), e);
         }
-    } else {
-        dbs("Cannot find git files");
+    }
+    else {
+        log_warn << "Cannot find git files";
         return;
     }
     errorReportingEnabled = false;
@@ -394,7 +398,7 @@ const QString Git::getRevInfo(const QString& sha) {
 const QString Git::getTagMsg(const QString& sha) {
 
     if (!checkRef(sha, TAG)) {
-        dbs("ASSERT in Git::getTagMsg, tag not found");
+        log_warn << "Tag not found";
         return "";
     }
     Reference& rf = refsShaMap[sha];
@@ -726,7 +730,7 @@ MyProcess* Git::getFile(const QString& fileSha, QObject* receiver, QByteArray* r
 MyProcess* Git::getHighlightedFile(const QString& fileSha, QObject* receiver, QString* result, const QString& fileName) {
 
     if (!isTextHighlighter()) {
-        dbs("ASSERT in getHighlightedFile: highlighter not found");
+        log_warn << "Highlighter not found";
         return NULL;
     }
     QString ext(fileName.section('.', -1, -1, QString::SectionIncludeLeadingSep));
@@ -962,13 +966,13 @@ const QString Git::getLastCommitMsg() {
     if (run("git rev-parse --verify HEAD", &top))
         sha = top.trimmed();
     else {
-        dbs("ASSERT: getLastCommitMsg head is not valid");
+        log_warn << "Head is not valid";
         return "";
     }
 
     const Rev* c = revLookup(sha);
     if (!c) {
-        dbp("ASSERT: getLastCommitMsg sha <%1> not found", sha);
+        log_warn << log_format("Sha <%?> not found", sha);
         return "";
     }
 
@@ -991,7 +995,7 @@ const QString Git::getNewCommitMsg() {
 
     const Rev* c = revLookup(ZERO_SHA);
     if (!c) {
-        dbs("ASSERT: getNewCommitMsg zero_sha not found");
+        log_warn << "ZERO_SHA not found";
         return "";
     }
     QString status = c->longLog();
@@ -1216,7 +1220,7 @@ const RevFile* Git::getFiles(const QString& sha, const QString& diffToSha, bool 
         return revsFiles[r->sha()]; // ZERO_SHA search arrives here
 
     if (sha == ZERO_SHA) {
-        dbs("ASSERT in Git::getFiles, ZERO_SHA not found");
+        log_warn << "ZERO_SHA not found";
         return NULL;
     }
 
@@ -1625,7 +1629,7 @@ bool Git::stgPush(const QString& sha) {
 
 	const QStringList patch(getRefNames(sha, UN_APPLIED));
     if (patch.count() != 1) {
-        dbp("ASSERT in Git::stgPush, found %1 patches instead of 1", patch.count());
+        log_warn << log_format("Found %? patches instead of 1", patch.count());
         return false;
     }
     return run("stg push " + quote(patch.first()));
@@ -1635,7 +1639,7 @@ bool Git::stgPop(const QString& sha) {
 
 	const QStringList patch(getRefNames(sha, APPLIED));
     if (patch.count() != 1) {
-        dbp("ASSERT in Git::stgPop, found %1 patches instead of 1", patch.count());
+        log_warn << log_format("Found %? patches instead of 1", patch.count());
         return false;
     }
     return run("stg pop " + quote(patch));
@@ -1905,8 +1909,7 @@ void Git::parseStGitPatches(const QStringList& patchNames, const QStringList& pa
         bool applied = (status == "+" || status == ">");
         int pos = patchNames.indexOf(patchName);
         if (pos == -1) {
-            dbp("ASSERT in Git::parseStGitPatches(), patch %1 "
-                "not found in references list.", patchName);
+            log_warn << log_format("Patch %? not found in references list", patchName);
             continue;
         }
         const QString& ss = patchShas.at(pos);
@@ -2068,8 +2071,8 @@ void Git::setStatus(RevFile& rf, const QString& rowSt) {
             rf.onlyModified = false;
             break;
         default:
-            dbp("ASSERT in Git::setStatus, unknown status <%1>. "
-                "'MODIFIED' will be used instead.", rowSt);
+            log_warn << log_format("Unknown status <%?>"
+                                   ". MODIFIED' will be used instead", rowSt);
             rf.status.append(RevFile::MODIFIED);
             break;
     }
@@ -2079,7 +2082,7 @@ void Git::setExtStatus(RevFile& rf, const QString& rowSt, int parNum, FileNamesL
 
     const QStringList sl(rowSt.split('\t', QString::SkipEmptyParts));
     if (sl.count() != 3) {
-        dbp("ASSERT in setExtStatus, unexpected status string %1", rowSt);
+        log_warn << log_format("Unexpected status string %?", rowSt);
         return;
     }
     // we want store extra info with format "orig --> dest (Rxx%)"
@@ -2222,8 +2225,7 @@ void Git::stop(bool saveCache) {
 
         if (!revsFiles.isEmpty()) {
             SHOW_MSG("Saving cache. Please wait...");
-            if (!Cache::save(gitDir, revsFiles, dirNamesVec, fileNamesVec))
-                dbs("ERROR unable to save file names cache");
+            Cache::save(gitDir, revsFiles, dirNamesVec, fileNamesVec);
         }
     }
 }
@@ -2297,7 +2299,7 @@ bool Git::init(const QString& wd, bool askForRange, const QStringList* passedArg
             // load references
             SHOW_MSG(msg1 + "refs...");
             if (!getRefs())
-                dbs("WARNING: no tags or heads found");
+                log_warn << "No tags or heads found";
 
             // startup input range dialog
             SHOW_MSG("");
@@ -2334,9 +2336,10 @@ bool Git::init(const QString& wd, bool askForRange, const QStringList* passedArg
             EM_THROW_PENDING;
             return false;
         }
-        QString info("Exception \'" + EM_DESC(i) + "\' "
-                     "not handled in init...re-throw");
-        dbs(info);
+        log_warn << log_format("Exception '%?' not handled"
+                               ". It will be re-throw", EM_DESC(i));
+        alog::logger().flush();
+        alog::logger().waitingFlush();
         throw;
     }
 }
@@ -2381,9 +2384,10 @@ void Git::init2() {
             EM_THROW_PENDING;
             return;
         }
-        QString info("Exception \'" + EM_DESC(i) + "\' "
-                     "not handled in init2...re-throw");
-        dbs(info);
+        log_warn << log_format("Exception '%?' not handled"
+                               ". It will be re-throw", EM_DESC(i));
+        alog::logger().flush();
+        alog::logger().waitingFlush();
         throw;
     }
 }
@@ -2530,7 +2534,6 @@ void Git::loadFileCache() {
             // The cache isn't valid. Clear it before we corrupt it
             // by freeing `shaBuf`.
             clearFileNames();
-            dbs("ERROR: unable to load file names cache");
         }
     }
 }
@@ -2652,7 +2655,7 @@ int Git::addChunk(FileHistory* fh, const QString& str) {
             }
             // could be a side effect of 'git log -m', see below
             if (isMainHistory(fh) || rev->parentsCount() < 2)
-                dbp("ASSERT: addChunk sha <%1> already received", sha);
+                log_warn << log_format("Sha <%?> already received", sha);
         }
     }
     if (r.isEmpty() && !isMainHistory(fh)) {
@@ -2735,7 +2738,7 @@ bool Git::copyDiffIndex(FileHistory* fh, const QString& parent) {
 // must be called with empty revs and empty revOrder
 
     if (!fh->revOrder.isEmpty() || !fh->revs.isEmpty()) {
-        dbs("ASSERT in copyDiffIndex: called with wrong context");
+        log_warn << "Called with wrong context";
         return false;
     }
     const Rev* r = revLookup(ZERO_SHA);
@@ -2744,7 +2747,7 @@ bool Git::copyDiffIndex(FileHistory* fh, const QString& parent) {
 
     const RevFile* files = getFiles(ZERO_SHA);
     if (!files || findFileIndex(*files, fh->fileNames().first()) == -1)
-            return false;
+        return false;
 
     // insert a custom ZERO_SHA rev with proper parent
     const Rev* rf = fakeWorkDirRev(parent, "Working directory changes", "long log\n", 0, fh);
@@ -2855,7 +2858,7 @@ void Git::procReadyRead(const QByteArray& fileChunk) {
                 cacheNeedsUpdate = true;
             }
             else
-                dbp("ASSERT: repeated sha %1 in file names loading", sha);
+                log_warn << log_format("Repeated sha %? in file names loading", sha);
         }
         else // line.constref(0) == ':'
             parseDiffFormatLine(*rf, line, 1, fileLoader);
@@ -2934,7 +2937,7 @@ void Git::updateDescMap(const Rev* r,uint idx, QHash<QPair<uint, uint>, bool>& d
         for (int i = 0; i < nr.count(); i++) {
 
             if (!dv.contains(nr[i])) {
-                dbp("ASSERT descendant for %1 not found", r->sha());
+                log_warn << log_format("Descendant for %? not found", r->sha());
                 return;
             }
             const QVector<int>& dvv = dv[nr[i]];

@@ -6,22 +6,6 @@
     Copyright: See COPYING file that comes with this distribution
 
 */
-#include <QCloseEvent>
-#include <QEvent>
-#include <QFileDialog>
-#include <QInputDialog>
-#include <QMenu>
-#include <QMessageBox>
-#include <QMimeData>
-#include <QProgressBar>
-#include <QScrollBar>
-#include <QSettings>
-#include <QShortcut>
-#include <QStatusBar>
-#include <QTimer>
-#include <QWheelEvent>
-#include <QTextCodec>
-#include <QUuid>
 #include <assert.h>
 #include "config.h" // defines PACKAGE_VERSION
 #include "commitimpl.h"
@@ -43,6 +27,27 @@
 #include "ui_revsview.h"
 #include "ui_fileview.h"
 #include "ui_patchview.h"
+
+#include "shared/logger/logger.h"
+#include "shared/logger/format.h"
+#include "shared/qt/logger_operators.h"
+
+#include <QCloseEvent>
+#include <QEvent>
+#include <QFileDialog>
+#include <QInputDialog>
+#include <QMenu>
+#include <QMessageBox>
+#include <QMimeData>
+#include <QProgressBar>
+#include <QScrollBar>
+#include <QSettings>
+#include <QShortcut>
+#include <QStatusBar>
+#include <QTimer>
+#include <QWheelEvent>
+#include <QTextCodec>
+#include <QUuid>
 
 using namespace QGit;
 
@@ -465,7 +470,7 @@ void MainImpl::setRepository(const QString& newDir, bool refresh, bool keepSelec
         git->stop(archiveChanged); // stop all pending processes, non blocking
 
         if (archiveChanged && refresh)
-            dbs("ASSERT in setRepository: different dir with no range select");
+            log_warn << "Different dir with no range select";
 
         // now we can clear all our data
         bool complete = !refresh || !keepSelection;
@@ -515,16 +520,18 @@ exit:
         if (quit && !startUpDir.isEmpty())
             close();
 
-    } catch (int i) {
+    }
+    catch (int i) {
         EM_REMOVE(exExiting);
 
         if (EM_MATCH(i, exExiting, "loading repository")) {
             EM_THROW_PENDING;
             return;
         }
-        const QString info("Exception \'" + EM_DESC(i) + "\' not "
-                           "handled in setRepository...re-throw");
-        dbs(info);
+        log_warn << log_format("Exception '%?' not handled"
+                               ". It will be re-throw", EM_DESC(i));
+        alog::logger().flush();
+        alog::logger().waitingFlush();
         throw;
     }
 }
@@ -659,8 +666,7 @@ void MainImpl::tabBar_tabCloseRequested(int index) {
         ActViewFileNewTab->setEnabled(ActViewFile->isEnabled() && firstTab<FileView>());
         break;
     default:
-		dbs("ASSERT in tabBar_tabCloseRequested: unknown current page");
-        break;
+        log_warn << "Unknown current page";
     }
 }
 
@@ -1048,9 +1054,8 @@ bool MainImpl::event(QEvent* e) {
         doFileContexPopup(data, e->type());
         break;
     default:
-        dbp("ASSERT in MainImpl::event unhandled event %1", e->type());
+        log_warn << log_format("Unhandled event %?", e->type());
         ret = false;
-        break;
     }
     return ret;
 }
@@ -1082,46 +1087,10 @@ int MainImpl::tabType(Domain** t, int index) {
         return TAB_FILE;
     }
     if (l2->count() > 0)
-        dbs("ASSERT in tabType file not found");
+        log_warn << "File not found";
 
     delete l2;
     return -1;
-}
-
-template<class X> QList<X*>* MainImpl::getTabs(QWidget* tabPage) {
-
-    QList<X*> l = this->findChildren<X*>();
-    QList<X*>* ret = new QList<X*>;
-
-    for (int i = 0; i < l.size(); ++i) {
-        if (!tabPage || l.at(i)->tabPage() == tabPage)
-            ret->append(l.at(i));
-    }
-    return ret; // 'ret' must be deleted by caller
-}
-
-template<class X> X* MainImpl::firstTab(QWidget* startPage) {
-
-    int minVal = 99, firstVal = 99;
-    int startPos = tabWdg->indexOf(startPage);
-    X* min = NULL;
-    X* first = NULL;
-    QList<X*>* l = getTabs<X>();
-    for (int i = 0; i < l->size(); ++i) {
-
-        X* d = l->at(i);
-        int idx = tabWdg->indexOf(d->tabPage());
-        if (idx < minVal) {
-            minVal = idx;
-            min = d;
-        }
-        if (idx < firstVal && idx > startPos) {
-            firstVal = idx;
-            first = d;
-        }
-    }
-    delete l;
-    return (first ? first : min);
 }
 
 void MainImpl::tabWdg_currentChanged(int w) {
@@ -1142,8 +1111,7 @@ void MainImpl::tabWdg_currentChanged(int w) {
         static_cast<FileView*>(t)->tab()->histListView->setFocus();
         break;
     default:
-        dbs("ASSERT in tabWdg_currentChanged: unknown current page");
-        break;
+        log_warn << "Unknown current page";
     }
 }
 
@@ -1535,8 +1503,7 @@ void MainImpl::ActSplitView_activated() {
         w->setHidden(w->isVisible()); }
         break;
     default:
-        dbs("ASSERT in ActSplitView_activated: unknown current page");
-        break;
+        log_warn << "Unknown current page";
     }
 }
 
@@ -1777,8 +1744,10 @@ void MainImpl::customAction_triggered(QAction* act) {
 
     QSettings set;
     QStringList actionsList = set.value(ACT_LIST_KEY).toStringList();
-    if (!(actionsList.contains(actionName) || actionsList.contains(actionName.remove(QChar('&'))))) {
-        dbp("ASSERT in customAction_activated, action %1 not found", actionName);
+    if (!(actionsList.contains(actionName)
+        || actionsList.contains(actionName.remove(QChar('&')))))
+    {
+        log_warn << log_format("Action %? not found", actionName);
         return;
     }
     QString cmd = set.value(ACT_GROUP_KEY + actionName + ACT_TEXT_KEY).toString().trimmed();
@@ -2127,7 +2096,7 @@ void MainImpl::ActPop_activated() {
 void MainImpl::ActFilterTree_toggled(bool b) {
 
     if (!ActFilterTree->isEnabled()) {
-        dbs("ASSERT ActFilterTree_toggled while disabled");
+        //dbs("ASSERT ActFilterTree_toggled while disabled");
         return;
     }
     if (b) {
@@ -2137,7 +2106,7 @@ void MainImpl::ActFilterTree_toggled(bool b) {
 
         treeView->getTreeSelectedItems(selectedItems);
         if (selectedItems.count() == 0) {
-            dbs("ASSERT tree filter action activated with no selected items");
+            log_warn << "Tree filter action activated with no selected items";
             return;
         }
         statusBar()->showMessage("Filter view on " + selectedItems.join(" "));

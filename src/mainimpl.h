@@ -249,3 +249,43 @@ private slots:
 
 private:
 };
+
+//----------------------------------------------------------------------------
+
+template<class X>
+QList<X*>* MainImpl::getTabs(QWidget* tabPage)
+{
+    QList<X*> l = this->findChildren<X*>();
+    QList<X*>* ret = new QList<X*>;
+
+    for (int i = 0; i < l.size(); ++i) {
+        if (!tabPage || l.at(i)->tabPage() == tabPage)
+            ret->append(l.at(i));
+    }
+    return ret; // 'ret' must be deleted by caller
+}
+
+template<class X> X*
+MainImpl::firstTab(QWidget* startPage)
+{
+    int minVal = 99, firstVal = 99;
+    int startPos = tabWdg->indexOf(startPage);
+    X* min = NULL;
+    X* first = NULL;
+    QList<X*>* l = getTabs<X>();
+    for (int i = 0; i < l->size(); ++i) {
+
+        X* d = l->at(i);
+        int idx = tabWdg->indexOf(d->tabPage());
+        if (idx < minVal) {
+            minVal = idx;
+            min = d;
+        }
+        if (idx < firstVal && idx > startPos) {
+            firstVal = idx;
+            first = d;
+        }
+    }
+    delete l;
+    return (first ? first : min);
+}

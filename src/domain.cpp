@@ -13,6 +13,10 @@
 #include "git.h"
 #include "domain.h"
 
+#include "shared/logger/logger.h"
+#include "shared/logger/format.h"
+#include "shared/qt/logger_operators.h"
+
 using namespace QGit;
 
 void StateInfo::S::clear() {
@@ -282,8 +286,8 @@ void Domain::update(bool fromMaster, bool force) {
         setThrowOnDelete(false);
         EM_REMOVE(exCancelRequest);
 
-    } catch (int i) {
-
+    }
+    catch (int i) {
         /*
            If we have a cancel request because of a new update is in queue we
            cannot roolback current state to avoid new update is filtered out
@@ -315,13 +319,15 @@ void Domain::update(bool fromMaster, bool force) {
             EM_THROW_PENDING;
             return;
         }
-        if (i == exCancelRequest)
+        if (i == exCancelRequest) {
             EM_THROW_PENDING;
             // do not return
+        }
         else {
-            const QString info("Exception \'" + EM_DESC(i) + "\' "
-                               "not handled in init...re-throw");
-            dbs(info);
+            log_warn << log_format("Exception '%?' not handled"
+                                   ". It will be re-throw", EM_DESC(i));
+            alog::logger().flush();
+            alog::logger().waitingFlush();
             throw;
         }
     }

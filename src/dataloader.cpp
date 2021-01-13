@@ -12,6 +12,9 @@
 
 #include "shared/defmac.h"
 #include "shared/break_point.h"
+#include "shared/logger/logger.h"
+#include "shared/logger/format.h"
+#include "shared/qt/logger_operators.h"
 
 #include <QDir>
 #include <QTemporaryFile>
@@ -64,7 +67,7 @@ void DataLoader::on_cancel() {
 bool DataLoader::start(const QStringList& args, const QString& wd, const QString& buf) {
 
     if (!procFinished) {
-        dbs("ASSERT in DataLoader::start(), called while processing");
+        log_warn << "Called while processing";
         return false;
     }
     procFinished = false;
@@ -88,10 +91,10 @@ void DataLoader::on_finished(int, QProcess::ExitStatus) {
     procFinished = true;
 
     if (parsing && guiUpdateTimer.isActive())
-        dbs("ASSERT in DataLoader: timer active while parsing");
+        log_error << "Timer active while parsing";
 
     if (parsing == guiUpdateTimer.isActive() && !canceling)
-        dbs("ASSERT in DataLoader: inconsistent timer");
+        log_error << "Inconsistent timer";
 
     if (guiUpdateTimer.isActive()) // no need to wait anymore
         guiUpdateTimer.start(0);
@@ -120,7 +123,7 @@ void DataLoader::on_timeout() {
     }
 
     if (procFinished) {
-        dbs("Exited while parsing!!!!");
+        log_debug << "Exited while parsing";
         guiUpdateTimer.start(0);
     }
     else
@@ -232,7 +235,7 @@ bool DataLoader::createTemporaryFile() {
 
        So try to manually set the best directory for our temporary file.
     */
-        QDir dir("/tmp");
+        QDir dir {"/tmp"};
         bool foundTmpDir = (dir.exists() && dir.isReadable());
         if (foundTmpDir && dir.absolutePath() != QDir::tempPath()) {
 
@@ -241,10 +244,11 @@ bool DataLoader::createTemporaryFile() {
 
                 delete dataFile;
                 dataFile = new UnbufferedTemporaryFile(this);
-                dbs("WARNING: directory '/tmp' is not writable, "
-                    "fallback on Qt default one, there could "
-                    "be a performance penalty.");
-            } else
+                log_warn << "Directory '/tmp' is not writable,"
+                            " fallback on Qt default one, there could"
+                            " be a performance penalty";
+            }
+            else
                 dataFile->close();
         }
 #endif

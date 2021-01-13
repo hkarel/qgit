@@ -13,6 +13,9 @@
 #include "listview.h"
 
 #include "shared/defmac.h"
+#include "shared/logger/logger.h"
+#include "shared/logger/format.h"
+#include "shared/qt/logger_operators.h"
 
 #include <QApplication>
 #include <QHeaderView>
@@ -702,16 +705,16 @@ bool ListView::getLaneParentsChildren(const QString& sha, int x, QStringList& p,
         p = git->revLookup(sha, fh)->parents(); // pointer cannot be NULL
         root = sha;
     } else {
-        const QString& par(git->getLaneParent(sha, lane));
-        if (par.isEmpty()) {
-                        dbs("ASSERT getLaneParentsChildren: parent not found");
+        const QString& parent {git->getLaneParent(sha, lane)};
+        if (parent.isEmpty()) {
+            log_warn << "Parent not found";
             return false;
         }
-        p.append(par);
+        p.append(parent);
         root = p.first();
     }
     // then find children
-        c = git->getChildren(root);
+    c = git->getChildren(root);
     return true;
 }
 
@@ -1260,7 +1263,7 @@ bool ListViewProxy::isMatch(const QString& sha) const {
 
     const Rev* r = git->revLookup(sha);
     if (!r) {
-        dbp("ASSERT in ListViewFilter::isMatch, sha <%1> not found", sha);
+        log_warn << log_format("Sha <%?> not found", sha);
         return false;
     }
     QString target;

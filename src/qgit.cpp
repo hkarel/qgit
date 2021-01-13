@@ -10,9 +10,10 @@
 #include "shared/defmac.h"
 #include "shared/utils.h"
 #include "shared/logger/logger.h"
+#include "shared/logger/format.h"
 #include "shared/logger/config.h"
-#include "shared/config/appl_conf.h"
-#include "shared/config/logger_conf.h"
+//#include "shared/config/appl_conf.h"
+//#include "shared/config/logger_conf.h"
 #include "shared/qt/logger_operators.h"
 #include "shared/qt/version_number.h"
 

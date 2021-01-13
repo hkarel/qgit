@@ -1,5 +1,6 @@
 #pragma once
 
+#include "shared/qt/logger_operators.h"
 #include <QtCore>
 
 // Class ShaString  is necessary for overloading qHash() function.
@@ -9,20 +10,30 @@ public:
     ShaString(const ShaString&) = default;
     ShaString(const QString& s) : QString(s) {}
     ShaString& operator= (const ShaString&) = default;
-    ShaString& operator= (const QString& s) {
-
+    ShaString& operator= (const QString& s)
+    {
         QString::operator= (s);
         return *this;
     }
 };
 
-inline bool operator== (const ShaString& s1, const QString& s2) {
+inline bool operator== (const ShaString& s1, const QString& s2)
+{
     return ((QString)s1 == s2);
 }
-inline bool operator!= (const ShaString& s1, const QString& s2) {
+inline bool operator!= (const ShaString& s1, const QString& s2)
+{
     return !(s1 == s2);
 }
 
 typedef QVector<QString>    StrVect;
 typedef QVector<ShaString>  ShaVect;
 typedef QSet<QString>       ShaSet;
+
+namespace alog {
+inline Line& operator<< (Line& line, const ShaString& s)
+{
+    line << (QString)s;
+    return line;
+}
+} // namespace alog

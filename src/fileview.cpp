@@ -15,6 +15,10 @@
 #include "filecontent.h"
 #include "fileview.h"
 
+#include "shared/logger/logger.h"
+#include "shared/logger/format.h"
+#include "shared/qt/logger_operators.h"
+
 #define MAX_LINE_NUM 5
 
 FileView::FileView(MainImpl* mi, Git* g) : Domain(mi, g, false) {
@@ -277,7 +281,7 @@ void FileView::on_toolButtonRangeFilter_toggled(bool b) {
     updateEnabledButtons();
     if (b) {
         if (!fileTab->textEditFile->isAnnotateAvailable()) {
-            dbs("ASSERT in on_toolButtonRangeFilter_toggled: annotate not available");
+            log_warn << "Annotate not available";
             return;
         }
         if (!fileTab->textEditFile->textCursor().hasSelection()) {

@@ -12,6 +12,9 @@
 #include "git.h"
 
 #include "shared/defmac.h"
+#include "shared/logger/logger.h"
+#include "shared/logger/format.h"
+#include "shared/qt/logger_operators.h"
 
 #include <QApplication>
 #include <QDateTime>
@@ -72,7 +75,7 @@ const QString FileHistory::sha(int row) const {
 void FileHistory::flushTail() {
 
   if (earlyOutputCnt < 0 || earlyOutputCnt >= revOrder.count()) {
-    dbp("ASSERT in FileHistory::flushTail(), earlyOutputCnt is %1", earlyOutputCnt);
+    log_warn << log_format("earlyOutputCnt is %?", earlyOutputCnt);
     return;
   }
   int cnt = revOrder.count() - earlyOutputCnt + 1;

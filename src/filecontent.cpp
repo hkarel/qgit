@@ -12,6 +12,9 @@
 #include "filecontent.h"
 
 #include "shared/defmac.h"
+#include "shared/logger/logger.h"
+#include "shared/logger/format.h"
+#include "shared/qt/logger_operators.h"
 
 #include <QListWidget>
 #include <QSyntaxHighlighter>
@@ -181,7 +184,7 @@ void FileContent::setShowAnnotate(bool b) {
 void FileContent::setHighlightSource(bool b) {
 
     if (b && !git->isTextHighlighter()) {
-        dbs("ASSERT in setHighlightSource: no highlighter found");
+        log_warn << "No highlighter found";
         return;
     }
     isHtmlSource = b;
@@ -379,7 +382,7 @@ bool FileContent::rangeFilter(bool b) {
 
     if (b) {
         if (!annotateObj) {
-            dbs("ASSERT in rangeFilter: annotateObj not available");
+            log_error << "annotateObj not available";
             return false;
         }
         QApplication::setOverrideCursor(QCursor(Qt::WaitCursor));
@@ -395,16 +398,18 @@ bool FileContent::rangeFilter(bool b) {
             ancestor = annotateObj->computeRanges(st->sha(), paraFrom, paraTo);
             d->setThrowOnDelete(false);
 
-        } catch (int i) {
+        }
+        catch (int i) {
             d->setThrowOnDelete(false);
             QApplication::restoreOverrideCursor();
             if (d->isThrowOnDeleteRaised(i, "range filtering")) {
                 EM_THROW_PENDING;
                 return false;
             }
-            const QString info("Exception \'" + EM_DESC(i) + "\' "
-                               "not handled in lookupAnnotation...re-throw");
-            dbs(info);
+            log_warn << log_format("Exception '%?' not handled"
+                                   ". It will be re-throw", EM_DESC(i));
+            alog::logger().flush();
+            alog::logger().waitingFlush();
             throw;
         }
         QApplication::restoreOverrideCursor();
@@ -440,15 +445,16 @@ bool FileContent::lookupAnnotation() {
         curAnn = git->lookupAnnotation(annotateObj, st->sha());
 
         if (!curAnn) {
-            dbp("ASSERT in lookupAnnotation: no annotation for %1", st->fileName());
+            log_warn << log_format("No annotation for %?", st->fileName());
             clearAnnotate(optEmitSignal);
-
-        } else if (curAnn->lines.empty())
+        }
+        else if (curAnn->lines.empty()) {
             curAnn = NULL;
-
+        }
         d->setThrowOnDelete(false);
 
-    } catch (int i) {
+    }
+    catch (int i) {
 
         d->setThrowOnDelete(false);
 
@@ -456,9 +462,10 @@ bool FileContent::lookupAnnotation() {
             EM_THROW_PENDING;
             return false;
         }
-        const QString info("Exception \'" + EM_DESC(i) + "\' "
-                           "not handled in lookupAnnotation...re-throw");
-        dbs(info);
+        log_warn << log_format("Exception '%?' not handled"
+                               ". It will be re-throw", EM_DESC(i));
+        alog::logger().flush();
+        alog::logger().waitingFlush();
         throw;
     }
     return (curAnn != NULL);

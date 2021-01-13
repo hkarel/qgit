@@ -2,6 +2,9 @@
 #include "common.h"
 
 #include "shared/defmac.h"
+#include "shared/logger/logger.h"
+#include "shared/logger/format.h"
+#include "shared/qt/logger_operators.h"
 
 #include <QLineEdit>
 #include <QTextEdit>
@@ -102,7 +105,8 @@ InputDialog::InputDialog(const QString &cmd, const VariableMap &variables,
         const QString name = re.cap(5);
         const QString value = re.cap(6).mid(1);
         if (widgets.count(name)) { // widget already created
-            if (!type.isEmpty()) dbs("token must not be redefined: " + name);
+            if (!type.isEmpty())
+                log_error << log_format("Token must not be redefined: %?", name);
             continue;
         }
 
@@ -121,12 +125,14 @@ InputDialog::InputDialog(const QString &cmd, const VariableMap &variables,
                 chk_connect_a(w, SIGNAL(editTextChanged(QString)), this, SLOT(validate()));
             }
             item->init(w, "currentText");
-        } else if (type == "listbox") {
+        }
+        else if (type == "listbox") {
             QListView *w = new QListView(this);
             w->installEventFilter(this);
             w->setModel(new QStringListModel(parseStringList(value, variables)));
             item->init(w, NULL);
-        } else if (type == "lineedit" || type == "") {
+        }
+        else if (type == "lineedit" || type == "") {
             QLineEdit *w = new QLineEdit(this);
             w->installEventFilter(this);
             w->setText(parseString(value, variables));
@@ -139,20 +145,24 @@ InputDialog::InputDialog(const QString &cmd, const VariableMap &variables,
                 chk_connect_a(w, SIGNAL(textEdited(QString)), this, SLOT(validate()));
             }
             item->init(w, "text");
-        } else if (type == "textedit") {
+        }
+        else if (type == "textedit") {
             QTextEdit *w = new QTextEdit(this);
             w->installEventFilter(this);
             w->setText(parseString(value, variables));
             w->selectAll();
             item->init(w, "plainText");
-        } else {
-            dbs("unknown widget type: " + type);
+        }
+        else {
+            log_warn << log_format("Unknown widget type: %?", type);
             continue;
         }
+
         widgets.insert(name, item);
         if (name.startsWith('_')) { // _name triggers hiding of label
             layout->addWidget(item->widget, row, 1);
-        } else {
+        }
+        else {
             layout->addWidget(new QLabel(name + ":"), row, 0);
             layout->addWidget(item->widget, row, 1);
         }
@@ -178,7 +188,7 @@ QVariant InputDialog::value(const QString &token) const
 {
     WidgetItemPtr item = widgets.value(token);
     if (!item) {
-        dbs("unknown token: " + token);
+        log_warn << log_format("Unknown token: %?", token);
         return QString();
     }
     return item->widget->property(item->prop_name);
