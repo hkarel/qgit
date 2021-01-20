@@ -49,7 +49,7 @@
 #include <QTextCodec>
 #include <QUuid>
 
-using namespace QGit;
+using namespace qgit;
 
 MainImpl::MainImpl(const QString& cd, QWidget* p) : QMainWindow(p) {
 
@@ -103,7 +103,7 @@ MainImpl::MainImpl(const QString& cd, QWidget* p) : QMainWindow(p) {
         font = QApplication::font().toString();
 #endif
 	}
-    QGit::STD_FONT.fromString(font);
+    qgit::STD_FONT.fromString(font);
 
     int iconSizeIndex = settings.value(ICON_SIZE_INDEX, 0).toInt();
     switch (iconSizeIndex) {
@@ -137,7 +137,7 @@ MainImpl::MainImpl(const QString& cd, QWidget* p) : QMainWindow(p) {
 #endif
         font = fnt.toString();              // to current style hint
     }
-    QGit::TYPE_WRITER_FONT.fromString(font);
+    qgit::TYPE_WRITER_FONT.fromString(font);
 
     // set-up tab view
     delete tabWdg->currentWidget(); // cannot be done in Qt Designer
@@ -157,9 +157,9 @@ MainImpl::MainImpl(const QString& cd, QWidget* p) : QMainWindow(p) {
     pbFileNamesLoading->hide();
     statusBar()->addPermanentWidget(pbFileNamesLoading);
 
-    QGit::SplitVect v {1, treeSplitter};
-    QGit::restoreGeometrySetting(QGit::MAIN_GEOM_KEY, this);
-    QGit::restoreGeometrySetting(QGit::MAIN_GEOM_KEY, &v);
+    qgit::SplitVect v {1, treeSplitter};
+    qgit::restoreGeometrySetting(qgit::MAIN_GEOM_KEY, this);
+    qgit::restoreGeometrySetting(qgit::MAIN_GEOM_KEY, &v);
     treeView->hide();
 
     // set-up menu for recent visited repositories
@@ -171,7 +171,7 @@ MainImpl::MainImpl(const QString& cd, QWidget* p) : QMainWindow(p) {
     doUpdateCustomActionMenu(settings.value(ACT_LIST_KEY).toStringList());
 
     // manual adjust lineEditSHA width
-    QString tmp(QGit::SHA_END_LENGTH, '8');
+    QString tmp(qgit::SHA_END_LENGTH, '8');
     int wd = lineEditSHA->fontMetrics().boundingRect(tmp).width();
     lineEditSHA->setMinimumWidth(wd);
 
@@ -234,7 +234,7 @@ MainImpl::MainImpl(const QString& cd, QWidget* p) : QMainWindow(p) {
 
 void MainImpl::initWithEventLoopActive() {
 
-	emit flagChanged(QGit::ENABLE_DRAGNDROP_F);
+    emit flagChanged(qgit::ENABLE_DRAGNDROP_F);
     git->checkEnvironment();
     setRepository(startUpDir);
     startUpDir = ""; // one shot
@@ -250,9 +250,9 @@ void MainImpl::initWithEventLoopActive() {
 
 void MainImpl::saveCurrentGeometry() {
 
-    QGit::SplitVect v {1, treeSplitter};
-    QGit::saveGeometrySetting(QGit::MAIN_GEOM_KEY, this);
-    QGit::saveGeometrySetting(QGit::MAIN_GEOM_KEY, &v);
+    qgit::SplitVect v {1, treeSplitter};
+    qgit::saveGeometrySetting(qgit::MAIN_GEOM_KEY, this);
+    qgit::saveGeometrySetting(qgit::MAIN_GEOM_KEY, &v);
 }
 
 void MainImpl::highlightAbbrevSha(const QString& abbrevSha) {
@@ -315,7 +315,7 @@ void MainImpl::ActExternalDiff_activated() {
     ExternalDiffProc* externalDiff = new ExternalDiffProc(filenames, this);
     externalDiff->setWorkingDirectory(curDir);
 
-    if (!QGit::startProcess(externalDiff, args)) {
+    if (!qgit::startProcess(externalDiff, args)) {
         QString text("Cannot start external viewer: ");
         text.append(args[0]);
         QMessageBox::warning(this, "Error - QGit", text);
@@ -404,7 +404,7 @@ void MainImpl::ActExternalEditor_activated() {
     ExternalEditorProc* externalEditor = new ExternalEditorProc(this);
     externalEditor->setWorkingDirectory(curDir);
 
-    if (!QGit::startProcess(externalEditor, args)) {
+    if (!qgit::startProcess(externalEditor, args)) {
         QString text("Cannot start external editor: ");
         text.append(args[0]);
         QMessageBox::warning(this, "Error - QGit", text);
@@ -763,7 +763,7 @@ bool MainImpl::eventFilter(QObject* obj, QEvent* ev) {
 void MainImpl::applyRevisions(const QStringList& remoteRevs, const QString& remoteRepo) {
 	// remoteRevs is already sanity checked to contain some possible valid data
 
-    QDir dr(curDir + QGit::PATCHES_DIR);
+    QDir dr(curDir + qgit::PATCHES_DIR);
 	dr.setFilter(QDir::Files);
 	if (!dr.exists(remoteRepo)) {
 		statusBar()->showMessage("Remote repository missing: " + remoteRepo);
@@ -1251,15 +1251,15 @@ void MainImpl::scrollTextEdit(int delta) {
 void MainImpl::adjustFontSize(int delta) {
 // font size is changed on a 'per instance' base and only on list views
 
-    int ps = QGit::STD_FONT.pointSize() + delta;
+    int ps = qgit::STD_FONT.pointSize() + delta;
     if (ps < 2)
         return;
 
-    QGit::STD_FONT.setPointSize(ps);
+    qgit::STD_FONT.setPointSize(ps);
 
     QSettings settings;
-    settings.setValue(QGit::STD_FNT_KEY, QGit::STD_FONT.toString());
-    emit changeFont(QGit::STD_FONT);
+    settings.setValue(qgit::STD_FNT_KEY, qgit::STD_FONT.toString());
+    emit changeFont(qgit::STD_FONT);
 }
 
 void MainImpl::fileNamesLoad(int status, int value) {

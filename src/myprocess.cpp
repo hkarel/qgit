@@ -121,7 +121,7 @@ bool MyProcess::launchMe(const QString& runCmd, const QString& buf) {
         return false;
 
     setWorkingDirectory(workDir);
-    if (!QGit::startProcess(this, arguments, buf, &isWinShell)) {
+    if (!qgit::startProcess(this, arguments, buf, &isWinShell)) {
         sendErrorMsg(true);
         return false;
     }
@@ -214,7 +214,7 @@ const QStringList MyProcess::splitArgList(const QString& cmd) {
 // sl = <cmd,some_arg,some thing,v='some value'>
 
     // early exit the common case
-    if (!(cmd.contains(QGit::QUOTE_CHAR)
+    if (!(cmd.contains(qgit::QUOTE_CHAR)
           || cmd.contains("\"")
           || cmd.contains("\'")))
         return cmd.split(' ', QString::SkipEmptyParts);
@@ -243,7 +243,7 @@ const QStringList MyProcess::splitArgList(const QString& cmd) {
     // with quoted text wholly inside as
     // arg1 = <[patch] cool patch on "cool feature">
     // and should be removed before to feed QProcess
-    newCmd.remove(QGit::QUOTE_CHAR);
+    newCmd.remove(qgit::QUOTE_CHAR);
 
     // QProcess::setArguments doesn't want quote
     // delimited arguments, so remove trailing quotes
@@ -266,7 +266,7 @@ void MyProcess::restoreSpaces(QString& newCmd, const QChar& sepChar) {
         const QChar& c = newCmd[i];
 
         if (!replace
-            && (c == QGit::QUOTE_CHAR[0] || c == '\"' || c == '\'')
+            && (c == qgit::QUOTE_CHAR[0] || c == '\"' || c == '\'')
             && (newCmd.count(c) % 2 == 0)) {
 
                 replace = true;

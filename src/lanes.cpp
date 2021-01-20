@@ -12,7 +12,7 @@
 
 #define IS_NODE(x) (x == NODE || x == NODE_R || x == NODE_L)
 
-using namespace QGit;
+using namespace qgit;
 
 void Lanes::init(const QString& expectedSha) {
 

@@ -25,7 +25,7 @@ void FileList::setup(Domain* dm, Git* g) {
     git = g;
     st = &(d->st);
 
-    setFont(QGit::STD_FONT);
+    setFont(qgit::STD_FONT);
 
     chk_connect_a(this, SIGNAL(customContextMenuRequested(const QPoint&)),
                   this, SLOT(on_customContextMenuRequested(const QPoint&)));
@@ -116,7 +116,7 @@ void FileList::on_customContextMenuRequested(const QPoint&) {
     if (row == -1 || (row == 0 && st->isMerge())) // header clicked
         return;
 
-    emit contextMenu(currentText(), QGit::POPUP_FILE_EV);
+    emit contextMenu(currentText(), qgit::POPUP_FILE_EV);
 }
 
 bool FileList::startDragging(QMouseEvent* /*e*/) {
@@ -150,7 +150,7 @@ bool FileList::startDragging(QMouseEvent* /*e*/) {
 }
 
 void FileList::mouseMoveEvent(QMouseEvent* e) {
-	if (e->buttons() == Qt::LeftButton && QGit::testFlag(QGit::ENABLE_DRAGNDROP_F))
+	if (e->buttons() == Qt::LeftButton && qgit::testFlag(qgit::ENABLE_DRAGNDROP_F))
         if (startDragging(e)) return;
 
     QListWidget::mouseMoveEvent(e);
@@ -219,7 +219,7 @@ void FileList::update(const RevFile* files, bool newFiles) {
 
     QPalette pl = QApplication::palette();
     if (!st->diffToSha().isEmpty())
-        pl.setColor(QPalette::Base, QGit::LIGHT_BLUE);
+        pl.setColor(QPalette::Base, qgit::LIGHT_BLUE);
 
     setPalette(pl);
     if (newFiles)

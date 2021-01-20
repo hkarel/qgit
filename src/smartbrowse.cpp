@@ -71,7 +71,7 @@ SmartBrowse::SmartBrowse(RevsView* par) : QObject(par) {
 
     rv = par;
     wheelCnt = 0;
-    lablesEnabled = QGit::testFlag(QGit::SMART_LBL_F);
+    lablesEnabled = qgit::testFlag(qgit::SMART_LBL_F);
 
     QString txt("<p><img src=\":/icons/resources/%1\"> %2 %3</p>");
     QString link("<a href=\"%1\">%2</a>");
@@ -180,13 +180,13 @@ void SmartBrowse::updateVisibility() {
 
 void SmartBrowse::flagChanged(uint flag) {
 
-    if (flag == QGit::SMART_LBL_F && curTextEdit()) {
-        lablesEnabled = QGit::testFlag(QGit::SMART_LBL_F);
+    if (flag == qgit::SMART_LBL_F && curTextEdit()) {
+        lablesEnabled = qgit::testFlag(qgit::SMART_LBL_F);
         setVisible(curTextEdit()->isEnabled());
         updatePosition();
     }
-    if (flag == QGit::LOG_DIFF_TAB_F)
-        rv->setTabLogDiffVisible(QGit::testFlag(QGit::LOG_DIFF_TAB_F));
+    if (flag == qgit::LOG_DIFF_TAB_F)
+        rv->setTabLogDiffVisible(qgit::testFlag(qgit::LOG_DIFF_TAB_F));
 }
 
 void SmartBrowse::linkActivated(const QString& text) {

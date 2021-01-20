@@ -19,7 +19,7 @@
 
 uint qHash(const ShaString&); // optimized custom hash for sha strings
 
-namespace QGit {
+namespace qgit {
 
 // minimum git version required
 extern const QString GIT_VERSION;
@@ -411,8 +411,8 @@ private:
 #define DEF_EVENT(X, T) class X : public BaseEvent { public:        \
                         explicit X (const QString& d) : BaseEvent(d, T) {} }
 
-DEF_EVENT(MessageEvent, QGit::MSG_EV);
-DEF_EVENT(AnnotateProgressEvent, QGit::ANN_PRG_EV);
+DEF_EVENT(MessageEvent, qgit::MSG_EV);
+DEF_EVENT(AnnotateProgressEvent, qgit::ANN_PRG_EV);
 
 class DeferredPopupEvent : public BaseEvent
 {
@@ -424,7 +424,7 @@ class MainExecErrorEvent : public BaseEvent
 {
 public:
     MainExecErrorEvent(const QString& c, const QString& e)
-        : BaseEvent("", QGit::ERROR_EV), cmd(c), err(e)
+        : BaseEvent("", qgit::ERROR_EV), cmd(c), err(e)
     {}
     const QString command() const {return cmd;}
     const QString report() const {return err;}

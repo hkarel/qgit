@@ -18,7 +18,7 @@
 #include <QStringListModel>
 #include <QKeyEvent>
 
-namespace QGit {
+namespace qgit {
 
 InputDialog::WidgetItem::WidgetItem() : widget(NULL)
 {

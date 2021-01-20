@@ -20,7 +20,7 @@
 
 #define MAX_AUTHOR_LEN 16
 
-using namespace QGit;
+using namespace qgit;
 
 Annotate::Annotate(Git* parent, QObject* guiObj) : QObject(parent) {
 

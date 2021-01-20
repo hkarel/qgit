@@ -20,13 +20,13 @@
 #include <QDateTime>
 #include <QFontMetrics>
 
-using namespace QGit;
+using namespace qgit;
 
 FileHistory::FileHistory(QObject* p, Git* g) : QAbstractItemModel(p), git(g) {
 
   headerInfo << "Graph" << "Id" << "Short Log" << "Author" << "Author Date";
   lns = new Lanes();
-  revs.reserve(QGit::MAX_DICT_SIZE);
+  revs.reserve(qgit::MAX_DICT_SIZE);
   clear(); // after _headerInfo is set
 
   chk_connect_a(git, SIGNAL(newRevsAdded(const FileHistory*, const QVector<ShaString>&)),
@@ -164,7 +164,7 @@ void FileHistory::on_loadCompleted(const FileHistory* fh, const QString&) {
 
   // adjust Id column width according to the numbers of revisions we have
   if (!git->isMainHistory(this))
-    on_changeFont(QGit::STD_FONT);
+    on_changeFont(qgit::STD_FONT);
 }
 
 void FileHistory::on_changeFont(const QFont& f) {
@@ -253,16 +253,16 @@ QVariant FileHistory::data(const QModelIndex& index, int role) const {
   if (r->lanes.count() == 0)
     git->setLane(r->sha(), const_cast<FileHistory*>(this));
 
-  if (col == QGit::ANN_ID_COL)
+  if (col == qgit::ANN_ID_COL)
     return (annIdValid ? rowCnt - index.row() : QVariant());
 
-  if (col == QGit::LOG_COL)
+  if (col == qgit::LOG_COL)
     return r->shortLog();
 
-  if (col == QGit::AUTH_COL)
+  if (col == qgit::AUTH_COL)
     return r->author();
 
-  if (col == QGit::TIME_COL && r->sha() != QGit::ZERO_SHA) {
+  if (col == qgit::TIME_COL && r->sha() != qgit::ZERO_SHA) {
 
     if (secs != 0) // secs is 0 for absolute date
       return timeDiff(secs - r->authorDate().toULong());

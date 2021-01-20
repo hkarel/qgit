@@ -32,7 +32,7 @@ void getTagMarkParams(QString &name, QStyleOptionViewItem& o,
                       const int type, const bool isCurrent);
 uint refTypeFromName(const QString& name);
 
-using namespace QGit;
+using namespace qgit;
 
 ListView::ListView(QWidget* parent) : QTreeView(parent), d(NULL), git(NULL), fh(NULL), lp(NULL), dropInfo(NULL) {}
 
@@ -44,7 +44,7 @@ void ListView::setup(Domain* dm, Git* g) {
     st = &(d->st);
     filterNextContextMenuRequest = false;
 
-    setFont(QGit::STD_FONT);
+    setFont(qgit::STD_FONT);
 
     // create ListViewProxy unplugged, will be plug
     // to the model only when filtering is needed
@@ -118,12 +118,12 @@ void ListView::setupGeometry() {
 
     if (git->isMainHistory(fh))
     {
-        QGit::HeaderVect v {1, header()};
-        QGit::restoreGeometrySetting(QGit::REV_GEOM_KEY, &v);
+        qgit::HeaderVect v {1, header()};
+        qgit::restoreGeometrySetting(qgit::REV_GEOM_KEY, &v);
         hideColumn(ANN_ID_COL);
     }
 
-    const QString settingsKey = git->isMainHistory(fh) ? QGit::REV_COLS_KEY : QGit::FILE_COLS_KEY;
+    const QString settingsKey = git->isMainHistory(fh) ? qgit::REV_COLS_KEY : qgit::FILE_COLS_KEY;
     QSettings settings;
     QVariant v = settings.value(settingsKey);
     if (v.isValid())
@@ -133,11 +133,11 @@ void ListView::setupGeometry() {
 void ListView::saveGeometry()
 {
     if (git->isMainHistory(fh)) {
-        QGit::HeaderVect v {1, header()};
-        QGit::saveGeometrySetting(QGit::REV_GEOM_KEY, &v);
+        qgit::HeaderVect v {1, header()};
+        qgit::saveGeometrySetting(qgit::REV_GEOM_KEY, &v);
     }
 
-    const QString settingsKey = git->isMainHistory(fh) ? QGit::REV_COLS_KEY : QGit::FILE_COLS_KEY;
+    const QString settingsKey = git->isMainHistory(fh) ? qgit::REV_COLS_KEY : qgit::FILE_COLS_KEY;
     QSettings settings;
     settings.setValue(settingsKey, header()->saveState());
 }
@@ -442,7 +442,7 @@ void ListView::startDragging(QMouseEvent* /*e*/) {
 
 void ListView::mouseMoveEvent(QMouseEvent* e) {
 
-    if (e->buttons() == Qt::LeftButton && QGit::testFlag(QGit::ENABLE_DRAGNDROP_F)) {
+    if (e->buttons() == Qt::LeftButton && qgit::testFlag(qgit::ENABLE_DRAGNDROP_F)) {
         startDragging(e);
         return;
     }

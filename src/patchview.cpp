@@ -115,7 +115,7 @@ void PatchView::button_clicked(int diffType) {
         sha = patchTab->lineEditDiff->text();
         break;
     }
-    if (sha == QGit::ZERO_SHA)
+    if (sha == qgit::ZERO_SHA)
         return;
 
     // check for a ref name or an abbreviated form

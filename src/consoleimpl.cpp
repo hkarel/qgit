@@ -17,18 +17,18 @@ ConsoleImpl::ConsoleImpl(const QString& nm, Git* g) : git(g), actionName(nm) {
 
     setAttribute(Qt::WA_DeleteOnClose);
     setupUi(this);
-    textEditOutput->setFont(QGit::TYPE_WRITER_FONT);
+    textEditOutput->setFont(qgit::TYPE_WRITER_FONT);
     QFont f = textLabelCmd->font();
     f.setBold(true);
     textLabelCmd->setFont(f);
     setWindowTitle("\'" + actionName + "\' output window - QGit");
-    QGit::restoreGeometrySetting(QGit::CON_GEOM_KEY, this);
+    qgit::restoreGeometrySetting(qgit::CON_GEOM_KEY, this);
 }
 
 void ConsoleImpl::typeWriterFontChanged() {
 
     QTextEdit* te = textEditOutput;
-    te->setFont(QGit::TYPE_WRITER_FONT);
+    te->setFont(qgit::TYPE_WRITER_FONT);
     te->setPlainText(te->toPlainText());
     te->moveCursor(QTextCursor::End);
 }
@@ -57,7 +57,7 @@ void ConsoleImpl::closeEvent(QCloseEvent* ce) {
     if (QApplication::overrideCursor())
         QApplication::restoreOverrideCursor();
 
-    QGit::saveGeometrySetting(QGit::CON_GEOM_KEY, this);
+    qgit::saveGeometrySetting(qgit::CON_GEOM_KEY, this);
     QMainWindow::closeEvent(ce);
 }
 
@@ -81,7 +81,7 @@ bool ConsoleImpl::start(const QString& cmd) {
 void ConsoleImpl::procReadyRead(const QByteArray& data) {
 
     QString newParagraph;
-    if (QGit::stripPartialParaghraps(data, &newParagraph, &inpBuf))
+    if (qgit::stripPartialParaghraps(data, &newParagraph, &inpBuf))
         // QTextEdit::append() adds a new paragraph,
         // i.e. inserts a LF if not already present.
         textEditOutput->append(newParagraph);

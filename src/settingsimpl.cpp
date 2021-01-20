@@ -40,7 +40,7 @@ static const char* en[] = { "Latin1", "Big5 -- Chinese", "EUC-JP -- Japanese",
     "windows-1255 -- Hebrew", "windows-1256 -- Arabic", "windows-1257 -- Baltic",
     "windows-1258", 0 };
 
-using namespace QGit;
+using namespace qgit;
 
 SettingsImpl::SettingsImpl(QWidget* p, Git* g, int defTab) : QDialog(p), git(g) {
 

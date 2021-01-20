@@ -24,7 +24,7 @@ void DiffHighlighter::highlightBlock(const QString& text) {
     QBrush blue    = useDark ? Qt::darkBlue    : QColor(Qt::cyan);
     QBrush green   = useDark ? Qt::darkGreen   : QColor(Qt::green);
     QBrush magenta = useDark ? Qt::darkMagenta : QColor(Qt::magenta);
-    QBrush backgroundPurple = useDark ? QGit::PURPLE : QGit::PURPLE.darker(600);
+    QBrush backgroundPurple = useDark ? qgit::PURPLE : qgit::PURPLE.darker(600);
 
     QTextCharFormat myFormat;
     const char firstChar = text.at(0).toLatin1();
@@ -99,7 +99,7 @@ PatchContent::PatchContent(QWidget* parent) : QTextEdit(parent) {
     pickAxeRE.setMinimal(true);
     pickAxeRE.setCaseSensitivity(Qt::CaseInsensitive);
 
-    setFont(QGit::TYPE_WRITER_FONT);
+    setFont(qgit::TYPE_WRITER_FONT);
     diffHighlighter = new DiffHighlighter(this);
 }
 
@@ -211,14 +211,14 @@ void PatchContent::procReadyRead(const QByteArray& data) {
 
 void PatchContent::typeWriterFontChanged() {
 
-    setFont(QGit::TYPE_WRITER_FONT);
+    setFont(qgit::TYPE_WRITER_FONT);
     setPlainText(toPlainText());
 }
 
 void PatchContent::processData(const QByteArray& fileChunk, int* prevLineNum) {
 
     QString newLines;
-    if (!QGit::stripPartialParaghraps(fileChunk, &newLines, &halfLine))
+    if (!qgit::stripPartialParaghraps(fileChunk, &newLines, &halfLine))
         return;
 
     if (!prevLineNum && curFilter == VIEW_ALL)

@@ -76,7 +76,7 @@ bool DataLoader::start(const QStringList& args, const QString& wd, const QString
     chk_connect_a(this, SIGNAL(finished(int, QProcess::ExitStatus)),
                   this, SLOT(on_finished(int, QProcess::ExitStatus)));
 
-    if (!createTemporaryFile() || !QGit::startProcess(this, args, buf)) {
+    if (!createTemporaryFile() || !qgit::startProcess(this, args, buf)) {
         deleteLater();
         return false;
     }

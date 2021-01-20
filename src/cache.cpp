@@ -16,7 +16,7 @@
 #include "shared/logger/format.h"
 #include "shared/qt/logger_operators.h"
 
-using namespace QGit;
+using namespace qgit;
 
 bool Cache::save(const QString& gitDir, const RevFileMap& rfm,
                  const StrVect& dirs, const StrVect& files) {

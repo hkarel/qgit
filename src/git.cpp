@@ -41,7 +41,7 @@
 // It's OK to be unique among qgit windows.
 static bool startup = true;
 
-using namespace QGit;
+using namespace qgit;
 
 
 // ****************************************************************************
@@ -527,7 +527,7 @@ MyProcess* Git::runAsync(const QString& runCmd, QObject* receiver, const QString
 
 MyProcess* Git::runAsScript(const QString& runCmd, QObject* receiver, const QString& buf) {
 
-    const QString scriptFile(workDir + "/qgit_script" + QGit::SCRIPT_EXT);
+    const QString scriptFile(workDir + "/qgit_script" + qgit::SCRIPT_EXT);
 #ifndef Q_OS_WIN32
     // without this process doesn't start under Linux
     QString cmd(runCmd.startsWith("#!") ? runCmd : "#!/bin/sh\n" + runCmd);
@@ -546,7 +546,7 @@ MyProcess* Git::runAsScript(const QString& runCmd, QObject* receiver, const QStr
 void Git::on_runAsScript_eof() {
 
     QDir dir(workDir);
-    dir.remove("qgit_script" + QGit::SCRIPT_EXT);
+    dir.remove("qgit_script" + qgit::SCRIPT_EXT);
 }
 
 void Git::cancelProcess(MyProcess* p) {
@@ -1818,8 +1818,8 @@ bool Git::getRefs() {
     const QStringList rLst = runOutput.split('\n', QString::SkipEmptyParts);
     for (const QString& s : rLst) {
 
-        const QString& revSha = s.left(QGit::SHA_LENGTH);
-        const QString& refName = s.mid(QGit::SHA_END_LENGTH);
+        const QString& revSha = s.left(qgit::SHA_LENGTH);
+        const QString& refName = s.mid(qgit::SHA_END_LENGTH);
 
         if (refName.startsWith("refs/patches/")) {
 

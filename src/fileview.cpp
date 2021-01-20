@@ -128,7 +128,7 @@ void FileView::clear(bool complete) {
 
 bool FileView::goToCurrentAnnotation(int direction) {
 
-    const QString& ids = fileTab->histListView->currentText(QGit::ANN_ID_COL);
+    const QString& ids = fileTab->histListView->currentText(qgit::ANN_ID_COL);
     int id = (!ids.isEmpty() ? ids.toInt() : 0);
     fileTab->textEditFile->goToAnnotation(id, direction);
     return (id != 0);
@@ -136,7 +136,7 @@ bool FileView::goToCurrentAnnotation(int direction) {
 
 void FileView::updateSpinBoxValue() {
 
-    const QString& ids = fileTab->histListView->currentText(QGit::ANN_ID_COL);
+    const QString& ids = fileTab->histListView->currentText(qgit::ANN_ID_COL);
     if (    ids.isEmpty()
         || !fileTab->spinBoxRevision->isEnabled()
         ||  fileTab->spinBoxRevision->value() == ids.toInt())

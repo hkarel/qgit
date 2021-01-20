@@ -4,7 +4,7 @@
 
 class QValidator;
 class QPushButton;
-namespace QGit {
+namespace qgit {
 
 /** create an input dialog from a command containing tokens of the form
  * %<widget_type>[options]:<widget name>=<default value>%

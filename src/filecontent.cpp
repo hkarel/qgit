@@ -63,7 +63,7 @@ FileContent::FileContent(QWidget* parent) : QTextEdit(parent) {
     rangeInfo = new RangeInfo();
     fileHighlighter = new FileHighlighter(this);
 
-    setFont(QGit::TYPE_WRITER_FONT);
+    setFont(qgit::TYPE_WRITER_FONT);
 }
 
 FileContent::~FileContent() {
@@ -493,7 +493,7 @@ void FileContent::on_annotateReady(Annotate* readyAnn, bool ok, const QString& m
 
 void FileContent::typeWriterFontChanged() {
 
-    setFont(QGit::TYPE_WRITER_FONT);
+    setFont(qgit::TYPE_WRITER_FONT);
 
     if (!isHtmlSource && !isImageFile && isFileAvail) {
         setPlainText(toPlainText());
@@ -544,7 +544,7 @@ void FileContent::showFileImage() {
         QString header("<p class=Image><img src=\"" +
                        f.fileName() + "\"></p>");
 
-        QGit::writeToFile(f.fileName(), fileRowData);
+        qgit::writeToFile(f.fileName(), fileRowData);
         setHtml(header);
     }
 }

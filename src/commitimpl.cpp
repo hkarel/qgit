@@ -23,7 +23,7 @@
 
 #include "shared/defmac.h"
 
-using namespace QGit;
+using namespace qgit;
 
 QString CommitImpl::lastMsgBeforeError;
 
@@ -34,9 +34,9 @@ CommitImpl::CommitImpl(Git* g, bool amend) : git(g) {
     setupUi(this);
     textEditMsg->setFont(TYPE_WRITER_FONT);
 
-    QGit::SplitVect v(1, splitter);
-    QGit::restoreGeometrySetting(CMT_GEOM_KEY, this);
-    QGit::restoreGeometrySetting(CMT_GEOM_KEY, &v);
+    qgit::SplitVect v(1, splitter);
+    qgit::restoreGeometrySetting(CMT_GEOM_KEY, this);
+    qgit::restoreGeometrySetting(CMT_GEOM_KEY, &v);
 
     QSettings settings;
     QString templ(settings.value(CMT_TEMPL_KEY, CMT_TEMPL_DEF).toString());
@@ -137,9 +137,9 @@ CommitImpl::CommitImpl(Git* g, bool amend) : git(g) {
 
 void CommitImpl::closeEvent(QCloseEvent*) {
 
-    QGit::SplitVect v {1, splitter};
-    QGit::saveGeometrySetting(CMT_GEOM_KEY, this);
-    QGit::saveGeometrySetting(CMT_GEOM_KEY, &v);
+    qgit::SplitVect v {1, splitter};
+    qgit::saveGeometrySetting(CMT_GEOM_KEY, this);
+    qgit::saveGeometrySetting(CMT_GEOM_KEY, &v);
 }
 
 void CommitImpl::contextMenuPopup(const QPoint& pos)  {

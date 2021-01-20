@@ -26,7 +26,7 @@
     #pragma comment(linker,"/subsystem:windows")
 #endif
 
-using namespace QGit;
+using namespace qgit;
 
 int main(int argc, char* argv[])
 {

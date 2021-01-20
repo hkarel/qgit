@@ -35,7 +35,7 @@ uint qHash(const ShaString& s) {
          +  hexVal(ch + 12);
 }
 
-namespace QGit {
+namespace qgit {
 
 #ifdef Q_OS_WIN32 // *********  platform dependent code ******
 
@@ -553,7 +553,7 @@ int Rev::parse(const QString& str, int start, int orderIdx, bool withDiff) {
         - a terminating '\0'
 */
     static int error = -1;
-    static int shaXEndlLength = QGit::SHA_LENGTH + 2; // an sha key + X marker + \n
+    static int shaXEndlLength = qgit::SHA_LENGTH + 2; // an sha key + X marker + \n
     static QChar finalOutputMarker('F'); // marks the beginning of "Final output" string
     static QChar logSizeMarker('l'); // marks the beginning of "log size" string
     static int logSizeStrLength = 9; // "log size"
@@ -594,22 +594,22 @@ int Rev::parse(const QString& str, int start, int orderIdx, bool withDiff) {
     shaStart = idx;
 
     _isBoundary = (str.at(shaStart - 1) == '-');
-    _sha = mid(str, shaStart, QGit::SHA_LENGTH);
+    _sha = mid(str, shaStart, qgit::SHA_LENGTH);
 
     // ok, now shaStart is valid but msgSize could be still 0 if not available
     logEnd = shaStart - 1 + logSize;
     if (logEnd > last)
         logEnd = last;
 
-    idx += QGit::SHA_LENGTH; // now points to 'X' place holder
+    idx += qgit::SHA_LENGTH; // now points to 'X' place holder
 
     //parentsCnt = 0;
 
     if (data[idx + 2] == '\n') // initial revision
         ++idx;
     else do {
-        _parents.append(mid(str, idx + 1, QGit::SHA_LENGTH));
-        idx += QGit::SHA_END_LENGTH;
+        _parents.append(mid(str, idx + 1, qgit::SHA_LENGTH));
+        idx += qgit::SHA_END_LENGTH;
 
         if (idx + 1 >= last)
             break;

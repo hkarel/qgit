@@ -12,7 +12,7 @@
 #include "git.h"
 #include "rangeselectimpl.h"
 
-using namespace QGit;
+using namespace qgit;
 
 RangeSelectImpl::RangeSelectImpl(QWidget* par, QString* r, bool repoChanged, Git* g)
                 : QDialog(par), git(g), range(r) {

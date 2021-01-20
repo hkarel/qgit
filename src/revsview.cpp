@@ -31,14 +31,14 @@ RevsView::RevsView(MainImpl* mi, Git* g, bool isMain) : Domain(mi, g, isMain) {
     tab()->fileList->setup(this, git);
     m()->treeView->setup(this, git);
 
-    setTabLogDiffVisible(QGit::testFlag(QGit::LOG_DIFF_TAB_F));
+    setTabLogDiffVisible(qgit::testFlag(qgit::LOG_DIFF_TAB_F));
 
     SmartBrowse* sb = new SmartBrowse(this);
 
     // restore geometry
-    QGit::SplitVect v;
+    qgit::SplitVect v;
     v << tab()->horizontalSplitter << tab()->verticalSplitter;
-    QGit::restoreGeometrySetting(QGit::REV_GEOM_KEY, &v);
+    qgit::restoreGeometrySetting(qgit::REV_GEOM_KEY, &v);
 
     chk_connect_a(m(), SIGNAL(typeWriterFontChanged()),
                   tab()->textEditDiff, SLOT(typeWriterFontChanged()));
@@ -94,9 +94,9 @@ RevsView::~RevsView() {
     if (!parent())
         return;
 
-    QGit::SplitVect v;
+    qgit::SplitVect v;
     v << tab()->horizontalSplitter << tab()->verticalSplitter;
-    QGit::saveGeometrySetting(QGit::REV_GEOM_KEY, &v);
+    qgit::saveGeometrySetting(qgit::REV_GEOM_KEY, &v);
 
     tab()->listViewLog->saveGeometry();
 
@@ -237,8 +237,8 @@ void RevsView::on_updateRevDesc() {
 
 void RevsView::on_flagChanged(uint flag) {
 
-	if (flag == QGit::ENABLE_DRAGNDROP_F) {
-		if (QGit::testFlag(QGit::ENABLE_DRAGNDROP_F)) {
+	if (flag == qgit::ENABLE_DRAGNDROP_F) {
+		if (qgit::testFlag(qgit::ENABLE_DRAGNDROP_F)) {
 			tab()->listViewLog->setSelectionMode(QAbstractItemView::ExtendedSelection);
 		} else {
 			tab()->listViewLog->setSelectionMode(QAbstractItemView::SingleSelection);
@@ -266,7 +266,7 @@ bool RevsView::doUpdate(bool force) {
             on_updateRevDesc();
             showStatusBarMessage(git->getRevInfo(st.sha()));
 
-            if (   testFlag(QGit::MSG_ON_NEW_F)
+            if (   testFlag(qgit::MSG_ON_NEW_F)
                 && tab()->textEditDiff->isVisible())
                 toggleDiffView();
         }

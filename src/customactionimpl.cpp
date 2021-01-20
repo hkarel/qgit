@@ -12,7 +12,7 @@
 #include "common.h"
 #include "customactionimpl.h"
 
-using namespace QGit;
+using namespace qgit;
 
 CustomActionImpl::CustomActionImpl() {
 

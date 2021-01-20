@@ -49,9 +49,9 @@ void TreeView::setup(Domain* dm, Git* g) {
     isWorkingDir = false;
 
     // set built-in pixmaps
-    folderClosed = QGit::mimePix(".#folder_closed");
-    folderOpen   = QGit::mimePix(".#folder_open");
-    fileDefault  = QGit::mimePix(".#default");
+    folderClosed = qgit::mimePix(".#folder_closed");
+    folderOpen   = qgit::mimePix(".#folder_open");
+    fileDefault  = qgit::mimePix(".#default");
 
     chk_connect_a(this, SIGNAL(itemExpanded(QTreeWidgetItem*)),
                   this, SLOT(on_itemExpanded(QTreeWidgetItem*)));
@@ -82,7 +82,7 @@ void TreeView::on_customContextMenuRequested(const QPoint& pos) {
 
     QTreeWidgetItem* item = itemAt(pos);
     if (item)
-        emit contextMenu(fullName(item), QGit::POPUP_TREE_EV);
+        emit contextMenu(fullName(item), qgit::POPUP_TREE_EV);
 }
 
 void TreeView::clear() {
@@ -194,7 +194,7 @@ void TreeView::on_itemExpanded(QTreeWidgetItem* itm) {
                     new DirItem(dir, "", ""); // dummy child to show expand sign
                 } else {
                     FileItem* file = new FileItem(item, te.name);
-                    file->setData(0, Qt::DecorationRole, *QGit::mimePix(te.name));
+                    file->setData(0, Qt::DecorationRole, *qgit::mimePix(te.name));
                     file->setBold(isModified(file->fullName()));
                 }
                 ++it;
@@ -215,7 +215,7 @@ void TreeView::updateTree() {
     ignoreCurrentChanged = true;
     QApplication::setOverrideCursor(Qt::WaitCursor);
 
-    isWorkingDir = (st->sha() == QGit::ZERO_SHA);
+    isWorkingDir = (st->sha() == qgit::ZERO_SHA);
     bool newTree = true;
     DirItem* root = static_cast<DirItem*>(topLevelItem(0));
     if (root && treeIsValid)
@@ -224,8 +224,8 @@ void TreeView::updateTree() {
     if (   newTree
         && treeIsValid
         && root
-        && st->sha() != QGit::ZERO_SHA
-        && root->treeSha != QGit::ZERO_SHA) {
+        && st->sha() != qgit::ZERO_SHA
+        && root->treeSha != qgit::ZERO_SHA) {
         // root->treeSha could reference a different sha from current
         // one in case the tree is the same, i.e. has the same files.
         // so we prefer to use the previous state sha to call isSameFiles()

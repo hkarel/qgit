@@ -17,7 +17,7 @@
 #include "shared/logger/format.h"
 #include "shared/qt/logger_operators.h"
 
-using namespace QGit;
+using namespace qgit;
 
 void StateInfo::S::clear() {
 
