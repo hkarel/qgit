@@ -9,13 +9,13 @@
 #include <QTextCodec>
 #include <QFileDialog>
 #include <QFontDialog>
-#include <QSettings>
 #include "common.h"
 #include "git.h"
 #include "settingsimpl.h"
 
 #include "shared/logger/logger.h"
 #include "shared/logger/format.h"
+#include "shared/config/appl_conf.h"
 #include "shared/qt/logger_operators.h"
 
 /*
@@ -45,7 +45,25 @@ using namespace qgit;
 SettingsImpl::SettingsImpl(QWidget* p, Git* g, int defTab) : QDialog(p), git(g) {
 
     setupUi(this);
-    int f = flags(FLAGS_KEY);
+
+//    int f = flags(FLAGS_KEY);
+//    checkBoxDiffCache->setChecked(f & DIFF_INDEX_F);
+//    checkBoxNumbers->setChecked(f & NUMBERS_F);
+//    checkBoxSign->setChecked(f & SIGN_PATCH_F);
+//    checkBoxCommitSign->setChecked(f & SIGN_CMT_F);
+//    checkBoxCommitVerify->setChecked(f & VERIFY_CMT_F);
+//    checkBoxCommitUseDefMsg->setChecked(f & USE_CMT_MSG_F);
+//    checkBoxRangeSelectDialog->setChecked(f & RANGE_SELECT_F);
+//    checkBoxReopenLastRepo->setChecked(f & REOPEN_REPO_F);
+//    checkBoxOpenInEditor->setChecked(f & OPEN_IN_EDITOR_F);
+//    checkBoxRelativeDate->setChecked(f & REL_DATE_F);
+//    checkBoxLogDiffTab->setChecked(f & LOG_DIFF_TAB_F);
+//    checkBoxSmartLabels->setChecked(f & SMART_LBL_F);
+//    checkBoxMsgOnNewSHA->setChecked(f & MSG_ON_NEW_F);
+//    checkBoxEnableDragnDrop->setChecked(f & ENABLE_DRAGNDROP_F);
+
+    qgit::FlagType f = qgit::flags();
+
     checkBoxDiffCache->setChecked(f & DIFF_INDEX_F);
     checkBoxNumbers->setChecked(f & NUMBERS_F);
     checkBoxSign->setChecked(f & SIGN_PATCH_F);
@@ -59,36 +77,73 @@ SettingsImpl::SettingsImpl(QWidget* p, Git* g, int defTab) : QDialog(p), git(g) 
     checkBoxLogDiffTab->setChecked(f & LOG_DIFF_TAB_F);
     checkBoxSmartLabels->setChecked(f & SMART_LBL_F);
     checkBoxMsgOnNewSHA->setChecked(f & MSG_ON_NEW_F);
-	checkBoxEnableDragnDrop->setChecked(f & ENABLE_DRAGNDROP_F);
+    checkBoxEnableDragnDrop->setChecked(f & ENABLE_DRAGNDROP_F);
 
-    QSettings set;
-    const QString& APOpt(set.value(AM_P_OPT_KEY).toString());
-    const QString& FPOpt(set.value(FMT_P_OPT_KEY).toString());
-    const QString& extDiff(set.value(EXT_DIFF_KEY, EXT_DIFF_DEF).toString());
-    const QString& extEditor(set.value(EXT_EDITOR_KEY, EXT_EDITOR_DEF).toString());
-    const QString& exFile(set.value(EX_KEY, EX_DEF).toString());
-    const QString& exPDir(set.value(EX_PER_DIR_KEY, EX_PER_DIR_DEF).toString());
-    const QString& tmplt(set.value(CMT_TEMPL_KEY, CMT_TEMPL_DEF).toString());
-    const QString& CMArgs(set.value(CMT_ARGS_KEY).toString());
+    QString FPOpt;
+    config::base().getValue("patch.args", FPOpt);
+
+    QString APOpt;
+    config::base().getValue("patch.args_2", APOpt);
+
+    QString extDiff;
+    config::base().getValue("general.external_diff_viewer", extDiff);
+
+    QString extEditor;
+    config::base().getValue("general.external_editor", extEditor);
+
+    int iconSizeIndex = 0;
+    config::base().getValue("general.icon_size_index", iconSizeIndex);
+
+    QString CMArgs;
+    config::base().getValue("commit.args", CMArgs);
+
+    QString exFile;
+    config::base().getValue("working_dir.exclude.from", exFile);
+
+    QString exPerDir;
+    config::base().getValue("working_dir.exclude.per_directory", exPerDir);
+
+    QString commitTmpl;
+    config::base().getValue("commit.template_file_path", commitTmpl);
 
     lineEditApplyPatchExtraOptions->setText(APOpt);
     lineEditFormatPatchExtraOptions->setText(FPOpt);
     lineEditExternalDiffViewer->setText(extDiff);
     lineEditExternalEditor->setText(extEditor);
     lineEditExcludeFile->setText(exFile);
-    lineEditExcludePerDir->setText(exPDir);
-    lineEditTemplate->setText(tmplt);
+    lineEditExcludePerDir->setText(exPerDir);
+    lineEditTemplate->setText(commitTmpl);
     lineEditCommitExtraOptions->setText(CMArgs);
     lineEditTypeWriterFont->setText(TYPE_WRITER_FONT.toString());
     lineEditTypeWriterFont->setCursorPosition(0); // font description could be long
 
-    comboBoxIconSize->setCurrentIndex(set.value(ICON_SIZE_INDEX, 0).toInt());
+    comboBoxIconSize->setCurrentIndex(iconSizeIndex);
 
     setupCodecsCombo();
     checkBoxDiffCache_toggled(checkBoxDiffCache->isChecked());
     tabDialog->setCurrentIndex(defTab);
     userInfo();
     comboBoxGitConfigSource_activated(0);
+
+    loadGeometry();
+}
+
+void SettingsImpl::loadGeometry()
+{
+    QVector<int> v;
+    config::base().getValue("geometry.settings.window", v);
+
+    if (v.count() == 4) {
+        move(v[0], v[1]);
+        resize(v[2], v[3]);
+    }
+}
+
+void SettingsImpl::saveGeometry()
+{
+    QPoint p = pos();
+    QVector<int> v {p.x(), p.y(), width(), height()};
+    config::base().setValue("geometry.settings.window", v);
 }
 
 void SettingsImpl::userInfo() {
@@ -186,12 +241,6 @@ void SettingsImpl::comboBoxGitConfigSource_activated(int) {
     readGitConfig(comboBoxGitConfigSource->currentText());
 }
 
-void SettingsImpl::writeSetting(const QString& key, const QVariant& value) {
-
-    QSettings settings;
-    settings.setValue(key, value);
-}
-
 void SettingsImpl::setupCodecList(QStringList& list) {
 
     int i = 0;
@@ -227,7 +276,8 @@ void SettingsImpl::setupCodecsCombo() {
 
 void SettingsImpl::comboBoxIconSize_activated(int i) {
 
-    writeSetting(ICON_SIZE_INDEX, i);
+    //writeSetting(ICON_SIZE_INDEX, i);
+    config::base().setValue("general.icon_size_index", i);
 }
 
 void SettingsImpl::comboBoxCodecs_activated(int idx) {
@@ -264,7 +314,9 @@ void SettingsImpl::pushButtonFont_clicked() {
         TYPE_WRITER_FONT = fnt;
         lineEditTypeWriterFont->setText(fnt.toString());
         lineEditTypeWriterFont->setCursorPosition(0);
-        writeSetting(TYPWRT_FNT_KEY, fnt.toString());
+
+        //writeSetting(TYPWRT_FNT_KEY, fnt.toString());
+        config::base().setValue("general.typewriter_font", fnt.toString());
 
         emit typeWriterFontChanged();
     }
@@ -272,8 +324,20 @@ void SettingsImpl::pushButtonFont_clicked() {
 
 void SettingsImpl::changeFlag(uint f, bool b) {
 
-    setFlag(f, b);
+    qgit::flags().set(f, b);
     emit flagChanged(f);
+}
+
+void SettingsImpl::done(int r)
+{
+    QDialog::done(r);
+    if (r == QDialog::Accepted) {
+        qgit::flags().save(); // Call config::base().save() inside
+    }
+    else
+        config::base().rereadFile();
+
+    saveGeometry();
 }
 
 void SettingsImpl::checkBoxDiffCache_toggled(bool b) {
@@ -350,40 +414,40 @@ void SettingsImpl::checkBoxCommitUseDefMsg_toggled(bool b) {
 
 void SettingsImpl::lineEditExternalDiffViewer_textChanged(const QString& s) {
 
-    writeSetting(EXT_DIFF_KEY, s);
+    config::base().setValue("general.external_diff_viewer", s);
 }
 
 void SettingsImpl::lineEditExternalEditor_textChanged(const QString& s) {
 
-    writeSetting(EXT_EDITOR_KEY, s);
+    config::base().setValue("general.external_editor", s);
 }
 
 void SettingsImpl::lineEditApplyPatchExtraOptions_textChanged(const QString& s) {
 
-    writeSetting(AM_P_OPT_KEY, s);
+    config::base().setValue("patch.args_2", s);
 }
 
 void SettingsImpl::lineEditFormatPatchExtraOptions_textChanged(const QString& s) {
 
-    writeSetting(FMT_P_OPT_KEY, s);
+    config::base().setValue("patch.args", s);
 }
 
 void SettingsImpl::lineEditExcludeFile_textChanged(const QString& s) {
 
-    writeSetting(EX_KEY, s);
+    config::base().setValue("working_dir.exclude.from", s);
 }
 
 void SettingsImpl::lineEditExcludePerDir_textChanged(const QString& s) {
 
-    writeSetting(EX_PER_DIR_KEY, s);
+    config::base().setValue("working_dir.exclude.per_directory", s);
 }
 
 void SettingsImpl::lineEditTemplate_textChanged(const QString& s) {
 
-    writeSetting(CMT_TEMPL_KEY, s);
+    config::base().setValue("commit.template_file_path", s);
 }
 
 void SettingsImpl::lineEditCommitExtraOptions_textChanged(const QString& s) {
 
-    writeSetting(CMT_ARGS_KEY, s);
+    config::base().setValue("commit/args", s);
 }

@@ -17,6 +17,9 @@ Q_OBJECT
 public:
     SettingsImpl(QWidget* parent, Git* git, int defTab = 0);
 
+    void loadGeometry();
+    void saveGeometry();
+
 signals:
     void typeWriterFontChanged();
     void flagChanged(uint);
@@ -54,7 +57,8 @@ protected slots:
     void pushButtonFont_clicked();
 
 private:
-    void writeSetting(const QString& key, const QVariant& value);
+    void done(int r) override;
+
     void addConfigOption(QTreeWidgetItem* parent, QStringList paths, const QString& value);
     void setupCodecList(QStringList& list);
     void setupCodecsCombo();

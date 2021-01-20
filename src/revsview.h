@@ -28,6 +28,9 @@ public:
     void setTabLogDiffVisible(bool);
     Ui_TabRev* tab() { return revTab; }
 
+    void loadGeometry();
+    void saveGeometry();
+
 public slots:
     void toggleDiffView();
 

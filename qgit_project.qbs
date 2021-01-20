@@ -41,6 +41,14 @@ Project {
         if (qbs.buildVariant === "release")
             def.push("NDEBUG");
 
+        if (qbs.targetOS.contains("windows")
+            && qbs.toolchain && qbs.toolchain.contains("mingw"))
+        {
+            def.push("CONFIG_DIR=\"ProgramData/qgit/config\"");
+        }
+        else
+            def.push("CONFIG_DIR=\"~/.config/qgit\"");
+
         return def;
     }
 

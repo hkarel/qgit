@@ -30,6 +30,7 @@
 
 #include "shared/logger/logger.h"
 #include "shared/logger/format.h"
+#include "shared/config/appl_conf.h"
 #include "shared/qt/logger_operators.h"
 
 #include <QCloseEvent>
@@ -41,7 +42,6 @@
 #include <QMimeData>
 #include <QProgressBar>
 #include <QScrollBar>
-#include <QSettings>
 #include <QShortcut>
 #include <QStatusBar>
 #include <QTimer>
@@ -94,18 +94,19 @@ MainImpl::MainImpl(const QString& cd, QWidget* p) : QMainWindow(p) {
     longLogRE.setCaseSensitivity(Qt::CaseInsensitive);
 
     // set-up standard revisions and files list font
-    QSettings settings;
-    QString font(settings.value(STD_FNT_KEY).toString());
-	if (font.isEmpty()) {
+    QString fontDescr; // (settings.value(STD_FNT_KEY).toString());
+    if (fontDescr.isEmpty()) {
 #if (QT_VERSION >= QT_VERSION_CHECK(5,2,0))
-		font = QFontDatabase::systemFont(QFontDatabase::GeneralFont).toString();
+        fontDescr = QFontDatabase::systemFont(QFontDatabase::GeneralFont).toString();
 #else
-        font = QApplication::font().toString();
+        fontDescr = QApplication::font().toString();
 #endif
 	}
-    qgit::STD_FONT.fromString(font);
+    qgit::STD_FONT.fromString(fontDescr);
 
-    int iconSizeIndex = settings.value(ICON_SIZE_INDEX, 0).toInt();
+    int iconSizeIndex = 0;
+    config::base().getValue("general.icon_size_index", iconSizeIndex);
+
     switch (iconSizeIndex) {
     case 1:
         toolBar->setIconSize(QSize(16, 16));
@@ -125,8 +126,10 @@ MainImpl::MainImpl(const QString& cd, QWidget* p) : QMainWindow(p) {
     }
 
     // set-up typewriter (fixed width) font
-    font = settings.value(TYPWRT_FNT_KEY).toString();
-    if (font.isEmpty()) { // choose a sensible default
+    fontDescr.clear();
+    config::base().getValue("general.typewriter_font", fontDescr);
+
+    if (fontDescr.isEmpty()) { // choose a sensible default
 #if (QT_VERSION >= QT_VERSION_CHECK(5,2,0))
 		QFont fnt = QFontDatabase::systemFont(QFontDatabase::FixedFont);
 #else
@@ -135,9 +138,9 @@ MainImpl::MainImpl(const QString& cd, QWidget* p) : QMainWindow(p) {
         fnt.setFixedPitch(true);
         fnt.setFamily(fnt.defaultFamily()); // the family corresponding
 #endif
-        font = fnt.toString();              // to current style hint
+        fontDescr = fnt.toString();              // to current style hint
     }
-    qgit::TYPE_WRITER_FONT.fromString(font);
+    qgit::TYPE_WRITER_FONT.fromString(fontDescr);
 
     // set-up tab view
     delete tabWdg->currentWidget(); // cannot be done in Qt Designer
@@ -157,9 +160,7 @@ MainImpl::MainImpl(const QString& cd, QWidget* p) : QMainWindow(p) {
     pbFileNamesLoading->hide();
     statusBar()->addPermanentWidget(pbFileNamesLoading);
 
-    qgit::SplitVect v {1, treeSplitter};
-    qgit::restoreGeometrySetting(qgit::MAIN_GEOM_KEY, this);
-    qgit::restoreGeometrySetting(qgit::MAIN_GEOM_KEY, &v);
+    loadGeometry();
     treeView->hide();
 
     // set-up menu for recent visited repositories
@@ -168,7 +169,7 @@ MainImpl::MainImpl(const QString& cd, QWidget* p) : QMainWindow(p) {
 
     // set-up menu for custom actions
     chk_connect_a(Actions, SIGNAL(triggered(QAction*)), this, SLOT(customAction_triggered(QAction*)));
-    doUpdateCustomActionMenu(settings.value(ACT_LIST_KEY).toStringList());
+    doUpdateCustomActionMenu();
 
     // manual adjust lineEditSHA width
     QString tmp(qgit::SHA_END_LENGTH, '8');
@@ -200,10 +201,12 @@ MainImpl::MainImpl(const QString& cd, QWidget* p) : QMainWindow(p) {
                   this, SLOT(treeView_doubleClicked(QTreeWidgetItem*, int)));
 
     // use most recent repo as startup dir if it exists and user opted to do so
-    QStringList recents(settings.value(REC_REP_KEY).toStringList());
+    QStringList recents;
+    config::base().getValue("general.recent_open_repos", (QList<QString>&)recents);
+
     QDir checkRepo;
-    if (    recents.size() >= 1
-         && testFlag(REOPEN_REPO_F, FLAGS_KEY)
+    if ( recents.size() >= 1
+         && qgit::flags().test(REOPEN_REPO_F)
          && checkRepo.exists(recents.at(0)))
     {
         startUpDir = recents.at(0);
@@ -232,6 +235,33 @@ MainImpl::MainImpl(const QString& cd, QWidget* p) : QMainWindow(p) {
     QTimer::singleShot(10, this, SLOT(initWithEventLoopActive()));
 }
 
+void MainImpl::loadGeometry()
+{
+    QVector<int> v;
+    config::base().getValue("geometry.mainwin.window", v);
+
+    if (v.count() == 4) {
+        move(v[0], v[1]);
+        resize(v[2], v[3]);
+    }
+
+    QString sval;
+    if (config::base().getValue("geometry.mainwin.spliter", sval)) {
+        QByteArray ba = QByteArray::fromBase64(sval.toLatin1());
+        treeSplitter->restoreState(ba);
+    }
+}
+
+void MainImpl::saveGeometry()
+{
+    QPoint p = pos();
+    QVector<int> v {p.x(), p.y(), width(), height()};
+    config::base().setValue("geometry.mainwin.window", v);
+
+    QByteArray ba = treeSplitter->saveState().toBase64();
+    config::base().setValue("geometry.mainwin.spliter", QString::fromLatin1(ba));
+}
+
 void MainImpl::initWithEventLoopActive() {
 
     emit flagChanged(qgit::ENABLE_DRAGNDROP_F);
@@ -246,13 +276,6 @@ void MainImpl::initWithEventLoopActive() {
 		openFileTab();
 		startUpFile = QString(); // one shot
 	}
-}
-
-void MainImpl::saveCurrentGeometry() {
-
-    qgit::SplitVect v {1, treeSplitter};
-    qgit::saveGeometrySetting(qgit::MAIN_GEOM_KEY, this);
-    qgit::saveGeometrySetting(qgit::MAIN_GEOM_KEY, &v);
 }
 
 void MainImpl::highlightAbbrevSha(const QString& abbrevSha) {
@@ -364,13 +387,9 @@ void MainImpl::getExternalDiffArgs(QStringList* args, QStringList* filenames) {
 	QString fName1 = copyFileToDiffIfNeeded(filenames, rv->st.sha());
 	QString fName2 = copyFileToDiffIfNeeded(filenames, prevRevSha);
 
-	QApplication::setOverrideCursor(QCursor(Qt::WaitCursor));
-
     // get external diff viewer command
-    QSettings settings;
-    QString extDiff(settings.value(EXT_DIFF_KEY, EXT_DIFF_DEF).toString());
-
-    QApplication::restoreOverrideCursor();
+    QString extDiff;
+    config::base().getValue("general.external_diff_viewer", extDiff);
 
     // if command doesn't have %1 and %2 to denote filenames, add them to end
     if (!extDiff.contains("%1")) {
@@ -417,8 +436,8 @@ QStringList MainImpl::getExternalEditorArgs() {
     QString fName1(curDir + "/" + rv->st.fileName());
 
     // get external diff viewer command
-    QSettings settings;
-    QString extEditor(settings.value(EXT_EDITOR_KEY, EXT_EDITOR_DEF).toString());
+    QString extEditor;
+    config::base().getValue("general.external_editor", extEditor);
 
     // if command doesn't have %1 to denote filename, add to end
     if (!extEditor.contains("%1")) extEditor.append(" %1");
@@ -504,7 +523,7 @@ void MainImpl::setRepository(const QString& newDir, bool refresh, bool keepSelec
                            passedArgs->join(" ") + " >");
 
         updateCommitMenu(ok && git->isStGITStack());
-        ActCheckWorkDir->setChecked(testFlag(DIFF_INDEX_F)); // could be changed in Git::init()
+        ActCheckWorkDir->setChecked(qgit::flags().test(DIFF_INDEX_F)); // could be changed in Git::init()
 
         if (ok) {
             updateGlobalActions(true);
@@ -628,7 +647,7 @@ void MainImpl::fileList_itemDoubleClicked(QListWidgetItem* item) {
     if (isFirst && rv->st.isMerge())
         return;
 
-    if (testFlag(OPEN_IN_EDITOR_F, FLAGS_KEY)) {
+    if (qgit::flags().test(OPEN_IN_EDITOR_F)) {
         if (item && ActExternalEditor->isEnabled())
             ActExternalEditor->activate(QAction::Trigger);
     } else {
@@ -642,7 +661,7 @@ void MainImpl::fileList_itemDoubleClicked(QListWidgetItem* item) {
 }
 
 void MainImpl::treeView_doubleClicked(QTreeWidgetItem* item, int) {
-    if (testFlag(OPEN_IN_EDITOR_F, FLAGS_KEY)) {
+    if (qgit::flags().test(OPEN_IN_EDITOR_F)) {
         if (item && ActExternalEditor->isEnabled())
             ActExternalEditor->activate(QAction::Trigger);
     } else {
@@ -1257,8 +1276,8 @@ void MainImpl::adjustFontSize(int delta) {
 
     qgit::STD_FONT.setPointSize(ps);
 
-    QSettings settings;
-    settings.setValue(qgit::STD_FNT_KEY, qgit::STD_FONT.toString());
+    //QSettings settings;
+    //settings.setValue(qgit::STD_FNT_KEY, qgit::STD_FONT.toString());
     emit changeFont(qgit::STD_FONT);
 }
 
@@ -1306,8 +1325,10 @@ void MainImpl::doUpdateRecentRepoMenu(const QString& newEntry) {
         if (act->data().toString().startsWith("RECENT"))
             File->removeAction(act);
     }
-    QSettings settings;
-    QStringList recents = settings.value(REC_REP_KEY).toStringList();
+
+    QStringList recents;
+    config::base().getValue("general.recent_open_repos", (QList<QString>&)recents);
+
     int idx = recents.indexOf(newEntry);
     if (idx != -1)
         recents.removeAt(idx);
@@ -1324,7 +1345,9 @@ void MainImpl::doUpdateRecentRepoMenu(const QString& newEntry) {
         if (idx > MAX_RECENT_REPOS)
             break;
     }
-    settings.setValue(REC_REP_KEY, newRecents);
+    config::base().setValue("general.recent_open_repos",
+                            (QList<QString>&)recents, YAML::EmitterStyle::Block);
+    config::base().save();
 }
 
 static void prepareRefSubmenu(QMenu* menu, const QStringList& refs, const QChar sep = '/') {
@@ -1535,7 +1558,7 @@ void MainImpl::ActShowTree_toggled(bool b) {
         treeView->show();
         UPDATE_DOMAIN(rv);
     } else {
-        saveCurrentGeometry();
+        saveGeometry();
         treeView->hide();
     }
 }
@@ -1614,15 +1637,18 @@ void MainImpl::ActMailFormatPatch_activated() {
         statusBar()->showMessage("Unable to save a patch for not committed content");
         return;
     }
-    QSettings settings;
-    QString outDir(settings.value(PATCH_DIR_KEY, curDir).toString());
+
+    QString outDir = curDir;
+    config::base().getValue("patch.last_dir", outDir);
     QString dirPath(QFileDialog::getExistingDirectory(this,
                     "Choose destination directory - Save Patch", outDir));
     if (dirPath.isEmpty())
         return;
 
     QDir d(dirPath);
-    settings.setValue(PATCH_DIR_KEY, d.absolutePath());
+    config::base().setValue("patch.last_dir", d.absolutePath());
+    config::base().save();
+
     QApplication::setOverrideCursor(QCursor(Qt::WaitCursor));
     git->formatPatch(selectedItems, d.absolutePath());
     QApplication::restoreOverrideCursor();
@@ -1648,8 +1674,9 @@ bool MainImpl::askApplyPatchParameters(bool* workDirOnly, bool* fold) {
 
 void MainImpl::ActMailApplyPatch_activated() {
 
-    QSettings settings;
-    QString outDir(settings.value(PATCH_DIR_KEY, curDir).toString());
+    QString outDir = curDir;
+    config::base().getValue("patch.last_dir", outDir);
+
     QString patchName(QFileDialog::getOpenFileName(this,
                       "Choose the patch file - Apply Patch", outDir,
                       "Patches (*.patch *.diff *.eml)\nAll Files (*.*)"));
@@ -1657,7 +1684,8 @@ void MainImpl::ActMailApplyPatch_activated() {
         return;
 
     QFileInfo f(patchName);
-    settings.setValue(PATCH_DIR_KEY, f.absolutePath());
+    config::base().setValue("patch.last_dir", f.absolutePath());
+    config::base().save();
 
     bool workDirOnly, fold;
     if (!askApplyPatchParameters(&workDirOnly, &fold))
@@ -1678,7 +1706,7 @@ void MainImpl::ActCheckWorkDir_toggled(bool b) {
     if (!ActCheckWorkDir->isEnabled()) // to avoid looping with setChecked()
         return;
 
-    setFlag(DIFF_INDEX_F, b);
+    qgit::flags().set(DIFF_INDEX_F, b);
     bool keepSelection = (rv->st.sha() != ZERO_SHA);
     refreshRepo(keepSelection);
 }
@@ -1695,68 +1723,64 @@ void MainImpl::ActSettings_activated() {
     setView.exec();
 
     // update ActCheckWorkDir if necessary
-    if (ActCheckWorkDir->isChecked() != testFlag(DIFF_INDEX_F))
+    if (ActCheckWorkDir->isChecked() != qgit::flags().test(DIFF_INDEX_F))
         ActCheckWorkDir->toggle();
 }
 
 void MainImpl::ActCustomActionSetup_activated() {
 
-    CustomActionImpl* ca = new CustomActionImpl(); // has Qt::WA_DeleteOnClose
-
-    chk_connect_a(this, SIGNAL(closeAllWindows()), ca, SLOT(close()));
-    chk_connect_a(ca, SIGNAL(listChanged(const QStringList&)),
-                  this, SLOT(customActionListChanged(const QStringList&)));
-
-    ca->show();
+    CustomActionImpl ca {this};
+     if (ca.exec() == QDialog::Accepted)
+         doUpdateCustomActionMenu();
 }
 
-void MainImpl::customActionListChanged(const QStringList& list) {
-
-    // update menu of all windows
-    foreach (QWidget* widget, QApplication::topLevelWidgets()) {
-
-        MainImpl* w = dynamic_cast<MainImpl*>(widget);
-        if (w)
-            w->doUpdateCustomActionMenu(list);
-    }
-}
-
-void MainImpl::doUpdateCustomActionMenu(const QStringList& list) {
+void MainImpl::doUpdateCustomActionMenu() {
 
     QAction* setupAct = Actions->actions().first(); // is never empty
     Actions->removeAction(setupAct);
     Actions->clear();
     Actions->addAction(setupAct);
-
-    if (list.isEmpty())
-        return;
-
     Actions->addSeparator();
-    for (const QString& s : list)
-		Actions->addAction(s)->setMenuRole(QAction::NoRole);
+
+    YamlConfig::Func loadFunc =
+        [this](YamlConfig* conf, YAML::Node& actions, bool /*logWarn*/)
+    {
+        for (size_t i = 0; i < actions.size(); ++i)
+        {
+            CustomActionData::Ptr cad {new CustomActionData};
+            conf->getValue(actions[i], "name",    cad->name);
+            conf->getValue(actions[i], "command", cad->command);
+            conf->getValue(actions[i], "refresh", cad->refresh);
+
+            QAction* act = Actions->addAction(cad->name);
+            act->setMenuRole(QAction::NoRole);
+            act->setData(qVariantFromValue(cad));
+        }
+        return true;
+    };
+    config::base().getValue("custom_actions", loadFunc);
 }
 
 void MainImpl::customAction_triggered(QAction* act) {
 
-    QString actionName = act->text();
-    if (actionName == "Setup actions...")
+    QVariant var = act->data();
+    if (!var.canConvert<CustomActionData::Ptr>())
         return;
 
-    QSettings set;
-    QStringList actionsList = set.value(ACT_LIST_KEY).toStringList();
-    if (!(actionsList.contains(actionName)
-        || actionsList.contains(actionName.remove(QChar('&')))))
-    {
-        log_warn << log_format("Action %? not found", actionName);
-        return;
-    }
-    QString cmd = set.value(ACT_GROUP_KEY + actionName + ACT_TEXT_KEY).toString().trimmed();
-    if (testFlag(ACT_CMD_LINE_F, ACT_GROUP_KEY + actionName + ACT_FLAGS_KEY)) {
-        // for backwards compatibility: if ACT_CMD_LINE_F is set, insert a dialog token in first line
-        int pos = cmd.indexOf('\n');
-        if (pos < 0) pos = cmd.length();
-        cmd.insert(pos, " %lineedit:cmdline args%");
-    }
+    CustomActionData::Ptr cad = var.value<CustomActionData::Ptr>();
+    QString cmd = cad->command;
+
+    QString actionName = act->text();
+    //actionName.remove("&");
+
+//    QString cmd = set.value(ACT_GROUP_KEY + actionName + ACT_TEXT_KEY).toString().trimmed();
+//    if (testFlag(ACT_CMD_LINE_F, ACT_GROUP_KEY + actionName + ACT_FLAGS_KEY)) {
+//        // for backwards compatibility: if ACT_CMD_LINE_F is set, insert a dialog token in first line
+//        int pos = cmd.indexOf('\n');
+//        if (pos < 0) pos = cmd.length();
+//        cmd.insert(pos, " %lineedit:cmdline args%");
+//    }
+
     updateRevVariables(lineEditSHA->text());
     InputDialog dlg(cmd, revision_variables, "Run custom action: " + actionName, this);
     if (!dlg.empty() && dlg.exec() != QDialog::Accepted) return;
@@ -1770,15 +1794,15 @@ void MainImpl::customAction_triggered(QAction* act) {
     if (cmd.isEmpty())
         return;
 
-    console = new ConsoleImpl(actionName, git); // has Qt::WA_DeleteOnClose attribute
+    console = new ConsoleImpl(cad, git); // has Qt::WA_DeleteOnClose attribute
 
     chk_connect_a(this, SIGNAL(typeWriterFontChanged()),
                   console, SLOT(typeWriterFontChanged()));
 
     chk_connect_a(this, SIGNAL(closeAllWindows()),
                   console, SLOT(close()));
-    chk_connect_a(console, SIGNAL(customAction_exited(const QString&)),
-                  this, SLOT(customAction_exited(const QString&)));
+    chk_connect_a(console, SIGNAL(customAction_exited(qgit::CustomActionData::Ptr)),
+                  this, SLOT(customAction_exited(qgit::CustomActionData::Ptr)));
     chk_connect_a(console, SIGNAL(destroyed(QObject*)),
                   this, SLOT(consoleDestroyed(QObject*)));
 
@@ -1786,10 +1810,9 @@ void MainImpl::customAction_triggered(QAction* act) {
         console->show();
 }
 
-void MainImpl::customAction_exited(const QString& name) {
+void MainImpl::customAction_exited(qgit::CustomActionData::Ptr cad) {
 
-    const QString flags(ACT_GROUP_KEY + name + ACT_FLAGS_KEY);
-    if (testFlag(ACT_REFRESH_F, flags))
+    if (cad->refresh)
         QTimer::singleShot(10, this, SLOT(refreshRepo())); // outside of event handler
 }
 
@@ -2235,7 +2258,7 @@ void MainImpl::ActAbout_activated() {
 
 void MainImpl::closeEvent(QCloseEvent* ce) {
 
-    saveCurrentGeometry();
+    saveGeometry();
 
     // lastWindowClosed() signal is emitted by close(), after sending
     // closeEvent(), so we need to close _here_ all secondary windows before

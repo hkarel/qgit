@@ -1186,7 +1186,7 @@
    <item>
     <widget class="QDialogButtonBox" name="buttonBox">
      <property name="standardButtons">
-      <set>QDialogButtonBox::Ok</set>
+      <set>QDialogButtonBox::Cancel|QDialogButtonBox::Ok</set>
      </property>
     </widget>
    </item>
@@ -1706,6 +1706,22 @@
     <hint type="destinationlabel">
      <x>510</x>
      <y>182</y>
+    </hint>
+   </hints>
+  </connection>
+  <connection>
+   <sender>buttonBox</sender>
+   <signal>rejected()</signal>
+   <receiver>settingsBase</receiver>
+   <slot>reject()</slot>
+   <hints>
+    <hint type="sourcelabel">
+     <x>301</x>
+     <y>473</y>
+    </hint>
+    <hint type="destinationlabel">
+     <x>301</x>
+     <y>246</y>
     </hint>
    </hints>
   </connection>

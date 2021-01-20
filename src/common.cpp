@@ -11,8 +11,10 @@
 #include <QTextDocument>
 
 #include "shared/break_point.h"
+#include "shared/safe_singleton.h"
 #include "shared/logger/logger.h"
 #include "shared/logger/format.h"
+#include "shared/config/appl_conf.h"
 #include "shared/qt/logger_operators.h"
 
 static inline uint hexVal(const QChar* ch) {
@@ -115,7 +117,7 @@ const QColor DARK_GREEN   = QColor(0, 205, 0);
 // initialized at startup according to system wide settings
 QColor  ODD_LINE_COL;
 QColor  EVEN_LINE_COL;
-QString GIT_DIR;
+//QString GIT_DIR;
 
 /*
    Default QFont c'tor calls static method QApplication::font() that could
@@ -137,45 +139,45 @@ const QString ALL_MERGE_FILES = "ALL_MERGE_FILES";
 //const QByteArray QGit::ZERO_SHA_BA(QGit::ZERO_SHA.toLatin1());
 //const ShaString  QGit::ZERO_SHA_RAW(QGit::ZERO_SHA_BA.constData());
 
-// settings keys
-const QString ORG_KEY         = "qgit";
-const QString APP_KEY         = "qgit4";
-const QString GIT_DIR_KEY     = "msysgit_exec_dir";
-const QString EXT_DIFF_KEY    = "external_diff_viewer";
-const QString EXT_EDITOR_KEY  = "external_editor";
-const QString ICON_SIZE_INDEX = "icon_size_index";
-const QString REC_REP_KEY     = "recent_open_repos";
-const QString STD_FNT_KEY     = "standard_font";
-const QString TYPWRT_FNT_KEY  = "typewriter_font";
-const QString FLAGS_KEY       = "flags";
-const QString PATCH_DIR_KEY   = "Patch/last_dir";
-const QString FMT_P_OPT_KEY   = "Patch/args";
-const QString AM_P_OPT_KEY    = "Patch/args_2";
-const QString EX_KEY          = "Working_dir/exclude_file_path";
-const QString EX_PER_DIR_KEY  = "Working_dir/exclude_per_directory_file_name";
-const QString CON_GEOM_KEY    = "Console/geometry";
-const QString CMT_GEOM_KEY    = "Commit/geometry";
-const QString MAIN_GEOM_KEY   = "Top_window/geometry";
-const QString REV_GEOM_KEY    = "Rev_List_view/geometry";
-const QString REV_COLS_KEY    = "Rev_List_view/columns";
-const QString FILE_COLS_KEY   = "File_List_view/columns";
-const QString CMT_TEMPL_KEY   = "Commit/template_file_path";
-const QString CMT_ARGS_KEY    = "Commit/args";
-const QString RANGE_FROM_KEY  = "RangeSelect/from";
-const QString RANGE_TO_KEY    = "RangeSelect/to";
-const QString RANGE_OPT_KEY   = "RangeSelect/options";
-const QString ACT_GEOM_KEY    = "Custom_actions/geometry";
-const QString ACT_LIST_KEY    = "Custom_actions/list";
-const QString ACT_GROUP_KEY   = "Custom_action_list/";
-const QString ACT_TEXT_KEY    = "/commands";
-const QString ACT_FLAGS_KEY   = "/flags";
+//// settings keys
+//const QString ORG_KEY         = "qgit";
+//const QString APP_KEY         = "qgit4";
+//const QString GIT_DIR_KEY     = "msysgit_exec_dir";
+//const QString EXT_DIFF_KEY    = "external_diff_viewer";
+//const QString EXT_EDITOR_KEY  = "external_editor";
+//const QString ICON_SIZE_INDEX = "icon_size_index";
+//const QString REC_REP_KEY     = "recent_open_repos";
+//const QString STD_FNT_KEY     = "standard_font";
+//const QString TYPWRT_FNT_KEY  = "typewriter_font";
+//const QString FLAGS_KEY       = "flags";
+//const QString PATCH_DIR_KEY   = "Patch/last_dir";
+//const QString FMT_P_OPT_KEY   = "Patch/args";
+//const QString AM_P_OPT_KEY    = "Patch/args_2";
+//const QString EX_KEY          = "Working_dir/exclude_file_path";
+//const QString EX_PER_DIR_KEY  = "Working_dir/exclude_per_directory_file_name";
+//const QString CON_GEOM_KEY    = "Console/geometry";
+//const QString CMT_GEOM_KEY    = "Commit/geometry";
+//const QString MAIN_GEOM_KEY   = "Top_window/geometry";
+//const QString REV_GEOM_KEY    = "Rev_List_view/geometry";
+//const QString REV_COLS_KEY    = "Rev_List_view/columns";
+//const QString FILE_COLS_KEY   = "File_List_view/columns";
+//const QString CMT_TEMPL_KEY   = "Commit/template_file_path";
+//const QString CMT_ARGS_KEY    = "Commit/args";
+//const QString RANGE_FROM_KEY  = "RangeSelect/from";
+//const QString RANGE_TO_KEY    = "RangeSelect/to";
+//const QString RANGE_OPT_KEY   = "RangeSelect/options";
+//const QString ACT_GEOM_KEY    = "Custom_actions/geometry";
+//const QString ACT_LIST_KEY    = "Custom_actions/list";
+//const QString ACT_GROUP_KEY   = "Custom_action_list/";
+//const QString ACT_TEXT_KEY    = "/commands";
+//const QString ACT_FLAGS_KEY   = "/flags";
 
-// settings default values
-const QString CMT_TEMPL_DEF   = ".git/commit-template";
-const QString EX_DEF          = ".git/info/exclude";
-const QString EX_PER_DIR_DEF  = ".gitignore";
-const QString EXT_DIFF_DEF    = "kompare";
-const QString EXT_EDITOR_DEF  = "emacs";
+//// settings default values
+//const QString CMT_TEMPL_DEF   = ".git/commit-template";
+//const QString EX_DEF          = ".git/info/exclude";
+//const QString EX_PER_DIR_DEF  = ".gitignore";
+//const QString EXT_DIFF_DEF    = "kompare";
+//const QString EXT_EDITOR_DEF  = "emacs";
 
 // cache file
 const QString BAK_EXT          = ".bak";
@@ -185,23 +187,40 @@ const QString C_DAT_FILE       = "/qgit_cache.dat";
 const QString QUOTE_CHAR = "$";
 
 // settings helpers
-uint flags(const QString& flagsVariable) {
-
-    QSettings settings;
-    return settings.value(flagsVariable, FLAGS_DEF).toUInt();
+void Flags::load()
+{
+    uint f = FLAGS_DEF;
+    config::base().getValue("general.flags", f);
+    value = f;
 }
 
-bool testFlag(uint f, const QString& flagsVariable) {
-
-    return (flags(flagsVariable) & f);
+void Flags::save() const
+{
+    config::base().setValue("general.flags", uint(value));
+    config::base().save();
 }
 
-void setFlag(uint f, bool b, const QString& flagsVariable) {
+bool Flags::test(uint flag) const
+{
+    uint flags = value;
+    return (flags & flag);
+}
 
-    QSettings settings;
-    uint flags = settings.value(flagsVariable, FLAGS_DEF).toUInt();
-    flags = b ? flags | f : flags & ~f;
-    settings.setValue(flagsVariable, flags);
+void Flags::set(uint flag, bool b)
+{
+    uint flags = value;
+    flags = b ? (flags | flag) : (flags & ~flag);
+    value = flags;
+}
+
+Flags::operator FlagType() const
+{
+    return static_cast<qgit::FlagType>(value.load());
+}
+
+Flags& flags()
+{
+    return ::safe_singleton<Flags>();
 }
 
 // tree view icons helpers
@@ -287,81 +306,6 @@ const QPixmap* mimePix(const QString& fileName) {
     const QString& ext = fileName.section('.', -1, -1).toLower();
     auto it = mimePixMap.find(ext);
     return (it != mimePixMap.end()) ? it.value() : mimePixMap["#default"];
-}
-
-// geometry settings helers
-void saveGeometrySetting(const QString& name, QWidget* w) {
-
-    QSettings settings;
-    if (w && w->isVisible())
-        settings.setValue(name + "_window", w->saveGeometry());
-}
-
-void saveGeometrySetting(const QString& name, SplitVect* svPtr) {
-
-    QSettings settings;
-    int cnt = 0;
-    for (QSplitter* split : *svPtr) {
-        cnt++;
-        if (split->sizes().contains(0))
-            continue;
-
-        QString nm = name + "_splitter_" + QString::number(cnt);
-        settings.setValue(nm, split->saveState());
-    }
-}
-
-void saveGeometrySetting(const QString& name, HeaderVect* hvPtr) {
-
-    QSettings settings;
-    int cnt = 0;
-    for (QHeaderView* header : *hvPtr) {
-        cnt++;
-        QString nm = name + "_header_" + QString::number(cnt);
-        settings.setValue(nm, header->saveState());
-    }
-}
-
-
-void restoreGeometrySetting(const QString& name, QWidget* w) {
-
-    QSettings settings;
-    if (w) {
-        QString nm = name + "_window";
-        QVariant v = settings.value(nm);
-        if (v.isValid())
-            w->restoreGeometry(v.toByteArray());
-    }
-}
-
-void restoreGeometrySetting(const QString& name, SplitVect* svPtr) {
-
-    QSettings settings;
-    int cnt = 0;
-    for (QSplitter* split : *svPtr) {
-        cnt++;
-        QString nm = name + "_splitter_" + QString::number(cnt);
-        QVariant v = settings.value(nm);
-        if (!v.isValid())
-            continue;
-
-        split->restoreState(v.toByteArray());
-    }
-}
-
-void restoreGeometrySetting(const QString& name, HeaderVect* hvPtr) {
-
-    QSettings settings;
-    int cnt = 0;
-    for (QHeaderView* header : *hvPtr) {
-        cnt++;
-        QString nm = name + "_header_" + QString::number(cnt);
-        QVariant v = settings.value(nm);
-        if (!v.isValid())
-            continue;
-
-        header->restoreState(v.toByteArray());
-    }
 }
 
 // misc helpers
@@ -493,7 +437,7 @@ bool startProcess(QProcess* proc, const QStringList& args, const QString& buf, b
     return proc->waitForStarted();
 }
 
-} // namespace QGit
+} // namespace qgit
 
 
 //---------------------------------- Rev ------------------------------------

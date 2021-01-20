@@ -1,7 +1,7 @@
 <?xml version="1.0" encoding="UTF-8"?>
 <ui version="4.0">
  <class>CustomActionBase</class>
- <widget class="QWidget" name="CustomActionBase">
+ <widget class="QDialog" name="CustomActionBase">
   <property name="geometry">
    <rect>
     <x>0</x>
@@ -200,7 +200,7 @@ variables &lt;code&gt;$CURRENT_BRANCH&lt;/code&gt; and &lt;code&gt;$SHA&lt;/code
    <item>
     <widget class="QDialogButtonBox" name="buttonBox">
      <property name="standardButtons">
-      <set>QDialogButtonBox::Ok</set>
+      <set>QDialogButtonBox::Cancel|QDialogButtonBox::Ok</set>
      </property>
     </widget>
    </item>
@@ -343,11 +343,27 @@ variables &lt;code&gt;$CURRENT_BRANCH&lt;/code&gt; and &lt;code&gt;$SHA&lt;/code
    <sender>buttonBox</sender>
    <signal>accepted()</signal>
    <receiver>CustomActionBase</receiver>
-   <slot>pushButtonOk_clicked()</slot>
+   <slot>accept()</slot>
    <hints>
     <hint type="sourcelabel">
      <x>289</x>
      <y>428</y>
+    </hint>
+    <hint type="destinationlabel">
+     <x>289</x>
+     <y>245</y>
+    </hint>
+   </hints>
+  </connection>
+  <connection>
+   <sender>buttonBox</sender>
+   <signal>rejected()</signal>
+   <receiver>CustomActionBase</receiver>
+   <slot>reject()</slot>
+   <hints>
+    <hint type="sourcelabel">
+     <x>289</x>
+     <y>471</y>
     </hint>
     <hint type="destinationlabel">
      <x>289</x>

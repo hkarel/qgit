@@ -17,6 +17,9 @@ Q_OBJECT
 public:
     explicit CommitImpl(Git* g, bool amend);
 
+    void loadGeometry();
+    void saveGeometry();
+
 signals:
     void changesCommitted(bool);
 

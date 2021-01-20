@@ -11,10 +11,13 @@
 
 #include "ui_customaction.h"
 
-class CustomActionImpl : public QWidget, public Ui_CustomActionBase {
+class CustomActionImpl : public QDialog, public Ui_CustomActionBase {
 Q_OBJECT
 public:
-    CustomActionImpl();
+    CustomActionImpl(QWidget* parent);
+
+    void loadGeometry();
+    void saveGeometry();
 
 signals:
     void listChanged(const QStringList&);
@@ -28,16 +31,20 @@ protected slots:
     void pushButtonMoveUp_clicked();
     void pushButtonMoveDown_clicked();
     void checkBoxRefreshAfterAction_toggled(bool);
-    void checkBoxAskArgs_toggled(bool);
     void textEditAction_textChanged();
-    void pushButtonOk_clicked();
 
 private:
-    const QStringList actions();
-    void updateActions();
-    bool getNewName(QString& name, const QString& caption);
-    void loadAction(const QString& name);
-    void removeAction(const QString& name);
+    void done(int r) override;
+
+    void loadActions();
+    void saveActions();
+    bool newNameAction(QString& name, const QString& caption);
+
+//    const QStringList actions();
+//    void updateActions();
+//    bool getNewName(QString& name, const QString& caption);
+//    void loadAction(const QString& name);
+//    void removeAction(const QString& name);
 };
 
 #endif

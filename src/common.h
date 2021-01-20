@@ -9,9 +9,12 @@
 
 #include "common_types.h"
 #include "shared/defmac.h"
+#include "shared/container_ptr.h"
 
 #include <QHeaderView>
 #include <QSplitter>
+#include <atomic>
+#include <memory>
 
 // some syntactic sugar
 #define FOREACH(i, c) \
@@ -130,7 +133,7 @@ extern QColor  ODD_LINE_COL;
 extern QColor  EVEN_LINE_COL;
 extern QFont   STD_FONT;
 extern QFont   TYPE_WRITER_FONT;
-extern QString GIT_DIR;
+//extern QString GIT_DIR;
 
 // patches drag and drop
 extern const QString PATCHES_DIR;
@@ -140,45 +143,45 @@ extern const QString ZERO_SHA;
 extern const QString CUSTOM_SHA;
 extern const QString ALL_MERGE_FILES;
 
-// settings keys
-extern const QString ORG_KEY;
-extern const QString APP_KEY;
-extern const QString GIT_DIR_KEY;
-extern const QString PATCH_DIR_KEY;
-extern const QString FMT_P_OPT_KEY;
-extern const QString AM_P_OPT_KEY;
-extern const QString STD_FNT_KEY;
-extern const QString TYPWRT_FNT_KEY;
-extern const QString FLAGS_KEY;
-extern const QString CON_GEOM_KEY;
-extern const QString CMT_GEOM_KEY;
-extern const QString MAIN_GEOM_KEY;
-extern const QString REV_GEOM_KEY;
-extern const QString REV_COLS_KEY;
-extern const QString FILE_COLS_KEY;
-extern const QString CMT_TEMPL_KEY;
-extern const QString CMT_ARGS_KEY;
-extern const QString RANGE_FROM_KEY;
-extern const QString RANGE_TO_KEY;
-extern const QString RANGE_OPT_KEY;
-extern const QString EX_KEY;
-extern const QString EX_PER_DIR_KEY;
-extern const QString EXT_DIFF_KEY;
-extern const QString EXT_EDITOR_KEY;
-extern const QString ICON_SIZE_INDEX;
-extern const QString REC_REP_KEY;
-extern const QString ACT_LIST_KEY;
-extern const QString ACT_GEOM_KEY;
-extern const QString ACT_GROUP_KEY;
-extern const QString ACT_TEXT_KEY;
-extern const QString ACT_FLAGS_KEY;
+//// settings keys
+//extern const QString ORG_KEY;
+//extern const QString APP_KEY;
+//extern const QString GIT_DIR_KEY;
+//extern const QString PATCH_DIR_KEY;
+//extern const QString FMT_P_OPT_KEY;
+//extern const QString AM_P_OPT_KEY;
+//extern const QString STD_FNT_KEY;
+//extern const QString TYPWRT_FNT_KEY;
+//extern const QString FLAGS_KEY;
+//extern const QString CON_GEOM_KEY;
+//extern const QString CMT_GEOM_KEY;
+//extern const QString MAIN_GEOM_KEY;
+//extern const QString REV_GEOM_KEY;
+//extern const QString REV_COLS_KEY;
+//extern const QString FILE_COLS_KEY;
+//extern const QString CMT_TEMPL_KEY;
+//extern const QString CMT_ARGS_KEY;
+//extern const QString RANGE_FROM_KEY;
+//extern const QString RANGE_TO_KEY;
+//extern const QString RANGE_OPT_KEY;
+//extern const QString EX_KEY;
+//extern const QString EX_PER_DIR_KEY;
+//extern const QString EXT_DIFF_KEY;
+//extern const QString EXT_EDITOR_KEY;
+//extern const QString ICON_SIZE_INDEX;
+//extern const QString REC_REP_KEY;
+//extern const QString ACT_LIST_KEY;
+//extern const QString ACT_GEOM_KEY;
+//extern const QString ACT_GROUP_KEY;
+//extern const QString ACT_TEXT_KEY;
+//extern const QString ACT_FLAGS_KEY;
 
-// settings default values
-extern const QString CMT_TEMPL_DEF;
-extern const QString EX_DEF;
-extern const QString EX_PER_DIR_DEF;
-extern const QString EXT_DIFF_DEF;
-extern const QString EXT_EDITOR_DEF;
+//// settings default values
+//extern const QString CMT_TEMPL_DEF;
+//extern const QString EX_DEF;
+//extern const QString EX_PER_DIR_DEF;
+//extern const QString EXT_DIFF_DEF;
+//extern const QString EXT_EDITOR_DEF;
 
 // settings booleans
 enum FlagType
@@ -205,25 +208,34 @@ enum FlagType
 const int FLAGS_DEF = USE_CMT_MSG_F | RANGE_SELECT_F | SMART_LBL_F
                       | VERIFY_CMT_F | SIGN_PATCH_F | LOG_DIFF_TAB_F
                       | MSG_ON_NEW_F | ENABLE_DRAGNDROP_F;
-// settings helpers
-uint flags(const QString& flagsVariable);
-bool testFlag(uint f, const QString& fv = FLAGS_KEY);
-void setFlag(uint f, bool b, const QString& fv = FLAGS_KEY);
+
+struct Flags
+{
+    void load();
+    void save() const;
+
+    bool test(uint flag) const;
+    void set(uint flag, bool b);
+
+    operator FlagType() const;
+
+    std::atomic_uint value = {0};
+};
+Flags& flags();
+
+struct CustomActionData
+{
+    typedef container_ptr<CustomActionData> Ptr;
+
+    QString name;
+    QString command;
+    bool refresh = {false};
+};
 
 // tree view icons helpers
 void initMimePix();
 void freeMimePix();
 const QPixmap* mimePix(const QString& fileName);
-
-// geometry settings helers
-typedef QVector<QSplitter*> SplitVect;
-typedef QVector<QHeaderView*> HeaderVect;
-void saveGeometrySetting(const QString& name, QWidget*);
-void saveGeometrySetting(const QString& name, SplitVect*);
-void saveGeometrySetting(const QString& name, HeaderVect*);
-void restoreGeometrySetting(const QString& name, QWidget*);
-void restoreGeometrySetting(const QString& name, SplitVect*);
-void restoreGeometrySetting(const QString& name, HeaderVect*);
 
 // misc helpers
 bool stripPartialParaghraps(const QByteArray& src, QString* dst, QString* prev);
@@ -249,7 +261,9 @@ extern const QString SCRIPT_EXT;
 const int SHA_LENGTH = 40; // from git ref. spec.
 const int SHA_END_LENGTH = SHA_LENGTH + 1; // an sha key + \n
 
-} // namespace QGit
+} // namespace qgit
+
+Q_DECLARE_METATYPE(qgit::CustomActionData::Ptr)
 
 class Rev
 {

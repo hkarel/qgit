@@ -120,7 +120,7 @@ void FileHistory::clear(bool complete) {
   //qDeleteAll(rowData);
   //rowData.clear();
 
-  if (testFlag(REL_DATE_F)) {
+  if (qgit::flags().test(REL_DATE_F)) {
     secs = QDateTime::currentDateTime().toTime_t();
     headerInfo[4] = "Last Change";
   } else {

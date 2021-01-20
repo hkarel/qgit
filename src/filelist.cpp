@@ -150,7 +150,7 @@ bool FileList::startDragging(QMouseEvent* /*e*/) {
 }
 
 void FileList::mouseMoveEvent(QMouseEvent* e) {
-	if (e->buttons() == Qt::LeftButton && qgit::testFlag(qgit::ENABLE_DRAGNDROP_F))
+    if (e->buttons() == Qt::LeftButton && qgit::flags().test(qgit::ENABLE_DRAGNDROP_F))
         if (startDragging(e)) return;
 
     QListWidget::mouseMoveEvent(e);

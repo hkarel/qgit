@@ -40,6 +40,8 @@ public:
     QString refNameAt(const QPoint &pos);
     const QString& selectedRefName() const {return lastRefName;}
     void markDiffToSha(const QString& sha);
+
+    void loadGeometry();
     void saveGeometry();
 
 signals:

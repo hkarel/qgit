@@ -15,6 +15,7 @@
 #include "shared/defmac.h"
 #include "shared/logger/logger.h"
 #include "shared/logger/format.h"
+#include "shared/config/appl_conf.h"
 #include "shared/qt/logger_operators.h"
 
 #include <QApplication>
@@ -26,7 +27,6 @@
 #include <QShortcut>
 #include <QDrag>
 #include <QUrl>
-#include <QSettings>
 
 void getTagMarkParams(QString &name, QStyleOptionViewItem& o,
                       const int type, const bool isCurrent);
@@ -34,7 +34,10 @@ uint refTypeFromName(const QString& name);
 
 using namespace qgit;
 
-ListView::ListView(QWidget* parent) : QTreeView(parent), d(NULL), git(NULL), fh(NULL), lp(NULL), dropInfo(NULL) {}
+ListView::ListView(QWidget* parent)
+    : QTreeView(parent), d(NULL), git(NULL), fh(NULL), lp(NULL), dropInfo(NULL)
+{
+}
 
 void ListView::setup(Domain* dm, Git* g) {
 
@@ -56,6 +59,7 @@ void ListView::setup(Domain* dm, Git* g) {
     setItemDelegate(lvd);
 
     setupGeometry(); // after setting delegate
+    loadGeometry();
 
     // shortcuts are activated only if widget is visible, this is good
     new QShortcut(Qt::Key_Up,   this, SLOT(on_keyUp()));
@@ -71,6 +75,7 @@ void ListView::setup(Domain* dm, Git* g) {
 
 ListView::~ListView() {
 
+    saveGeometry();
     git->cancelDataLoading(fh); // non blocking
 }
 
@@ -115,31 +120,32 @@ void ListView::setupGeometry() {
     hv->resizeSection(LOG_COL, DEF_LOG_COL_WIDTH);
     hv->resizeSection(AUTH_COL, DEF_AUTH_COL_WIDTH);
     hv->resizeSection(TIME_COL, DEF_TIME_COL_WIDTH);
+}
 
+void ListView::loadGeometry()
+{
+    QString sval;
     if (git->isMainHistory(fh))
-    {
-        qgit::HeaderVect v {1, header()};
-        qgit::restoreGeometrySetting(qgit::REV_GEOM_KEY, &v);
-        hideColumn(ANN_ID_COL);
+        config::base().getValue("geometry.listview.rev_header", sval);
+    else
+        config::base().getValue("geometry.listview.file_header", sval);
+
+    if (!sval.isEmpty()) {
+        QByteArray ba = QByteArray::fromBase64(sval.toLatin1());
+        header()->restoreState(ba);
     }
 
-    const QString settingsKey = git->isMainHistory(fh) ? qgit::REV_COLS_KEY : qgit::FILE_COLS_KEY;
-    QSettings settings;
-    QVariant v = settings.value(settingsKey);
-    if (v.isValid())
-        hv->restoreState(v.toByteArray());
+    if (git->isMainHistory(fh))
+        hideColumn(ANN_ID_COL);
 }
 
 void ListView::saveGeometry()
 {
-    if (git->isMainHistory(fh)) {
-        qgit::HeaderVect v {1, header()};
-        qgit::saveGeometrySetting(qgit::REV_GEOM_KEY, &v);
-    }
-
-    const QString settingsKey = git->isMainHistory(fh) ? qgit::REV_COLS_KEY : qgit::FILE_COLS_KEY;
-    QSettings settings;
-    settings.setValue(settingsKey, header()->saveState());
+    QByteArray ba = header()->saveState().toBase64();
+    if (git->isMainHistory(fh))
+        config::base().setValue("geometry.listview.rev_header", QString::fromLatin1(ba));
+    else
+        config::base().setValue("geometry.listview.file_header", QString::fromLatin1(ba));
 }
 
 void ListView::scrollToNextHighlighted(int direction) {
@@ -442,7 +448,7 @@ void ListView::startDragging(QMouseEvent* /*e*/) {
 
 void ListView::mouseMoveEvent(QMouseEvent* e) {
 
-    if (e->buttons() == Qt::LeftButton && qgit::testFlag(qgit::ENABLE_DRAGNDROP_F)) {
+    if (e->buttons() == Qt::LeftButton && qgit::flags().test(qgit::ENABLE_DRAGNDROP_F)) {
         startDragging(e);
         return;
     }

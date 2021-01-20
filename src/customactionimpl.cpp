@@ -6,211 +6,244 @@
     Copyright: See COPYING file that comes with this distribution
 
 */
-#include <QSettings>
-#include <QMessageBox>
-#include <QInputDialog>
+
 #include "common.h"
 #include "customactionimpl.h"
 
+#include "shared/logger/logger.h"
+#include "shared/logger/format.h"
+#include "shared/config/appl_conf.h"
+#include "shared/qt/logger_operators.h"
+
+#include <QMessageBox>
+#include <QInputDialog>
+
 using namespace qgit;
 
-CustomActionImpl::CustomActionImpl() {
-
-    setAttribute(Qt::WA_DeleteOnClose);
+CustomActionImpl::CustomActionImpl(QWidget* parent) : QDialog(parent)
+{
     setupUi(this);
+    //setAttribute(Qt::WA_DeleteOnClose);
 
-    QSettings settings;
-    restoreGeometry(settings.value(ACT_GEOM_KEY).toByteArray());
-    QStringList actions = settings.value(ACT_LIST_KEY).toStringList();
-
-    listWidgetNames->insertItems(0, actions);
-    if (listWidgetNames->count())
-        listWidgetNames->setCurrentItem(listWidgetNames->item(0));
-    else
-        listWidgetNames_currentItemChanged(NULL, NULL);
+    loadGeometry();
+    QTimer::singleShot(10, this, &CustomActionImpl::loadActions);
 }
 
-void CustomActionImpl::closeEvent(QCloseEvent* ce) {
+void CustomActionImpl::loadGeometry()
+{
+    QVector<int> v;
+    config::base().getValue("geometry.custact.window", v);
 
-    QSettings settings;
-    settings.setValue(ACT_GEOM_KEY, saveGeometry());
+    if (v.count() == 4) {
+        move(v[0], v[1]);
+        resize(v[2], v[3]);
+    }
+}
+
+void CustomActionImpl::saveGeometry()
+{
+    QPoint p = pos();
+    QVector<int> v {p.x(), p.y(), width(), height()};
+    config::base().setValue("geometry.custact.window", v);
+}
+
+void CustomActionImpl::closeEvent(QCloseEvent* ce)
+{
     QWidget::closeEvent(ce);
 }
 
-void CustomActionImpl::loadAction(const QString& name) {
+void CustomActionImpl::done(int r)
+{
+    QDialog::done(r);
 
-    const QString flags(ACT_GROUP_KEY + name + ACT_FLAGS_KEY);
-    checkBoxRefreshAfterAction->setChecked(testFlag(ACT_REFRESH_F, flags));
-    QSettings set;
-    const QString& data(set.value(ACT_GROUP_KEY + name + ACT_TEXT_KEY, "").toString());
-    textEditAction->setPlainText(data);
-}
-
-void CustomActionImpl::removeAction(const QString& name) {
-
-    QSettings set;
-    set.remove(ACT_GROUP_KEY + name);
-}
-
-const QStringList CustomActionImpl::actions() {
-
-    QStringList actionsList;
-    QListWidgetItem* item;
-    int row = 0;
-    while ((item = listWidgetNames->item(row)) != 0) {
-        actionsList.append(item->text());
-        row++;
+    if (r == QDialog::Accepted) {
+        saveActions();
+        config::base().save();
     }
-    return actionsList;
+    else
+        config::base().rereadFile();
+
+    saveGeometry();
 }
 
-void CustomActionImpl::updateActions() {
+void CustomActionImpl::loadActions()
+{
+    YamlConfig::Func loadFunc =
+        [this](YamlConfig* conf, YAML::Node& actions, bool /*logWarn*/)
+    {
+        for (size_t i = 0; i < actions.size(); ++i)
+        {
+            CustomActionData::Ptr cad {new CustomActionData};
+            conf->getValue(actions[i], "name",    cad->name);
+            conf->getValue(actions[i], "command", cad->command);
+            conf->getValue(actions[i], "refresh", cad->refresh);
 
-    QSettings settings;
-    settings.setValue(ACT_LIST_KEY, actions());
-    emit listChanged(actions());
+            QListWidgetItem* item = new QListWidgetItem(cad->name);
+            item->setData(Qt::UserRole, qVariantFromValue(cad));
+            listWidgetNames->addItem(item);
+        }
+        return true;
+    };
+    config::base().getValue("custom_actions", loadFunc);
 }
 
-void CustomActionImpl::listWidgetNames_currentItemChanged(QListWidgetItem* item, QListWidgetItem*) {
+void CustomActionImpl::saveActions()
+{
+    YamlConfig::Func saveFunc =
+        [this](YamlConfig* conf, YAML::Node& actions, bool /*logWarn*/)
+    {
+        actions = YAML::Node();
+        for (int i = 0; i < listWidgetNames->count(); ++i)
+        {
+            QListWidgetItem* item = listWidgetNames->item(i);
+            QVariant var = item->data(Qt::UserRole);
+            CustomActionData::Ptr cad = var.value<CustomActionData::Ptr>();
 
-    bool empty = (item == NULL);
+            YAML::Node node;
+            conf->setValue(node, "name",    cad->name);
+            conf->setValue(node, "command", cad->command);
+            conf->setValue(node, "refresh", cad->refresh);
+            actions.push_back(node);
+        }
+        return true;
+    };
+    config::base().setValue("custom_actions", saveFunc);
+}
 
-    if (!empty) {
-        loadAction(item->text());
-        listWidgetNames->scrollToItem(item);
-    } else {
+void CustomActionImpl::listWidgetNames_currentItemChanged(QListWidgetItem* item,
+                                                          QListWidgetItem*)
+{
+    if (item) {
+        QVariant var = item->data(Qt::UserRole);
+        CustomActionData::Ptr cad = var.value<CustomActionData::Ptr>();
+
+        checkBoxRefreshAfterAction->setChecked(cad->refresh);
+
+        QSignalBlocker blocker {textEditAction}; (void) blocker;
+        textEditAction->setText(cad->command);
+    }
+    else {
+        checkBoxRefreshAfterAction->setChecked(false);
+
+        QSignalBlocker blocker {textEditAction}; (void) blocker;
         textEditAction->clear();
-        if (checkBoxRefreshAfterAction->isChecked())
-            checkBoxRefreshAfterAction->toggle();
     }
-    textEditAction->setEnabled(!empty);
-    checkBoxRefreshAfterAction->setEnabled(!empty);
-    pushButtonRename->setEnabled(!empty);
-    pushButtonRemove->setEnabled(!empty);
-    pushButtonMoveUp->setEnabled(!empty && (item != listWidgetNames->item(0)));
-    int lastRow = listWidgetNames->count() - 1;
-    pushButtonMoveDown->setEnabled(!empty && (item != listWidgetNames->item(lastRow)));
+
+//    bool empty = (item == nullptr);
+//    textEditAction->setEnabled(!empty);
+//    checkBoxRefreshAfterAction->setEnabled(!empty);
+//    _ui->btnRename->setEnabled(!empty);
+//    _ui->btnRemove->setEnabled(!empty);
+//    _ui->btnMoveUp->setEnabled(!empty && (item != listWidgetNames->item(0)));
+//    int lastRow = listWidgetNames->count() - 1;
+//    _ui->btnMoveDown->setEnabled(!empty && (item != listWidgetNames->item(lastRow)));
 }
 
-bool CustomActionImpl::getNewName(QString& name, const QString& caption) {
-
+bool CustomActionImpl::newNameAction(QString& name, const QString& caption)
+{
     bool ok;
-    const QString oldName = name;
+    QString oldName = name;
     name = QInputDialog::getText(this, caption + " - QGit", "Enter action name:",
                                  QLineEdit::Normal, name, &ok);
 
     if (!ok || name.isEmpty() || name == oldName)
         return false;
 
-    if (actions().contains(name)) {
-        QMessageBox::warning(this, caption + " - QGit", "Sorry, action name "
-                             "already exists.\nPlease choose a different name.");
-        return false;
+    for (int i = 0; i < listWidgetNames->count(); ++i) {
+        QListWidgetItem* item = listWidgetNames->item(i);
+        if (item->text() == name) {
+            QMessageBox::warning(this, caption + " - QGit",
+                                 "Sorry, action name already exists.\n"
+                                 "Please choose a different name.");
+            return false;
+        }
     }
     return true;
 }
 
-void CustomActionImpl::pushButtonNew_clicked() {
-
+void CustomActionImpl::pushButtonNew_clicked()
+{
     QString name;
-    if (!getNewName(name, "Create new action"))
+    if (!newNameAction(name, "Create new action"))
         return;
 
-    QListWidgetItem* item = new QListWidgetItem(name);
+    CustomActionData::Ptr cad {new CustomActionData};
+    cad->name = name;
+
+    QListWidgetItem* item = new QListWidgetItem(cad->name);
+    item->setData(Qt::UserRole, qVariantFromValue(cad));
     listWidgetNames->addItem(item);
-    updateActions();
     listWidgetNames->setCurrentItem(item);
+
+    QSignalBlocker blocker {textEditAction}; (void) blocker;
     textEditAction->setPlainText("<write here your action's commands sequence>");
     textEditAction->selectAll();
     textEditAction->setFocus();
 }
 
-void CustomActionImpl::pushButtonRename_clicked() {
-
+void CustomActionImpl::pushButtonRename_clicked()
+{
     QListWidgetItem* item = listWidgetNames->currentItem();
-    if (!item || !item->isSelected())
+    if (!item)
         return;
 
-    QString newName(item->text());
-    if (!getNewName(newName, "Rename action"))
+    QString newName = item->text();
+    if (!newNameAction(newName, "Rename action"))
         return;
 
-    const QString oldActionName(item->text());
-    item->setText(newName);
-    updateActions();
-    listWidgetNames_currentItemChanged(item, item);
-    loadAction(oldActionName);
-    removeAction(oldActionName);
+    QVariant var = item->data(Qt::UserRole);
+    CustomActionData::Ptr cad = var.value<CustomActionData::Ptr>();
+    cad->name = newName;
+    item->setText(cad->name);
 }
 
-void CustomActionImpl::pushButtonRemove_clicked() {
-
+void CustomActionImpl::pushButtonRemove_clicked()
+{
     QListWidgetItem* item = listWidgetNames->currentItem();
-    if (!item || !item->isSelected())
+    if (!item)
         return;
 
-    removeAction(item->text());
     delete item;
-    updateActions();
     if (!listWidgetNames->count())
         listWidgetNames_currentItemChanged(NULL, NULL);
 }
 
-void CustomActionImpl::pushButtonMoveUp_clicked() {
-
-    QListWidgetItem* item = listWidgetNames->currentItem();
-    int row = listWidgetNames->row(item);
-    if (!item || row == 0)
+void CustomActionImpl::pushButtonMoveUp_clicked()
+{
+    int row = listWidgetNames->currentRow();
+    if (row <= 0)
         return;
 
-    item = listWidgetNames->takeItem(row);
+    QListWidgetItem* item = listWidgetNames->takeItem(row);
     listWidgetNames->insertItem(row - 1, item);
-    updateActions();
-    listWidgetNames->setCurrentItem(item);
+    listWidgetNames->setCurrentRow(row - 1);
 }
 
-void CustomActionImpl::pushButtonMoveDown_clicked() {
-
-    QListWidgetItem* item = listWidgetNames->currentItem();
-    int row = listWidgetNames->row(item);
-    if (!item || row == listWidgetNames->count() - 1)
+void CustomActionImpl::pushButtonMoveDown_clicked()
+{
+    int row = listWidgetNames->currentRow();
+    if ((row == -1) || (row == (listWidgetNames->count() - 1)))
         return;
 
-    item = listWidgetNames->takeItem(row);
+    QListWidgetItem* item = listWidgetNames->takeItem(row);
     listWidgetNames->insertItem(row + 1, item);
-    updateActions();
-    listWidgetNames->setCurrentItem(item);
+    listWidgetNames->setCurrentRow(row + 1);
 }
 
-void CustomActionImpl::textEditAction_textChanged() {
-
-    QListWidgetItem* item = listWidgetNames->currentItem();
-    if (item) {
-        QSettings s;
-        QString key(ACT_GROUP_KEY + item->text() + ACT_TEXT_KEY);
-        s.setValue(key, textEditAction->toPlainText());
+void CustomActionImpl::textEditAction_textChanged()
+{
+    if (QListWidgetItem* item = listWidgetNames->currentItem()) {
+        QVariant var = item->data(Qt::UserRole);
+        CustomActionData::Ptr cad = var.value<CustomActionData::Ptr>();
+        cad->command = textEditAction->toPlainText();
     }
 }
 
-void CustomActionImpl::checkBoxRefreshAfterAction_toggled(bool b) {
-
-    QListWidgetItem* item = listWidgetNames->currentItem();
-    if (item) {
-        QString flags(ACT_GROUP_KEY + item->text() + ACT_FLAGS_KEY);
-        setFlag(ACT_REFRESH_F, b, flags);
+void CustomActionImpl::checkBoxRefreshAfterAction_toggled(bool b)
+{
+    if (QListWidgetItem* item = listWidgetNames->currentItem()) {
+        QVariant var = item->data(Qt::UserRole);
+        CustomActionData::Ptr cad = var.value<CustomActionData::Ptr>();
+        cad->refresh = checkBoxRefreshAfterAction->isChecked();
     }
-}
-
-void CustomActionImpl::checkBoxAskArgs_toggled(bool b) {
-
-    QListWidgetItem* item = listWidgetNames->currentItem();
-    if (item) {
-        QString flags(ACT_GROUP_KEY + item->text() + ACT_FLAGS_KEY);
-        setFlag(ACT_CMD_LINE_F, b, flags);
-    }
-}
-
-void CustomActionImpl::pushButtonOk_clicked() {
-
-    close();
 }

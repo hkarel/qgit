@@ -6,11 +6,11 @@
     Copyright: See COPYING file that comes with this distribution
 
 */
-#include <QSettings>
 #include <QRegExp>
 #include "common.h"
 #include "git.h"
 #include "rangeselectimpl.h"
+#include "shared/config/appl_conf.h"
 
 using namespace qgit;
 
@@ -48,10 +48,9 @@ RangeSelectImpl::RangeSelectImpl(QWidget* par, QString* r, bool repoChanged, Git
 
     if (!repoChanged) {
         // range values are sensible only when reloading the same repo
-        QSettings settings;
-        from = settings.value(RANGE_FROM_KEY).toString();
-        to = settings.value(RANGE_TO_KEY).toString();
-        options = settings.value(RANGE_OPT_KEY).toString();
+        config::base().getValue("range_select.from",    from);
+        config::base().getValue("range_select.to",      to);
+        config::base().getValue("range_select.options", options);
     }
     comboBoxTo->insertItem(0, "HEAD");
     comboBoxTo->insertItems(1, orl);
@@ -72,7 +71,7 @@ RangeSelectImpl::RangeSelectImpl(QWidget* par, QString* r, bool repoChanged, Git
 
     lineEditOptions->setText(options);
 
-    int f = flags(FLAGS_KEY);
+    qgit::FlagType f = qgit::flags();
     checkBoxDiffCache->setChecked(f & DIFF_INDEX_F);
     checkBoxShowAll->setChecked(f & ALL_BRANCHES_F);
     checkBoxShowWholeHistory->setChecked(f & WHOLE_HISTORY_F);
@@ -124,12 +123,12 @@ void RangeSelectImpl::orderRefs(const QStringList& src, QStringList& dst) {
 
 void RangeSelectImpl::checkBoxDiffCache_toggled(bool b) {
 
-    setFlag(DIFF_INDEX_F, b);
+    qgit::flags().set(DIFF_INDEX_F, b);
 }
 
 void RangeSelectImpl::checkBoxShowDialog_toggled(bool b) {
 
-    setFlag(RANGE_SELECT_F, b);
+    qgit::flags().set(RANGE_SELECT_F, b);
 }
 
 void RangeSelectImpl::checkBoxShowAll_toggled(bool b) {
@@ -140,19 +139,19 @@ void RangeSelectImpl::checkBoxShowAll_toggled(bool b) {
         opt.append(" --all");
 
     lineEditOptions->setText(opt.trimmed());
-    setFlag(ALL_BRANCHES_F, b);
+    qgit::flags().set(ALL_BRANCHES_F, b);
 }
 
 void RangeSelectImpl::checkBoxShowWholeHistory_toggled(bool b) {
 
     comboBoxFrom->setEnabled(!b);
     comboBoxTo->setEnabled(!b);
-    setFlag(WHOLE_HISTORY_F, b);
+    qgit::flags().set(WHOLE_HISTORY_F, b);
 }
 
 void RangeSelectImpl::pushButtonOk_clicked() {
 
-    if (testFlag(WHOLE_HISTORY_F))
+    if (qgit::flags().test(WHOLE_HISTORY_F))
         *range = "HEAD";
     else {
         *range = comboBoxFrom->currentText();
@@ -172,15 +171,16 @@ void RangeSelectImpl::pushButtonOk_clicked() {
     *range = range->trimmed();
 
     // save settings before leaving
-    QSettings settings;
-    settings.setValue(RANGE_FROM_KEY, comboBoxFrom->currentText());
-    settings.setValue(RANGE_TO_KEY, comboBoxTo->currentText());
-    settings.setValue(RANGE_OPT_KEY, lineEditOptions->text());
+    config::base().setValue("range_select.from",    comboBoxFrom->currentText());
+    config::base().setValue("range_select.to",      comboBoxTo->currentText());
+    config::base().setValue("range_select.options", lineEditOptions->text());
 
+    qgit::flags().save(); // Call config::base().save() inside
     done(QDialog::Accepted);
 }
 
 QString RangeSelectImpl::getDefaultArgs() {
-    QSettings settings;
-    return settings.value(RANGE_OPT_KEY).toString();
+    QString options;
+    config::base().getValue("range_select.options", options);
+    return options;
 }

@@ -20,6 +20,11 @@
 #include "mainimpl.h"
 #include "revsview.h"
 
+#include "shared/logger/logger.h"
+#include "shared/logger/format.h"
+#include "shared/config/appl_conf.h"
+#include "shared/qt/logger_operators.h"
+
 RevsView::RevsView(MainImpl* mi, Git* g, bool isMain) : Domain(mi, g, isMain) {
 
     revTab = new Ui_TabRev();
@@ -31,14 +36,15 @@ RevsView::RevsView(MainImpl* mi, Git* g, bool isMain) : Domain(mi, g, isMain) {
     tab()->fileList->setup(this, git);
     m()->treeView->setup(this, git);
 
-    setTabLogDiffVisible(qgit::testFlag(qgit::LOG_DIFF_TAB_F));
+    setTabLogDiffVisible(qgit::flags().test(qgit::LOG_DIFF_TAB_F));
 
     SmartBrowse* sb = new SmartBrowse(this);
 
     // restore geometry
-    qgit::SplitVect v;
-    v << tab()->horizontalSplitter << tab()->verticalSplitter;
-    qgit::restoreGeometrySetting(qgit::REV_GEOM_KEY, &v);
+//    qgit::SplitVect v;
+//    v << tab()->horizontalSplitter << tab()->verticalSplitter;
+//    qgit::restoreGeometrySetting(qgit::REV_GEOM_KEY, &v);
+    loadGeometry();
 
     chk_connect_a(m(), SIGNAL(typeWriterFontChanged()),
                   tab()->textEditDiff, SLOT(typeWriterFontChanged()));
@@ -94,11 +100,11 @@ RevsView::~RevsView() {
     if (!parent())
         return;
 
-    qgit::SplitVect v;
-    v << tab()->horizontalSplitter << tab()->verticalSplitter;
-    qgit::saveGeometrySetting(qgit::REV_GEOM_KEY, &v);
-
-    tab()->listViewLog->saveGeometry();
+//    qgit::SplitVect v;
+//    v << tab()->horizontalSplitter << tab()->verticalSplitter;
+//    qgit::saveGeometrySetting(qgit::REV_GEOM_KEY, &v);
+    saveGeometry();
+    //tab()->listViewLog->saveGeometry();
 
     // manually delete before container is removed in Domain
     // d'tor to avoid a crash due to spurious events in
@@ -108,6 +114,31 @@ RevsView::~RevsView() {
 
     delete linkedPatchView;
     delete revTab;
+}
+
+void RevsView::loadGeometry()
+{
+    QString sval;
+    if (config::base().getValue("geometry.revsview.splitter.horizontal", sval))
+    {
+        QByteArray ba = QByteArray::fromBase64(sval.toLatin1());
+        tab()->horizontalSplitter->restoreState(ba);
+    }
+
+    if (config::base().getValue("geometry.revsview.splitter.vertical", sval))
+    {
+        QByteArray ba = QByteArray::fromBase64(sval.toLatin1());
+        tab()->verticalSplitter->restoreState(ba);
+    }
+}
+
+void RevsView::saveGeometry()
+{
+    QByteArray ba = tab()->horizontalSplitter->saveState().toBase64();
+    config::base().setValue("geometry.revsview.splitter.horizontal", QString::fromLatin1(ba));
+
+    ba = tab()->verticalSplitter->saveState().toBase64();
+    config::base().setValue("geometry.revsview.splitter.vertical", QString::fromLatin1(ba));
 }
 
 void RevsView::clear(bool complete) {
@@ -238,7 +269,7 @@ void RevsView::on_updateRevDesc() {
 void RevsView::on_flagChanged(uint flag) {
 
 	if (flag == qgit::ENABLE_DRAGNDROP_F) {
-		if (qgit::testFlag(qgit::ENABLE_DRAGNDROP_F)) {
+        if (qgit::flags().test(qgit::ENABLE_DRAGNDROP_F)) {
 			tab()->listViewLog->setSelectionMode(QAbstractItemView::ExtendedSelection);
 		} else {
 			tab()->listViewLog->setSelectionMode(QAbstractItemView::SingleSelection);
@@ -266,7 +297,7 @@ bool RevsView::doUpdate(bool force) {
             on_updateRevDesc();
             showStatusBarMessage(git->getRevInfo(st.sha()));
 
-            if (   testFlag(qgit::MSG_ON_NEW_F)
+            if (qgit::flags().test(qgit::MSG_ON_NEW_F)
                 && tab()->textEditDiff->isVisible())
                 toggleDiffView();
         }

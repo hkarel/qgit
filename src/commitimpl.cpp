@@ -6,7 +6,6 @@
     Copyright: See COPYING file that comes with this distribution
 */
 #include <QTextCodec>
-#include <QSettings>
 #include <QMenu>
 #include <QRegExp>
 #include <QDir>
@@ -22,6 +21,10 @@
 #include "commitimpl.h"
 
 #include "shared/defmac.h"
+#include "shared/logger/logger.h"
+#include "shared/logger/format.h"
+#include "shared/config/appl_conf.h"
+#include "shared/qt/logger_operators.h"
 
 using namespace qgit;
 
@@ -34,16 +37,13 @@ CommitImpl::CommitImpl(Git* g, bool amend) : git(g) {
     setupUi(this);
     textEditMsg->setFont(TYPE_WRITER_FONT);
 
-    qgit::SplitVect v(1, splitter);
-    qgit::restoreGeometrySetting(CMT_GEOM_KEY, this);
-    qgit::restoreGeometrySetting(CMT_GEOM_KEY, &v);
+    QString commitTmpl;
+    config::base().getValue("commit.template_file_path", commitTmpl);
 
-    QSettings settings;
-    QString templ(settings.value(CMT_TEMPL_KEY, CMT_TEMPL_DEF).toString());
     QString msg;
     QDir d;
-    if (d.exists(templ))
-        readFromFile(templ, msg);
+    if (d.exists(commitTmpl))
+        readFromFile(commitTmpl, msg);
 
     // set-up files list
     const RevFile* f = git->getFiles(ZERO_SHA);
@@ -89,7 +89,7 @@ CommitImpl::CommitImpl(Git* g, bool amend) : git(g) {
             status = git->getLastCommitMsg();
 
         // setup textEditMsg with default value if user opted to do so (default)
-        if (testFlag(USE_CMT_MSG_F, FLAGS_KEY))
+        if (qgit::flags().test(USE_CMT_MSG_F))
             status += git->getNewCommitMsg();
 
         msg = status.trimmed();
@@ -133,13 +133,41 @@ CommitImpl::CommitImpl(Git* g, bool amend) : git(g) {
                   this, SLOT(textEditMsg_cursorPositionChanged()));
 
     textEditMsg->installEventFilter(this);
+
+    loadGeometry();
+}
+
+void CommitImpl::loadGeometry()
+{
+    QVector<int> v;
+    config::base().getValue("geometry.commit.window", v);
+
+    if (v.count() == 4) {
+        move(v[0], v[1]);
+        resize(v[2], v[3]);
+    }
+
+    QString sval;
+    if (config::base().getValue("geometry.commit.splitter", sval))
+    {
+        QByteArray ba = QByteArray::fromBase64(sval.toLatin1());
+        splitter->restoreState(ba);
+    }
+}
+
+void CommitImpl::saveGeometry()
+{
+    QPoint p = pos();
+    QVector<int> v {p.x(), p.y(), width(), height()};
+    config::base().setValue("geometry.commit.window", v);
+
+    QByteArray ba = splitter->saveState().toBase64();
+    config::base().setValue("geometry.commit.splitter", QString::fromLatin1(ba));
 }
 
 void CommitImpl::closeEvent(QCloseEvent*) {
 
-    qgit::SplitVect v {1, splitter};
-    qgit::saveGeometrySetting(CMT_GEOM_KEY, this);
-    qgit::saveGeometrySetting(CMT_GEOM_KEY, &v);
+    saveGeometry();
 }
 
 void CommitImpl::contextMenuPopup(const QPoint& pos)  {

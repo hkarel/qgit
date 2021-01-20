@@ -6,23 +6,51 @@
     Copyright: See COPYING file that comes with this distribution
 
 */
-#include <QSettings>
 #include <QStatusBar>
 #include <QMessageBox>
 #include "myprocess.h"
 #include "git.h"
 #include "consoleimpl.h"
 
-ConsoleImpl::ConsoleImpl(const QString& nm, Git* g) : git(g), actionName(nm) {
+#include "shared/logger/logger.h"
+#include "shared/logger/format.h"
+#include "shared/config/appl_conf.h"
+#include "shared/qt/logger_operators.h"
 
+ConsoleImpl::ConsoleImpl(qgit::CustomActionData::Ptr actionData, Git* g) :
+    git(g),
+    actionData(actionData)
+{
     setAttribute(Qt::WA_DeleteOnClose);
     setupUi(this);
     textEditOutput->setFont(qgit::TYPE_WRITER_FONT);
     QFont f = textLabelCmd->font();
     f.setBold(true);
     textLabelCmd->setFont(f);
-    setWindowTitle("\'" + actionName + "\' output window - QGit");
-    qgit::restoreGeometrySetting(qgit::CON_GEOM_KEY, this);
+
+    if (actionData) {
+        QString msg = "'%1' output window - QGit";
+        setWindowTitle(msg.arg(actionData->name));
+    }
+    loadGeometry();
+}
+
+void ConsoleImpl::loadGeometry()
+{
+    QVector<int> v;
+    config::base().getValue("geometry.console.window", v);
+
+    if (v.count() == 4) {
+        move(v[0], v[1]);
+        resize(v[2], v[3]);
+    }
+}
+
+void ConsoleImpl::saveGeometry()
+{
+    QPoint p = pos();
+    QVector<int> v {p.x(), p.y(), width(), height()};
+    config::base().setValue("geometry.console.window", v);
 }
 
 void ConsoleImpl::typeWriterFontChanged() {
@@ -57,13 +85,16 @@ void ConsoleImpl::closeEvent(QCloseEvent* ce) {
     if (QApplication::overrideCursor())
         QApplication::restoreOverrideCursor();
 
-    qgit::saveGeometrySetting(qgit::CON_GEOM_KEY, this);
+    saveGeometry();
     QMainWindow::closeEvent(ce);
 }
 
 bool ConsoleImpl::start(const QString& cmd) {
 
-    textLabelEnd->setText("Executing \'" + actionName + "\' action...");
+    if (actionData) {
+        QString msg = "Executing '%1' action...";
+        textLabelEnd->setText(msg.arg(actionData->name));
+    }
     textLabelCmd->setText(cmd);
     if (cmd.indexOf('\n') < 0)
         proc = git->runAsync(cmd, this);
@@ -92,7 +123,11 @@ void ConsoleImpl::procFinished() {
     textEditOutput->append(inpBuf);
     inpBuf = "";
     QApplication::restoreOverrideCursor();
-    textLabelEnd->setText("End of \'" + actionName + "\' execution");
+
+    if (actionData) {
+           QString msg = "End of '%1' execution";
+           textLabelEnd->setText(msg.arg(actionData->name));
+    }
     pushButtonTerminate->setEnabled(false);
-    emit customAction_exited(actionName);
+    emit customAction_exited(actionData);
 }

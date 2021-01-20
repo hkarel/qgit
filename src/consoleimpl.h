@@ -11,6 +11,8 @@
 
 #include <QCloseEvent>
 #include <QPointer>
+
+#include "common.h"
 #include "ui_console.h"
 
 class MyProcess;
@@ -19,11 +21,14 @@ class Git;
 class ConsoleImpl : public QMainWindow, Ui_Console { // we need a statusbar
 Q_OBJECT
 public:
-    ConsoleImpl(const QString& nm, Git* g);
+    ConsoleImpl(qgit::CustomActionData::Ptr actionData, Git* g);
     bool start(const QString &cmd);
 
+    void loadGeometry();
+    void saveGeometry();
+
 signals:
-    void customAction_exited(const QString& name);
+    void customAction_exited(qgit::CustomActionData::Ptr);
 
 public slots:
     void typeWriterFontChanged();
@@ -37,7 +42,7 @@ protected slots:
 
 private:
     Git* git;
-    QString actionName;
+    qgit::CustomActionData::Ptr actionData;
     QPointer<MyProcess> proc;
     QString inpBuf;
 };

@@ -57,6 +57,9 @@ public:
 
     QComboBox* cmbSearch;
 
+    void loadGeometry();
+    void saveGeometry();
+
 signals:
     void highlightPatch(const QString&, bool);
     void updateRevDesc();
@@ -88,10 +91,9 @@ protected slots:
     void fileList_itemDoubleClicked(QListWidgetItem*);
     void treeView_doubleClicked(QTreeWidgetItem*, int);
     void histListView_doubleClicked(const QModelIndex&);
-    void customActionListChanged(const QStringList& list);
     void openRecent_triggered(QAction*);
     void customAction_triggered(QAction*);
-    void customAction_exited(const QString& name);
+    void customAction_exited(qgit::CustomActionData::Ptr);
     void goRef_triggered(QAction*);
     void changesCommitted(bool);
     void lineEditSHA_returnPressed();
@@ -160,7 +162,7 @@ private:
     void updateCommitMenu(bool isStGITStack);
     void updateRecentRepoMenu(const QString& newEntry = "");
     void doUpdateRecentRepoMenu(const QString& newEntry);
-    void doUpdateCustomActionMenu(const QStringList& list);
+    void doUpdateCustomActionMenu();
     void doBranchOrTag(bool isTag);
     void ActCommit_setEnabled(bool b);
     void doContexPopup(const QString& sha);
@@ -169,7 +171,6 @@ private:
     void scrollTextEdit(int delta);
     void goMatch(int delta);
     bool askApplyPatchParameters(bool* commit, bool* fold);
-    void saveCurrentGeometry();
     QTextEdit* getCurrentTextEdit();
     template<class X> QList<X*>* getTabs(QWidget* tabPage = NULL);
     template<class X> X* firstTab(QWidget* startPage = NULL);

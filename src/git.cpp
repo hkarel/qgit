@@ -19,6 +19,7 @@
 #include "shared/break_point.h"
 #include "shared/logger/logger.h"
 #include "shared/logger/format.h"
+#include "shared/config/appl_conf.h"
 #include "shared/qt/logger_operators.h"
 
 #include <QApplication>
@@ -28,7 +29,6 @@
 #include <QPalette>
 #include <QRegExp>
 //#include <QSet> //CT TODO remove
-#include <QSettings>
 #include <QTextCodec>
 #include <QTextDocument>
 #include <QTextStream>
@@ -1372,15 +1372,16 @@ bool Git::applyPatchFile(const QString& patchPath, bool fold, bool isDragDrop) {
     }
     QString runCmd("git am ");
 
-    QSettings settings;
-    const QString APOpt(settings.value(AM_P_OPT_KEY).toString());
+    QString APOpt;
+    config::base().getValue("patch.args2", APOpt);
+
     if (!APOpt.isEmpty())
         runCmd.append(APOpt.trimmed() + " ");
 
     if (isDragDrop)
         runCmd.append("--keep ");
 
-    if (testFlag(SIGN_PATCH_F))
+    if (qgit::flags().test(SIGN_PATCH_F))
         runCmd.append("--signoff ");
 
     return run(runCmd + quote(patchPath));
@@ -1405,11 +1406,12 @@ const QStringList Git::sortShaListByIndex(const QStringList& shaList) {
 bool Git::formatPatch(const QStringList& shaList, const QString& dirPath, const QString& remoteDir) {
 
     bool remote = !remoteDir.isEmpty();
-    QSettings settings;
-    const QString FPOpt(settings.value(FMT_P_OPT_KEY).toString());
+
+    QString FPOpt;
+    config::base().getValue("patch.args", FPOpt);
 
     QString runCmd("git format-patch --no-color");
-    if (testFlag(NUMBERS_F) && !remote)
+    if (qgit::flags().test(NUMBERS_F) && !remote)
         runCmd.append(" -n");
 
     if (remote)
@@ -1473,17 +1475,17 @@ bool Git::commitFiles(const QStringList& selFiles, const QString& msg, bool amen
         return false;
 
     // add user selectable commit options
-    QSettings settings;
-    const QString CMArgs(settings.value(CMT_ARGS_KEY).toString());
+    QString CMArgs;
+    config::base().getValue("commit.args", CMArgs);
 
     QString cmtOptions;
     if (!CMArgs.isEmpty())
         cmtOptions.append(" " + CMArgs);
 
-    if (testFlag(SIGN_CMT_F))
+    if (qgit::flags().test(SIGN_CMT_F))
         cmtOptions.append(" -s");
 
-    if (testFlag(VERIFY_CMT_F))
+    if (qgit::flags().test(VERIFY_CMT_F))
         cmtOptions.append(" -v");
 
     if (amend)
@@ -1703,7 +1705,7 @@ const QStringList Git::getArgs(bool* quit, bool repoChanged) {
         }
     }
     if (!startup || args.isEmpty()) { // need to retrieve args
-        if (testFlag(RANGE_SELECT_F)) { // open range dialog
+        if (qgit::flags().test(RANGE_SELECT_F)) { // open range dialog
             RangeSelectImpl rs((QWidget*)parent(), &args, repoChanged, this);
             *quit = (rs.exec() == QDialog::Rejected); // modal execution
             if (*quit)
@@ -1926,14 +1928,16 @@ const QStringList Git::getOthersFiles() {
 // add files present in working directory but not in git archive
 
     QString runCmd("git ls-files --others");
-    QSettings settings;
-    QString exFile(settings.value(EX_KEY, EX_DEF).toString());
+
+    QString exFile;
+    config::base().getValue("working_dir.exclude.from", exFile);
     if (!exFile.isEmpty()) {
         QString path = (exFile.startsWith("/")) ? exFile : workDir + "/" + exFile;
         if (QFile::exists(path))
             runCmd.append(" --exclude-from=" + quote(exFile));
     }
-    QString exPerDir(settings.value(EX_PER_DIR_KEY, EX_PER_DIR_DEF).toString());
+    QString exPerDir;
+    config::base().getValue("working_dir.exclude.per_directory", exPerDir);
     if (!exPerDir.isEmpty())
         runCmd.append(" --exclude-per-directory=" + quote(exPerDir));
 
@@ -2357,7 +2361,7 @@ void Git::init2() {
         setThrowOnStop(true);
 
         // load working directory files
-        if (!loadArguments.filteredLoading && testFlag(DIFF_INDEX_F)) {
+        if (!loadArguments.filteredLoading && qgit::flags().test(DIFF_INDEX_F)) {
             SHOW_MSG(msg1 + "working directory changed files...");
             getDiffIndex(); // blocking, we could be in setRepository() now
         }
