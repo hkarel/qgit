@@ -11,7 +11,7 @@
 
 #include "ui_customaction.h"
 
-class CustomActionImpl : public QDialog, public Ui_CustomActionBase {
+class CustomActionImpl : public QDialog, public Ui_CustomAction {
 Q_OBJECT
 public:
     CustomActionImpl(QWidget* parent);
@@ -24,14 +24,14 @@ signals:
 
 protected slots:
     virtual void closeEvent(QCloseEvent*);
-    void listWidgetNames_currentItemChanged(QListWidgetItem*, QListWidgetItem*);
-    void pushButtonNew_clicked();
-    void pushButtonRename_clicked();
-    void pushButtonRemove_clicked();
-    void pushButtonMoveUp_clicked();
-    void pushButtonMoveDown_clicked();
-    void checkBoxRefreshAfterAction_toggled(bool);
-    void textEditAction_textChanged();
+    void on_lstActionNames_currentItemChanged(QListWidgetItem*, QListWidgetItem*);
+    void on_btnNew_clicked();
+    void on_btnRename_clicked();
+    void on_btnRemove_clicked();
+    void on_btnMoveUp_clicked();
+    void on_btnMoveDown_clicked();
+    void on_txtAction_textChanged();
+    void on_chkRefreshAfterAction_toggled(bool);
 
 private:
     void done(int r) override;

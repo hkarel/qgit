@@ -80,7 +80,7 @@ void CustomActionImpl::loadActions()
 
             QListWidgetItem* item = new QListWidgetItem(cad->name);
             item->setData(Qt::UserRole, qVariantFromValue(cad));
-            listWidgetNames->addItem(item);
+            lstActionNames->addItem(item);
         }
         return true;
     };
@@ -93,9 +93,9 @@ void CustomActionImpl::saveActions()
         [this](YamlConfig* conf, YAML::Node& actions, bool /*logWarn*/)
     {
         actions = YAML::Node();
-        for (int i = 0; i < listWidgetNames->count(); ++i)
+        for (int i = 0; i < lstActionNames->count(); ++i)
         {
-            QListWidgetItem* item = listWidgetNames->item(i);
+            QListWidgetItem* item = lstActionNames->item(i);
             QVariant var = item->data(Qt::UserRole);
             CustomActionData::Ptr cad = var.value<CustomActionData::Ptr>();
 
@@ -110,33 +110,33 @@ void CustomActionImpl::saveActions()
     config::base().setValue("custom_actions", saveFunc);
 }
 
-void CustomActionImpl::listWidgetNames_currentItemChanged(QListWidgetItem* item,
-                                                          QListWidgetItem*)
+void CustomActionImpl::on_lstActionNames_currentItemChanged(QListWidgetItem* item,
+                                                            QListWidgetItem*)
 {
     if (item) {
         QVariant var = item->data(Qt::UserRole);
         CustomActionData::Ptr cad = var.value<CustomActionData::Ptr>();
 
-        checkBoxRefreshAfterAction->setChecked(cad->refresh);
+        chkRefreshAfterAction->setChecked(cad->refresh);
 
-        QSignalBlocker blocker {textEditAction}; (void) blocker;
-        textEditAction->setText(cad->command);
+        QSignalBlocker blocker {txtAction}; (void) blocker;
+        txtAction->setText(cad->command);
     }
     else {
-        checkBoxRefreshAfterAction->setChecked(false);
+        chkRefreshAfterAction->setChecked(false);
 
-        QSignalBlocker blocker {textEditAction}; (void) blocker;
-        textEditAction->clear();
+        QSignalBlocker blocker {txtAction}; (void) blocker;
+        txtAction->clear();
     }
 
 //    bool empty = (item == nullptr);
-//    textEditAction->setEnabled(!empty);
-//    checkBoxRefreshAfterAction->setEnabled(!empty);
+//    txtAction->setEnabled(!empty);
+//    chkRefreshAfterAction->setEnabled(!empty);
 //    _ui->btnRename->setEnabled(!empty);
 //    _ui->btnRemove->setEnabled(!empty);
-//    _ui->btnMoveUp->setEnabled(!empty && (item != listWidgetNames->item(0)));
-//    int lastRow = listWidgetNames->count() - 1;
-//    _ui->btnMoveDown->setEnabled(!empty && (item != listWidgetNames->item(lastRow)));
+//    _ui->btnMoveUp->setEnabled(!empty && (item != lstActionNames->item(0)));
+//    int lastRow = lstActionNames->count() - 1;
+//    _ui->btnMoveDown->setEnabled(!empty && (item != lstActionNames->item(lastRow)));
 }
 
 bool CustomActionImpl::newNameAction(QString& name, const QString& caption)
@@ -149,8 +149,8 @@ bool CustomActionImpl::newNameAction(QString& name, const QString& caption)
     if (!ok || name.isEmpty() || name == oldName)
         return false;
 
-    for (int i = 0; i < listWidgetNames->count(); ++i) {
-        QListWidgetItem* item = listWidgetNames->item(i);
+    for (int i = 0; i < lstActionNames->count(); ++i) {
+        QListWidgetItem* item = lstActionNames->item(i);
         if (item->text() == name) {
             QMessageBox::warning(this, caption + " - QGit",
                                  "Sorry, action name already exists.\n"
@@ -161,7 +161,7 @@ bool CustomActionImpl::newNameAction(QString& name, const QString& caption)
     return true;
 }
 
-void CustomActionImpl::pushButtonNew_clicked()
+void CustomActionImpl::on_btnNew_clicked()
 {
     QString name;
     if (!newNameAction(name, "Create new action"))
@@ -172,18 +172,18 @@ void CustomActionImpl::pushButtonNew_clicked()
 
     QListWidgetItem* item = new QListWidgetItem(cad->name);
     item->setData(Qt::UserRole, qVariantFromValue(cad));
-    listWidgetNames->addItem(item);
-    listWidgetNames->setCurrentItem(item);
+    lstActionNames->addItem(item);
+    lstActionNames->setCurrentItem(item);
 
-    QSignalBlocker blocker {textEditAction}; (void) blocker;
-    textEditAction->setPlainText("<write here your action's commands sequence>");
-    textEditAction->selectAll();
-    textEditAction->setFocus();
+    QSignalBlocker blocker {txtAction}; (void) blocker;
+    txtAction->setPlainText("<write here your action's commands sequence>");
+    txtAction->selectAll();
+    txtAction->setFocus();
 }
 
-void CustomActionImpl::pushButtonRename_clicked()
+void CustomActionImpl::on_btnRename_clicked()
 {
-    QListWidgetItem* item = listWidgetNames->currentItem();
+    QListWidgetItem* item = lstActionNames->currentItem();
     if (!item)
         return;
 
@@ -197,53 +197,53 @@ void CustomActionImpl::pushButtonRename_clicked()
     item->setText(cad->name);
 }
 
-void CustomActionImpl::pushButtonRemove_clicked()
+void CustomActionImpl::on_btnRemove_clicked()
 {
-    QListWidgetItem* item = listWidgetNames->currentItem();
+    QListWidgetItem* item = lstActionNames->currentItem();
     if (!item)
         return;
 
     delete item;
-    if (!listWidgetNames->count())
-        listWidgetNames_currentItemChanged(NULL, NULL);
+    if (!lstActionNames->count())
+        on_lstActionNames_currentItemChanged(NULL, NULL);
 }
 
-void CustomActionImpl::pushButtonMoveUp_clicked()
+void CustomActionImpl::on_btnMoveUp_clicked()
 {
-    int row = listWidgetNames->currentRow();
+    int row = lstActionNames->currentRow();
     if (row <= 0)
         return;
 
-    QListWidgetItem* item = listWidgetNames->takeItem(row);
-    listWidgetNames->insertItem(row - 1, item);
-    listWidgetNames->setCurrentRow(row - 1);
+    QListWidgetItem* item = lstActionNames->takeItem(row);
+    lstActionNames->insertItem(row - 1, item);
+    lstActionNames->setCurrentRow(row - 1);
 }
 
-void CustomActionImpl::pushButtonMoveDown_clicked()
+void CustomActionImpl::on_btnMoveDown_clicked()
 {
-    int row = listWidgetNames->currentRow();
-    if ((row == -1) || (row == (listWidgetNames->count() - 1)))
+    int row = lstActionNames->currentRow();
+    if ((row == -1) || (row == (lstActionNames->count() - 1)))
         return;
 
-    QListWidgetItem* item = listWidgetNames->takeItem(row);
-    listWidgetNames->insertItem(row + 1, item);
-    listWidgetNames->setCurrentRow(row + 1);
+    QListWidgetItem* item = lstActionNames->takeItem(row);
+    lstActionNames->insertItem(row + 1, item);
+    lstActionNames->setCurrentRow(row + 1);
 }
 
-void CustomActionImpl::textEditAction_textChanged()
+void CustomActionImpl::on_txtAction_textChanged()
 {
-    if (QListWidgetItem* item = listWidgetNames->currentItem()) {
+    if (QListWidgetItem* item = lstActionNames->currentItem()) {
         QVariant var = item->data(Qt::UserRole);
         CustomActionData::Ptr cad = var.value<CustomActionData::Ptr>();
-        cad->command = textEditAction->toPlainText();
+        cad->command = txtAction->toPlainText();
     }
 }
 
-void CustomActionImpl::checkBoxRefreshAfterAction_toggled(bool b)
+void CustomActionImpl::on_chkRefreshAfterAction_toggled(bool b)
 {
-    if (QListWidgetItem* item = listWidgetNames->currentItem()) {
+    if (QListWidgetItem* item = lstActionNames->currentItem()) {
         QVariant var = item->data(Qt::UserRole);
         CustomActionData::Ptr cad = var.value<CustomActionData::Ptr>();
-        cad->refresh = checkBoxRefreshAfterAction->isChecked();
+        cad->refresh = chkRefreshAfterAction->isChecked();
     }
 }
