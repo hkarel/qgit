@@ -11,20 +11,20 @@
 
 class Git;
 
-class RangeSelectImpl: public QDialog, public Ui_RangeSelectBase {
+class RangeSelectImpl: public QDialog, public Ui_RangeSelect {
 Q_OBJECT
 public:
-    RangeSelectImpl(QWidget* par, QString* range, bool rc, Git* g);
+    RangeSelectImpl(QWidget* parent, QString* range, bool rc, Git* g);
     static QString getDefaultArgs();
 
 public slots:
-    void pushButtonOk_clicked();
-    void checkBoxDiffCache_toggled(bool b);
-    void checkBoxShowAll_toggled(bool b);
-    void checkBoxShowDialog_toggled(bool b);
-    void checkBoxShowWholeHistory_toggled(bool b);
+    void on_chkDiffCache_toggled(bool b);
+    void on_chkShowAll_toggled(bool b);
+    void on_chkShowDialog_toggled(bool b);
+    void on_chkShowWholeHistory_toggled(bool b);
 
 private:
+    void done(int r) override;
     void orderRefs(const QStringList& src, QStringList& dst);
 
     Git* git;

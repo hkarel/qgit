@@ -14,9 +14,9 @@
 
 using namespace qgit;
 
-RangeSelectImpl::RangeSelectImpl(QWidget* par, QString* r, bool repoChanged, Git* g)
-                : QDialog(par), git(g), range(r) {
-
+RangeSelectImpl::RangeSelectImpl(QWidget* parent, QString* r, bool repoChanged, Git* g)
+    : QDialog(parent), git(g), range(r)
+{
     setupUi(this);
 
     QStringList orl, tmp;
@@ -52,30 +52,30 @@ RangeSelectImpl::RangeSelectImpl(QWidget* par, QString* r, bool repoChanged, Git
         config::base().getValue("range_select.to",      to);
         config::base().getValue("range_select.options", options);
     }
-    comboBoxTo->insertItem(0, "HEAD");
-    comboBoxTo->insertItems(1, orl);
-    int idx = repoChanged ? 0 : comboBoxTo->findText(to);
+    cboxTo->insertItem(0, "HEAD");
+    cboxTo->insertItems(1, orl);
+    int idx = repoChanged ? 0 : cboxTo->findText(to);
     if (idx != -1)
-        comboBoxTo->setCurrentIndex(idx);
+        cboxTo->setCurrentIndex(idx);
     else
-        comboBoxTo->setEditText(to);
+        cboxTo->setEditText(to);
 
-    comboBoxFrom->insertItems(0, orl);
-    idx = repoChanged ? defIdx : comboBoxFrom->findText(from);
+    cboxFrom->insertItems(0, orl);
+    idx = repoChanged ? defIdx : cboxFrom->findText(from);
     if (idx != -1)
-        comboBoxFrom->setCurrentIndex(idx);
+        cboxFrom->setCurrentIndex(idx);
     else
-        comboBoxFrom->setEditText(from);
+        cboxFrom->setEditText(from);
 
-    comboBoxFrom->setFocus();
+    cboxFrom->setFocus();
 
-    lineEditOptions->setText(options);
+    lineOptions->setText(options);
 
     qgit::FlagType f = qgit::flags();
-    checkBoxDiffCache->setChecked(f & DIFF_INDEX_F);
-    checkBoxShowAll->setChecked(f & ALL_BRANCHES_F);
-    checkBoxShowWholeHistory->setChecked(f & WHOLE_HISTORY_F);
-    checkBoxShowDialog->setChecked(f & RANGE_SELECT_F);
+    chkDiffCache->setChecked(f & DIFF_INDEX_F);
+    chkShowAll->setChecked(f & ALL_BRANCHES_F);
+    chkShowWholeHistory->setChecked(f & WHOLE_HISTORY_F);
+    chkShowDialog->setChecked(f & RANGE_SELECT_F);
 }
 
 void RangeSelectImpl::orderRefs(const QStringList& src, QStringList& dst) {
@@ -121,62 +121,70 @@ void RangeSelectImpl::orderRefs(const QStringList& src, QStringList& dst) {
         dst.prepend(it.value());
 }
 
-void RangeSelectImpl::checkBoxDiffCache_toggled(bool b) {
+void RangeSelectImpl::on_chkDiffCache_toggled(bool b) {
 
     qgit::flags().set(DIFF_INDEX_F, b);
 }
 
-void RangeSelectImpl::checkBoxShowDialog_toggled(bool b) {
+void RangeSelectImpl::on_chkShowDialog_toggled(bool b) {
 
     qgit::flags().set(RANGE_SELECT_F, b);
 }
 
-void RangeSelectImpl::checkBoxShowAll_toggled(bool b) {
+void RangeSelectImpl::on_chkShowAll_toggled(bool b) {
 
-    QString opt(lineEditOptions->text());
+    QString opt(lineOptions->text());
     opt.remove("--all");
     if (b)
         opt.append(" --all");
 
-    lineEditOptions->setText(opt.trimmed());
+    lineOptions->setText(opt.trimmed());
     qgit::flags().set(ALL_BRANCHES_F, b);
 }
 
-void RangeSelectImpl::checkBoxShowWholeHistory_toggled(bool b) {
+void RangeSelectImpl::on_chkShowWholeHistory_toggled(bool b) {
 
-    comboBoxFrom->setEnabled(!b);
-    comboBoxTo->setEnabled(!b);
+    cboxFrom->setEnabled(!b);
+    cboxTo->setEnabled(!b);
     qgit::flags().set(WHOLE_HISTORY_F, b);
 }
 
-void RangeSelectImpl::pushButtonOk_clicked() {
+void RangeSelectImpl::done(int r) {
 
-    if (qgit::flags().test(WHOLE_HISTORY_F))
+    QDialog::done(r);
+
+    if (r != QDialog::Accepted) {
+        config::base().rereadFile();
+        qgit::flags().load();
+        return;
+    }
+
+    if (qgit::flags().test(WHOLE_HISTORY_F)) {
         *range = "HEAD";
+    }
     else {
-        *range = comboBoxFrom->currentText();
+        *range = cboxFrom->currentText();
         if (!range->isEmpty())
             range->append("..");
 
-        range->append(comboBoxTo->currentText());
+        range->append(cboxTo->currentText());
     }
     // all stuff after "--" should go after range
-    if (lineEditOptions->text().contains("--")) {
-        QString tmp(lineEditOptions->text());
+    if (lineOptions->text().contains("--")) {
+        QString tmp {lineOptions->text()};
         tmp.insert(tmp.indexOf("--"), *range + " ");
         *range = tmp;
-    } else
-        range->prepend(lineEditOptions->text() + " ");
+    }
+    else
+        range->prepend(lineOptions->text() + " ");
 
     *range = range->trimmed();
 
-    // save settings before leaving
-    config::base().setValue("range_select.from",    comboBoxFrom->currentText());
-    config::base().setValue("range_select.to",      comboBoxTo->currentText());
-    config::base().setValue("range_select.options", lineEditOptions->text());
+    config::base().setValue("range_select.from",    cboxFrom->currentText());
+    config::base().setValue("range_select.to",      cboxTo->currentText());
+    config::base().setValue("range_select.options", lineOptions->text());
 
     qgit::flags().save(); // Call config::base().save() inside
-    done(QDialog::Accepted);
 }
 
 QString RangeSelectImpl::getDefaultArgs() {
