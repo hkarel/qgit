@@ -353,7 +353,7 @@ void RevsView::updateLineEditSHA(bool clear) {
     if (clear) {
         l->setText(""); // clears history
     }
-    else if (sha == "0000000000000000000000000000000000000000") {
+    else if (sha == qgit::ZERO_SHA) {
         l->clear();
     }
     else if (l->text() != sha) {
