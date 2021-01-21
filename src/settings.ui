@@ -1,7 +1,7 @@
 <?xml version="1.0" encoding="UTF-8"?>
 <ui version="4.0">
- <class>settingsBase</class>
- <widget class="QDialog" name="settingsBase">
+ <class>SettingsBase</class>
+ <widget class="QDialog" name="SettingsBase">
   <property name="geometry">
    <rect>
     <x>0</x>
@@ -62,7 +62,7 @@
            <number>6</number>
           </property>
           <item>
-           <widget class="QCheckBox" name="checkBoxRelativeDate">
+           <widget class="QCheckBox" name="chkRelativeDate">
             <property name="toolTip">
              <string>Check to see commit author date as relative time from now</string>
             </property>
@@ -75,7 +75,7 @@
            </widget>
           </item>
           <item>
-           <widget class="QCheckBox" name="checkBoxRangeSelectDialog">
+           <widget class="QCheckBox" name="chkRangeSelectDialog">
             <property name="toolTip">
              <string>Check to view range select dialog at repository opening</string>
             </property>
@@ -88,14 +88,14 @@
            </widget>
           </item>
           <item>
-           <widget class="QCheckBox" name="checkBoxReopenLastRepo">
+           <widget class="QCheckBox" name="chkReopenLastRepo">
             <property name="text">
              <string>Reopen last repository on startup</string>
             </property>
            </widget>
           </item>
           <item>
-           <widget class="QCheckBox" name="checkBoxOpenInEditor">
+           <widget class="QCheckBox" name="chkOpenInEditor">
             <property name="text">
              <string>Double click opens file in editor</string>
             </property>
@@ -135,14 +135,14 @@
           <number>4</number>
          </property>
          <item row="3" column="1">
-          <widget class="QLineEdit" name="lineEditExternalEditor">
+          <widget class="QLineEdit" name="lineExternalEditor">
            <property name="toolTip">
             <string>Set path of the external editor</string>
            </property>
           </widget>
          </item>
          <item row="6" column="0">
-          <widget class="QLabel" name="textLabelCodecs">
+          <widget class="QLabel" name="labelCodecs">
            <property name="toolTip">
             <string>Select text codec to use. You need to refresh the view (F5) after a codec change</string>
            </property>
@@ -153,19 +153,19 @@
             <bool>false</bool>
            </property>
            <property name="buddy">
-            <cstring>comboBoxCodecs</cstring>
+            <cstring>cboxCodecs</cstring>
            </property>
           </widget>
          </item>
          <item row="5" column="0">
-          <widget class="QLabel" name="textLabelIconSize">
+          <widget class="QLabel" name="labelIconSize">
            <property name="text">
             <string>Icon size</string>
            </property>
           </widget>
          </item>
          <item row="0" column="1">
-          <widget class="QLineEdit" name="lineEditTypeWriterFont">
+          <widget class="QLineEdit" name="lineTypeWriterFont">
            <property name="toolTip">
             <string>Typewriter (fixed width) font used by patch and file viewers</string>
            </property>
@@ -175,7 +175,7 @@
           </widget>
          </item>
          <item row="1" column="2">
-          <widget class="QPushButton" name="pushButtonExtDiff">
+          <widget class="QPushButton" name="btnExtDiff">
            <property name="maximumSize">
             <size>
              <width>40</width>
@@ -194,14 +194,14 @@
           </widget>
          </item>
          <item row="1" column="1">
-          <widget class="QLineEdit" name="lineEditExternalDiffViewer">
+          <widget class="QLineEdit" name="lineExternalDiffViewer">
            <property name="toolTip">
             <string>Set path of the external diff tool</string>
            </property>
           </widget>
          </item>
          <item row="1" column="0">
-          <widget class="QLabel" name="textLabelExternalDiffViewer">
+          <widget class="QLabel" name="labelExternalDiffViewer">
            <property name="text">
             <string>&amp;External diff tool</string>
            </property>
@@ -209,12 +209,12 @@
             <bool>false</bool>
            </property>
            <property name="buddy">
-            <cstring>lineEditExternalDiffViewer</cstring>
+            <cstring>lineExternalDiffViewer</cstring>
            </property>
           </widget>
          </item>
          <item row="5" column="1">
-          <widget class="QComboBox" name="comboBoxIconSize">
+          <widget class="QComboBox" name="cboxIconSize">
            <property name="currentIndex">
             <number>0</number>
            </property>
@@ -251,7 +251,7 @@
           </widget>
          </item>
          <item row="0" column="0">
-          <widget class="QLabel" name="textLabelTypewriterFont">
+          <widget class="QLabel" name="labelTypewriterFont">
            <property name="text">
             <string>&amp;Fixed width font</string>
            </property>
@@ -259,12 +259,12 @@
             <bool>false</bool>
            </property>
            <property name="buddy">
-            <cstring>lineEditTypeWriterFont</cstring>
+            <cstring>lineTypeWriterFont</cstring>
            </property>
           </widget>
          </item>
          <item row="6" column="1">
-          <widget class="QComboBox" name="comboBoxCodecs">
+          <widget class="QComboBox" name="cboxCodecs">
            <property name="sizePolicy">
             <sizepolicy hsizetype="Preferred" vsizetype="Fixed">
              <horstretch>1</horstretch>
@@ -284,7 +284,7 @@
           </widget>
          </item>
          <item row="3" column="0">
-          <widget class="QLabel" name="textLabelExternalEditor">
+          <widget class="QLabel" name="labelExternalEditor">
            <property name="text">
             <string>&amp;External editor</string>
            </property>
@@ -292,7 +292,7 @@
             <bool>false</bool>
            </property>
            <property name="buddy">
-            <cstring>lineEditExternalEditor</cstring>
+            <cstring>lineExternalEditor</cstring>
            </property>
           </widget>
          </item>
@@ -304,7 +304,7 @@
           </widget>
          </item>
          <item row="0" column="2">
-          <widget class="QPushButton" name="pushButtonFont">
+          <widget class="QPushButton" name="btnFont">
            <property name="maximumSize">
             <size>
              <width>40</width>
@@ -323,7 +323,7 @@
           </widget>
          </item>
          <item row="3" column="2">
-          <widget class="QPushButton" name="pushButtonExtEditor">
+          <widget class="QPushButton" name="btnExtEditor">
            <property name="maximumSize">
             <size>
              <width>40</width>
@@ -372,7 +372,7 @@
            <number>6</number>
           </property>
           <item>
-           <widget class="QCheckBox" name="checkBoxLogDiffTab">
+           <widget class="QCheckBox" name="chkLogDiffTab">
             <property name="toolTip">
              <string>Check to see tabbed revision log / diff pane</string>
             </property>
@@ -382,7 +382,7 @@
            </widget>
           </item>
           <item>
-           <widget class="QCheckBox" name="checkBoxSmartLabels">
+           <widget class="QCheckBox" name="chkSmartLabels">
             <property name="toolTip">
              <string>Check to show smart jump labels on revision description pane</string>
             </property>
@@ -392,7 +392,7 @@
            </widget>
           </item>
           <item>
-           <widget class="QCheckBox" name="checkBoxMsgOnNewSHA">
+           <widget class="QCheckBox" name="chkMsgOnNewSHA">
             <property name="toolTip">
              <string>Check to see always the revision description in main view when browsing the repo. Patch content will be visible after request.</string>
             </property>
@@ -405,7 +405,7 @@
            </widget>
           </item>
           <item>
-           <widget class="QCheckBox" name="checkBoxEnableDragnDrop">
+           <widget class="QCheckBox" name="chkEnableDragnDrop">
             <property name="toolTip">
              <string>Check to enable Git operations, etc. via drag &amp; drop</string>
             </property>
@@ -459,7 +459,7 @@
            <number>6</number>
           </property>
           <item>
-           <widget class="QCheckBox" name="checkBoxNumbers">
+           <widget class="QCheckBox" name="chkNumbers">
             <property name="toolTip">
              <string>Check to see patch numbers on patch series header</string>
             </property>
@@ -472,7 +472,7 @@
            </widget>
           </item>
           <item>
-           <widget class="QCheckBox" name="checkBoxSign">
+           <widget class="QCheckBox" name="chkSign">
             <property name="toolTip">
              <string>Check to add a 'Signed-off-by:' line if not already existent</string>
             </property>
@@ -503,7 +503,7 @@
        <item>
         <layout class="QGridLayout">
          <item row="0" column="0">
-          <widget class="QLabel" name="textLabelApplyPatchExtraOptions">
+          <widget class="QLabel" name="labelApplyPatchExtraOptions">
            <property name="text">
             <string>&amp;Apply patch extra options</string>
            </property>
@@ -511,12 +511,12 @@
             <bool>false</bool>
            </property>
            <property name="buddy">
-            <cstring>lineEditApplyPatchExtraOptions</cstring>
+            <cstring>lineApplyPatchExtraOptions</cstring>
            </property>
           </widget>
          </item>
          <item row="0" column="1">
-          <widget class="QLineEdit" name="lineEditApplyPatchExtraOptions">
+          <widget class="QLineEdit" name="lineApplyPatchExtraOptions">
            <property name="toolTip">
             <string>Extra options to pass to 'git am'</string>
            </property>
@@ -526,7 +526,7 @@
           </widget>
          </item>
          <item row="1" column="0">
-          <widget class="QLabel" name="textLabelFormatPatchExtraOptions">
+          <widget class="QLabel" name="labelFormatPatchExtraOptions">
            <property name="text">
             <string>&amp;Format patch extra options</string>
            </property>
@@ -534,12 +534,12 @@
             <bool>false</bool>
            </property>
            <property name="buddy">
-            <cstring>lineEditFormatPatchExtraOptions</cstring>
+            <cstring>lineFormatPatchExtraOptions</cstring>
            </property>
           </widget>
          </item>
          <item row="1" column="1">
-          <widget class="QLineEdit" name="lineEditFormatPatchExtraOptions">
+          <widget class="QLineEdit" name="lineFormatPatchExtraOptions">
            <property name="toolTip">
             <string>Extra options to pass to 'git format-patch'</string>
            </property>
@@ -582,7 +582,7 @@
            <number>6</number>
           </property>
           <item>
-           <widget class="QCheckBox" name="checkBoxDiffCache">
+           <widget class="QCheckBox" name="chkDiffCache">
             <property name="toolTip">
              <string>Check to see git status. You need this to commit changes</string>
             </property>
@@ -628,7 +628,7 @@
           <number>4</number>
          </property>
          <item row="1" column="1">
-          <widget class="QLineEdit" name="lineEditExcludePerDir">
+          <widget class="QLineEdit" name="lineExcludePerDir">
            <property name="toolTip">
             <string>Exclude patterns file that apply only to the
 	directory and its subdirectories</string>
@@ -636,14 +636,14 @@
           </widget>
          </item>
          <item row="0" column="1">
-          <widget class="QLineEdit" name="lineEditExcludeFile">
+          <widget class="QLineEdit" name="lineExcludeFile">
            <property name="toolTip">
             <string>Exclude patterns are read from this file one per line</string>
            </property>
           </widget>
          </item>
          <item row="1" column="0">
-          <widget class="QLabel" name="textLabelExcludePerDir">
+          <widget class="QLabel" name="labelExcludePerDir">
            <property name="text">
             <string>E&amp;xclude per dir</string>
            </property>
@@ -651,12 +651,12 @@
             <bool>false</bool>
            </property>
            <property name="buddy">
-            <cstring>lineEditExcludePerDir</cstring>
+            <cstring>lineExcludePerDir</cstring>
            </property>
           </widget>
          </item>
          <item row="0" column="0">
-          <widget class="QLabel" name="textLabelExcludeFile">
+          <widget class="QLabel" name="labelExcludeFile">
            <property name="text">
             <string>&amp;Exclude file path</string>
            </property>
@@ -664,7 +664,7 @@
             <bool>false</bool>
            </property>
            <property name="buddy">
-            <cstring>lineEditExcludeFile</cstring>
+            <cstring>lineExcludeFile</cstring>
            </property>
           </widget>
          </item>
@@ -699,7 +699,7 @@
            <number>6</number>
           </property>
           <item>
-           <widget class="QCheckBox" name="checkBoxCommitSign">
+           <widget class="QCheckBox" name="chkCommitSign">
             <property name="toolTip">
              <string>Check to add -s option to git commit-script</string>
             </property>
@@ -712,7 +712,7 @@
            </widget>
           </item>
           <item>
-           <widget class="QCheckBox" name="checkBoxCommitVerify">
+           <widget class="QCheckBox" name="chkCommitVerify">
             <property name="toolTip">
              <string>Check to add -v option to git commit-script</string>
             </property>
@@ -725,7 +725,7 @@
            </widget>
           </item>
           <item>
-           <widget class="QCheckBox" name="checkBoxCommitUseDefMsg">
+           <widget class="QCheckBox" name="chkCommitUseDefMsg">
             <property name="text">
              <string>Use default commit message</string>
             </property>
@@ -765,46 +765,46 @@
           <number>4</number>
          </property>
          <item row="0" column="2">
-          <widget class="QLabel" name="textLabelComboUsr">
+          <widget class="QLabel" name="labelComboUsr">
            <property name="text">
             <string>Defined in:                           </string>
            </property>
           </widget>
          </item>
          <item row="0" column="0">
-          <widget class="QLabel" name="textLabelAuthor">
+          <widget class="QLabel" name="labelAuthor">
            <property name="text">
             <string>Author</string>
            </property>
            <property name="buddy">
-            <cstring>lineEditAuthor</cstring>
+            <cstring>lineAuthor</cstring>
            </property>
           </widget>
          </item>
          <item row="1" column="2">
-          <widget class="QComboBox" name="comboBoxUserSrc"/>
+          <widget class="QComboBox" name="cboxUserSrc"/>
          </item>
          <item row="0" column="1">
-          <widget class="QLineEdit" name="lineEditAuthor">
+          <widget class="QLineEdit" name="lineAuthor">
            <property name="readOnly">
             <bool>true</bool>
            </property>
           </widget>
          </item>
          <item row="1" column="1">
-          <widget class="QLineEdit" name="lineEditMail">
+          <widget class="QLineEdit" name="lineMail">
            <property name="readOnly">
             <bool>true</bool>
            </property>
           </widget>
          </item>
          <item row="1" column="0">
-          <widget class="QLabel" name="textLabelAuthor_2">
+          <widget class="QLabel" name="labelAuthor_2">
            <property name="text">
             <string>E-mail</string>
            </property>
            <property name="buddy">
-            <cstring>lineEditMail</cstring>
+            <cstring>lineMail</cstring>
            </property>
           </widget>
          </item>
@@ -841,7 +841,7 @@
           <number>4</number>
          </property>
          <item row="0" column="0">
-          <widget class="QLabel" name="textLabelTemplate">
+          <widget class="QLabel" name="labelTemplate">
            <property name="text">
             <string>Ms&amp;g template</string>
            </property>
@@ -852,12 +852,12 @@
             <bool>false</bool>
            </property>
            <property name="buddy">
-            <cstring>lineEditAuthor</cstring>
+            <cstring>lineAuthor</cstring>
            </property>
           </widget>
          </item>
          <item row="1" column="0">
-          <widget class="QLabel" name="textLabelDiffTreeArgs_2">
+          <widget class="QLabel" name="labelDiffTreeArgs_2">
            <property name="text">
             <string>&amp;Extra options</string>
            </property>
@@ -865,19 +865,19 @@
             <bool>false</bool>
            </property>
            <property name="buddy">
-            <cstring>lineEditCommitExtraOptions</cstring>
+            <cstring>lineCommitExtraOptions</cstring>
            </property>
           </widget>
          </item>
          <item row="0" column="1">
-          <widget class="QLineEdit" name="lineEditTemplate">
+          <widget class="QLineEdit" name="lineTemplate">
            <property name="toolTip">
             <string>Commit message template file</string>
            </property>
           </widget>
          </item>
          <item row="1" column="1">
-          <widget class="QLineEdit" name="lineEditCommitExtraOptions">
+          <widget class="QLineEdit" name="lineCommitExtraOptions">
            <property name="toolTip">
             <string>Extra options to pass to git commit-script</string>
            </property>
@@ -908,14 +908,14 @@
           </spacer>
          </item>
          <item>
-          <widget class="QLabel" name="textLabelGitConfigSource">
+          <widget class="QLabel" name="labelGitConfigSource">
            <property name="text">
             <string>Git options source:</string>
            </property>
           </widget>
          </item>
          <item>
-          <widget class="QComboBox" name="comboBoxGitConfigSource">
+          <widget class="QComboBox" name="cboxGitConfigSource">
            <item>
             <property name="text">
              <string>Local</string>
@@ -931,7 +931,7 @@
         </layout>
        </item>
        <item>
-        <widget class="QTreeWidget" name="treeWidgetGitConfig">
+        <widget class="QTreeWidget" name="treeGitConfig">
          <property name="columnCount">
           <number>2</number>
          </property>
@@ -966,489 +966,9 @@
  </resources>
  <connections>
   <connection>
-   <sender>checkBoxNumbers</sender>
-   <signal>toggled(bool)</signal>
-   <receiver>settingsBase</receiver>
-   <slot>checkBoxNumbers_toggled(bool)</slot>
-   <hints>
-    <hint type="sourcelabel">
-     <x>46</x>
-     <y>60</y>
-    </hint>
-    <hint type="destinationlabel">
-     <x>20</x>
-     <y>20</y>
-    </hint>
-   </hints>
-  </connection>
-  <connection>
-   <sender>lineEditFormatPatchExtraOptions</sender>
-   <signal>textChanged(QString)</signal>
-   <receiver>settingsBase</receiver>
-   <slot>lineEditFormatPatchExtraOptions_textChanged(QString)</slot>
-   <hints>
-    <hint type="sourcelabel">
-     <x>101</x>
-     <y>73</y>
-    </hint>
-    <hint type="destinationlabel">
-     <x>20</x>
-     <y>20</y>
-    </hint>
-   </hints>
-  </connection>
-  <connection>
-   <sender>checkBoxDiffCache</sender>
-   <signal>toggled(bool)</signal>
-   <receiver>settingsBase</receiver>
-   <slot>checkBoxDiffCache_toggled(bool)</slot>
-   <hints>
-    <hint type="sourcelabel">
-     <x>52</x>
-     <y>67</y>
-    </hint>
-    <hint type="destinationlabel">
-     <x>20</x>
-     <y>20</y>
-    </hint>
-   </hints>
-  </connection>
-  <connection>
-   <sender>lineEditExcludePerDir</sender>
-   <signal>textChanged(QString)</signal>
-   <receiver>settingsBase</receiver>
-   <slot>lineEditExcludePerDir_textChanged(QString)</slot>
-   <hints>
-    <hint type="sourcelabel">
-     <x>96</x>
-     <y>69</y>
-    </hint>
-    <hint type="destinationlabel">
-     <x>20</x>
-     <y>20</y>
-    </hint>
-   </hints>
-  </connection>
-  <connection>
-   <sender>lineEditExcludeFile</sender>
-   <signal>textChanged(QString)</signal>
-   <receiver>settingsBase</receiver>
-   <slot>lineEditExcludeFile_textChanged(QString)</slot>
-   <hints>
-    <hint type="sourcelabel">
-     <x>96</x>
-     <y>65</y>
-    </hint>
-    <hint type="destinationlabel">
-     <x>20</x>
-     <y>20</y>
-    </hint>
-   </hints>
-  </connection>
-  <connection>
-   <sender>checkBoxSign</sender>
-   <signal>toggled(bool)</signal>
-   <receiver>settingsBase</receiver>
-   <slot>checkBoxSign_toggled(bool)</slot>
-   <hints>
-    <hint type="sourcelabel">
-     <x>46</x>
-     <y>62</y>
-    </hint>
-    <hint type="destinationlabel">
-     <x>20</x>
-     <y>20</y>
-    </hint>
-   </hints>
-  </connection>
-  <connection>
-   <sender>lineEditTemplate</sender>
-   <signal>textChanged(QString)</signal>
-   <receiver>settingsBase</receiver>
-   <slot>lineEditTemplate_textChanged(QString)</slot>
-   <hints>
-    <hint type="sourcelabel">
-     <x>96</x>
-     <y>67</y>
-    </hint>
-    <hint type="destinationlabel">
-     <x>20</x>
-     <y>20</y>
-    </hint>
-   </hints>
-  </connection>
-  <connection>
-   <sender>lineEditCommitExtraOptions</sender>
-   <signal>textChanged(QString)</signal>
-   <receiver>settingsBase</receiver>
-   <slot>lineEditCommitExtraOptions_textChanged(QString)</slot>
-   <hints>
-    <hint type="sourcelabel">
-     <x>96</x>
-     <y>70</y>
-    </hint>
-    <hint type="destinationlabel">
-     <x>20</x>
-     <y>20</y>
-    </hint>
-   </hints>
-  </connection>
-  <connection>
-   <sender>checkBoxRelativeDate</sender>
-   <signal>toggled(bool)</signal>
-   <receiver>settingsBase</receiver>
-   <slot>checkBoxRelativeDate_toggled(bool)</slot>
-   <hints>
-    <hint type="sourcelabel">
-     <x>55</x>
-     <y>82</y>
-    </hint>
-    <hint type="destinationlabel">
-     <x>20</x>
-     <y>20</y>
-    </hint>
-   </hints>
-  </connection>
-  <connection>
-   <sender>checkBoxRangeSelectDialog</sender>
-   <signal>toggled(bool)</signal>
-   <receiver>settingsBase</receiver>
-   <slot>checkBoxRangeSelectDialog_toggled(bool)</slot>
-   <hints>
-    <hint type="sourcelabel">
-     <x>77</x>
-     <y>150</y>
-    </hint>
-    <hint type="destinationlabel">
-     <x>20</x>
-     <y>20</y>
-    </hint>
-   </hints>
-  </connection>
-  <connection>
-   <sender>checkBoxReopenLastRepo</sender>
-   <signal>toggled(bool)</signal>
-   <receiver>settingsBase</receiver>
-   <slot>checkBoxReopenLastRepo_toggled(bool)</slot>
-   <hints>
-    <hint type="sourcelabel">
-     <x>77</x>
-     <y>192</y>
-    </hint>
-    <hint type="destinationlabel">
-     <x>20</x>
-     <y>20</y>
-    </hint>
-   </hints>
-  </connection>
-  <connection>
-   <sender>checkBoxOpenInEditor</sender>
-   <signal>toggled(bool)</signal>
-   <receiver>settingsBase</receiver>
-   <slot>checkBoxOpenInEditor_toggled(bool)</slot>
-   <hints>
-    <hint type="sourcelabel">
-     <x>77</x>
-     <y>234</y>
-    </hint>
-    <hint type="destinationlabel">
-     <x>20</x>
-     <y>20</y>
-    </hint>
-   </hints>
-  </connection>
-  <connection>
-   <sender>comboBoxIconSize</sender>
-   <signal>activated(int)</signal>
-   <receiver>settingsBase</receiver>
-   <slot>comboBoxIconSize_activated(int)</slot>
-   <hints>
-    <hint type="sourcelabel">
-     <x>434</x>
-     <y>736</y>
-    </hint>
-    <hint type="destinationlabel">
-     <x>20</x>
-     <y>20</y>
-    </hint>
-   </hints>
-  </connection>
-  <connection>
-   <sender>comboBoxCodecs</sender>
-   <signal>activated(int)</signal>
-   <receiver>settingsBase</receiver>
-   <slot>comboBoxCodecs_activated(int)</slot>
-   <hints>
-    <hint type="sourcelabel">
-     <x>434</x>
-     <y>736</y>
-    </hint>
-    <hint type="destinationlabel">
-     <x>20</x>
-     <y>20</y>
-    </hint>
-   </hints>
-  </connection>
-  <connection>
-   <sender>checkBoxCommitVerify</sender>
-   <signal>toggled(bool)</signal>
-   <receiver>settingsBase</receiver>
-   <slot>checkBoxCommitVerify_toggled(bool)</slot>
-   <hints>
-    <hint type="sourcelabel">
-     <x>52</x>
-     <y>68</y>
-    </hint>
-    <hint type="destinationlabel">
-     <x>20</x>
-     <y>20</y>
-    </hint>
-   </hints>
-  </connection>
-  <connection>
-   <sender>checkBoxCommitSign</sender>
-   <signal>toggled(bool)</signal>
-   <receiver>settingsBase</receiver>
-   <slot>checkBoxCommitSign_toggled(bool)</slot>
-   <hints>
-    <hint type="sourcelabel">
-     <x>52</x>
-     <y>67</y>
-    </hint>
-    <hint type="destinationlabel">
-     <x>20</x>
-     <y>20</y>
-    </hint>
-   </hints>
-  </connection>
-  <connection>
-   <sender>checkBoxCommitUseDefMsg</sender>
-   <signal>toggled(bool)</signal>
-   <receiver>settingsBase</receiver>
-   <slot>checkBoxCommitUseDefMsg_toggled(bool)</slot>
-   <hints>
-    <hint type="sourcelabel">
-     <x>81</x>
-     <y>68</y>
-    </hint>
-    <hint type="destinationlabel">
-     <x>20</x>
-     <y>20</y>
-    </hint>
-   </hints>
-  </connection>
-  <connection>
-   <sender>checkBoxCommitSign</sender>
-   <signal>toggled(bool)</signal>
-   <receiver>settingsBase</receiver>
-   <slot>checkBoxCommitSign_toggled(bool)</slot>
-   <hints>
-    <hint type="sourcelabel">
-     <x>52</x>
-     <y>67</y>
-    </hint>
-    <hint type="destinationlabel">
-     <x>20</x>
-     <y>20</y>
-    </hint>
-   </hints>
-  </connection>
-  <connection>
-   <sender>lineEditExternalDiffViewer</sender>
-   <signal>textChanged(QString)</signal>
-   <receiver>settingsBase</receiver>
-   <slot>lineEditExternalDiffViewer_textChanged(QString)</slot>
-   <hints>
-    <hint type="sourcelabel">
-     <x>497</x>
-     <y>484</y>
-    </hint>
-    <hint type="destinationlabel">
-     <x>20</x>
-     <y>20</y>
-    </hint>
-   </hints>
-  </connection>
-  <connection>
-   <sender>lineEditExternalEditor</sender>
-   <signal>textChanged(QString)</signal>
-   <receiver>settingsBase</receiver>
-   <slot>lineEditExternalEditor_textChanged(QString)</slot>
-   <hints>
-    <hint type="sourcelabel">
-     <x>497</x>
-     <y>573</y>
-    </hint>
-    <hint type="destinationlabel">
-     <x>20</x>
-     <y>20</y>
-    </hint>
-   </hints>
-  </connection>
-  <connection>
-   <sender>pushButtonExtDiff</sender>
-   <signal>clicked()</signal>
-   <receiver>settingsBase</receiver>
-   <slot>pushButtonExtDiff_clicked()</slot>
-   <hints>
-    <hint type="sourcelabel">
-     <x>1146</x>
-     <y>485</y>
-    </hint>
-    <hint type="destinationlabel">
-     <x>20</x>
-     <y>20</y>
-    </hint>
-   </hints>
-  </connection>
-  <connection>
-   <sender>pushButtonExtEditor</sender>
-   <signal>clicked()</signal>
-   <receiver>settingsBase</receiver>
-   <slot>pushButtonExtEditor_clicked()</slot>
-   <hints>
-    <hint type="sourcelabel">
-     <x>1146</x>
-     <y>574</y>
-    </hint>
-    <hint type="destinationlabel">
-     <x>256</x>
-     <y>188</y>
-    </hint>
-   </hints>
-  </connection>
-  <connection>
-   <sender>pushButtonFont</sender>
-   <signal>clicked()</signal>
-   <receiver>settingsBase</receiver>
-   <slot>pushButtonFont_clicked()</slot>
-   <hints>
-    <hint type="sourcelabel">
-     <x>1146</x>
-     <y>436</y>
-    </hint>
-    <hint type="destinationlabel">
-     <x>20</x>
-     <y>20</y>
-    </hint>
-   </hints>
-  </connection>
-  <connection>
-   <sender>comboBoxUserSrc</sender>
-   <signal>activated(int)</signal>
-   <receiver>settingsBase</receiver>
-   <slot>comboBoxUserSrc_activated(int)</slot>
-   <hints>
-    <hint type="sourcelabel">
-     <x>96</x>
-     <y>67</y>
-    </hint>
-    <hint type="destinationlabel">
-     <x>256</x>
-     <y>195</y>
-    </hint>
-   </hints>
-  </connection>
-  <connection>
-   <sender>checkBoxMsgOnNewSHA</sender>
-   <signal>toggled(bool)</signal>
-   <receiver>settingsBase</receiver>
-   <slot>checkBoxMsgOnNewSHA_toggled(bool)</slot>
-   <hints>
-    <hint type="sourcelabel">
-     <x>75</x>
-     <y>68</y>
-    </hint>
-    <hint type="destinationlabel">
-     <x>225</x>
-     <y>194</y>
-    </hint>
-   </hints>
-  </connection>
-  <connection>
-   <sender>checkBoxLogDiffTab</sender>
-   <signal>toggled(bool)</signal>
-   <receiver>settingsBase</receiver>
-   <slot>checkBoxLogDiffTab_toggled(bool)</slot>
-   <hints>
-    <hint type="sourcelabel">
-     <x>65</x>
-     <y>65</y>
-    </hint>
-    <hint type="destinationlabel">
-     <x>225</x>
-     <y>194</y>
-    </hint>
-   </hints>
-  </connection>
-  <connection>
-   <sender>checkBoxSmartLabels</sender>
-   <signal>toggled(bool)</signal>
-   <receiver>settingsBase</receiver>
-   <slot>checkBoxSmartLabels_toggled(bool)</slot>
-   <hints>
-    <hint type="sourcelabel">
-     <x>65</x>
-     <y>67</y>
-    </hint>
-    <hint type="destinationlabel">
-     <x>225</x>
-     <y>194</y>
-    </hint>
-   </hints>
-  </connection>
-  <connection>
-   <sender>lineEditApplyPatchExtraOptions</sender>
-   <signal>textChanged(QString)</signal>
-   <receiver>settingsBase</receiver>
-   <slot>lineEditApplyPatchExtraOptions_textChanged(QString)</slot>
-   <hints>
-    <hint type="sourcelabel">
-     <x>101</x>
-     <y>69</y>
-    </hint>
-    <hint type="destinationlabel">
-     <x>221</x>
-     <y>171</y>
-    </hint>
-   </hints>
-  </connection>
-  <connection>
-   <sender>comboBoxGitConfigSource</sender>
-   <signal>activated(int)</signal>
-   <receiver>settingsBase</receiver>
-   <slot>comboBoxGitConfigSource_activated(int)</slot>
-   <hints>
-    <hint type="sourcelabel">
-     <x>101</x>
-     <y>61</y>
-    </hint>
-    <hint type="destinationlabel">
-     <x>159</x>
-     <y>89</y>
-    </hint>
-   </hints>
-  </connection>
-  <connection>
-   <sender>treeWidgetGitConfig</sender>
-   <signal>itemChanged(QTreeWidgetItem*,int)</signal>
-   <receiver>settingsBase</receiver>
-   <slot>treeWidgetGitConfig_itemChanged(QTreeWidgetItem*, int)</slot>
-   <hints>
-    <hint type="sourcelabel">
-     <x>102</x>
-     <y>74</y>
-    </hint>
-    <hint type="destinationlabel">
-     <x>147</x>
-     <y>359</y>
-    </hint>
-   </hints>
-  </connection>
-  <connection>
    <sender>buttonBox</sender>
    <signal>accepted()</signal>
-   <receiver>settingsBase</receiver>
+   <receiver>SettingsBase</receiver>
    <slot>accept()</slot>
    <hints>
     <hint type="sourcelabel">
@@ -1462,25 +982,9 @@
    </hints>
   </connection>
   <connection>
-   <sender>checkBoxEnableDragnDrop</sender>
-   <signal>toggled(bool)</signal>
-   <receiver>settingsBase</receiver>
-   <slot>checkBoxEnableDragnDrop_toggled(bool)</slot>
-   <hints>
-    <hint type="sourcelabel">
-     <x>93</x>
-     <y>140</y>
-    </hint>
-    <hint type="destinationlabel">
-     <x>510</x>
-     <y>182</y>
-    </hint>
-   </hints>
-  </connection>
-  <connection>
    <sender>buttonBox</sender>
    <signal>rejected()</signal>
-   <receiver>settingsBase</receiver>
+   <receiver>SettingsBase</receiver>
    <slot>reject()</slot>
    <hints>
     <hint type="sourcelabel">
