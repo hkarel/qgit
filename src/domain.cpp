@@ -108,7 +108,7 @@ Domain::Domain(MainImpl* m, Git* g, bool isMain) : QObject(m), git(g) {
     st.clear();
 	busy = linked = false;
     popupType = 0;
-    container = new QWidget(NULL); // will be reparented to m()->tabWdg
+    container = new QWidget(NULL); // will be reparented to m()->tabWidget
 }
 
 Domain::~Domain() {
@@ -117,7 +117,7 @@ Domain::~Domain() {
         return;
 
     // remove before to delete, avoids a Qt warning in QInputContext()
-    m()->tabWdg->removeTab(m()->tabWdg->indexOf(container));
+    m()->tabWidget->removeTab(m()->tabWidget->indexOf(container));
     container->deleteLater();
 }
 
@@ -177,8 +177,8 @@ void Domain::showStatusBarMessage(const QString& msg, int timeout) {
 
 void Domain::setTabCaption(const QString& caption) {
 
-    int idx = m()->tabWdg->indexOf(container);
-    m()->tabWdg->setTabText(idx, caption);
+    int idx = m()->tabWidget->indexOf(container);
+    m()->tabWidget->setTabText(idx, caption);
 }
 
 void Domain::unlinkDomain(Domain* d) {

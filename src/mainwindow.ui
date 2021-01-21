@@ -1,7 +1,7 @@
 <?xml version="1.0" encoding="UTF-8"?>
 <ui version="4.0">
- <class>MainBase</class>
- <widget class="QMainWindow" name="MainBase">
+ <class>MainWindow</class>
+ <widget class="QMainWindow" name="MainWindow">
   <property name="geometry">
    <rect>
     <x>0</x>
@@ -61,7 +61,7 @@
         </property>
        </column>
       </widget>
-      <widget class="TabWidget" name="tabWdg">
+      <widget class="TabWidget" name="tabWidget">
        <property name="tabsClosable">
         <bool>true</bool>
        </property>
@@ -88,17 +88,17 @@
    <attribute name="toolBarBreak">
     <bool>false</bool>
    </attribute>
-   <addaction name="ActOpenRepo"/>
-   <addaction name="ActBack"/>
-   <addaction name="ActForward"/>
-   <addaction name="ActRefresh"/>
-   <addaction name="ActShowTree"/>
-   <addaction name="ActFilterTree"/>
-   <addaction name="ActMailFormatPatch"/>
-   <addaction name="ActMailApplyPatch"/>
+   <addaction name="actOpenRepo"/>
+   <addaction name="actBack"/>
+   <addaction name="actForward"/>
+   <addaction name="actRefresh"/>
+   <addaction name="actShowTree"/>
+   <addaction name="actFilterTree"/>
+   <addaction name="actMailFormatPatch"/>
+   <addaction name="actMailApplyPatch"/>
    <addaction name="separator"/>
-   <addaction name="ActSearchAndFilter"/>
-   <addaction name="ActSearchAndHighlight"/>
+   <addaction name="actSearchAndFilter"/>
+   <addaction name="actSearchAndHighlight"/>
    <addaction name="separator"/>
   </widget>
   <widget class="QMenuBar" name="MenuBarEditor">
@@ -107,91 +107,91 @@
      <x>0</x>
      <y>0</y>
      <width>905</width>
-     <height>22</height>
+     <height>23</height>
     </rect>
    </property>
-   <widget class="QMenu" name="Help">
+   <widget class="QMenu" name="mnuHelp">
     <property name="title">
      <string>&amp;Help</string>
     </property>
-    <addaction name="ActHelp"/>
-    <addaction name="ActAbout"/>
+    <addaction name="actHelp"/>
+    <addaction name="actAbout"/>
    </widget>
-   <widget class="QMenu" name="File">
+   <widget class="QMenu" name="mnuFile">
     <property name="title">
      <string>&amp;File</string>
     </property>
     <property name="separatorsCollapsible">
      <bool>true</bool>
     </property>
-    <addaction name="ActOpenRepo"/>
-    <addaction name="ActOpenRepoNewWindow"/>
-    <addaction name="ActRefresh"/>
-    <addaction name="ActSaveFile"/>
-    <addaction name="ActMailFormatPatch"/>
-    <addaction name="ActMailApplyPatch"/>
+    <addaction name="actOpenRepo"/>
+    <addaction name="actOpenRepoNewWindow"/>
+    <addaction name="actRefresh"/>
+    <addaction name="actSaveFile"/>
+    <addaction name="actMailFormatPatch"/>
+    <addaction name="actMailApplyPatch"/>
     <addaction name="separator"/>
-    <addaction name="ActClose"/>
-    <addaction name="ActExit"/>
+    <addaction name="actClose"/>
+    <addaction name="actExit"/>
     <addaction name="separator"/>
    </widget>
-   <widget class="QMenu" name="Edit">
+   <widget class="QMenu" name="mnuEdit">
     <property name="title">
      <string>&amp;Edit</string>
     </property>
-    <addaction name="ActCommit"/>
-    <addaction name="ActAmend"/>
-    <addaction name="ActCheckout"/>
-    <addaction name="ActBranch"/>
-    <addaction name="ActTag"/>
-    <addaction name="ActDelete"/>
-    <addaction name="ActPush"/>
-    <addaction name="ActPop"/>
+    <addaction name="actCommit"/>
+    <addaction name="actAmend"/>
+    <addaction name="actCheckout"/>
+    <addaction name="actBranch"/>
+    <addaction name="actTag"/>
+    <addaction name="actDelete"/>
+    <addaction name="actPush"/>
+    <addaction name="actPop"/>
     <addaction name="separator"/>
-    <addaction name="ActFind"/>
-    <addaction name="ActFindNext"/>
+    <addaction name="actFind"/>
+    <addaction name="actFindNext"/>
     <addaction name="separator"/>
-    <addaction name="ActSettings"/>
+    <addaction name="actSettings"/>
    </widget>
-   <widget class="QMenu" name="Actions">
+   <widget class="QMenu" name="mnuActions">
     <property name="title">
      <string>&amp;Actions</string>
     </property>
-    <addaction name="ActCustomActionSetup"/>
+    <addaction name="actCustomActionSetup"/>
    </widget>
-   <widget class="QMenu" name="View">
+   <widget class="QMenu" name="mnuView">
     <property name="title">
      <string>&amp;View</string>
     </property>
-    <addaction name="ActBack"/>
-    <addaction name="ActForward"/>
+    <addaction name="actBack"/>
+    <addaction name="actForward"/>
     <addaction name="separator"/>
-    <addaction name="ActRangeDlg"/>
+    <addaction name="actRangeDlg"/>
     <addaction name="separator"/>
-    <addaction name="ActCheckWorkDir"/>
-    <addaction name="ActMarkDiffToSha"/>
+    <addaction name="actCheckWorkDir"/>
+    <addaction name="actMarkDiffToSha"/>
     <addaction name="separator"/>
-    <addaction name="ActViewRev"/>
-    <addaction name="ActViewDiff"/>
-    <addaction name="ActViewDiffNewTab"/>
-    <addaction name="ActViewFile"/>
-    <addaction name="ActViewFileNewTab"/>
-    <addaction name="ActExternalDiff"/>
-    <addaction name="ActExternalEditor"/>
-    <addaction name="ActShowTree"/>
-    <addaction name="ActSplitView"/>
-    <addaction name="ActToggleLogsDiff"/>
-    <addaction name="ActShowDescHeader"/>
-    <addaction name="ActFilterTree"/>
+    <addaction name="actViewRev"/>
+    <addaction name="actViewDiff"/>
+    <addaction name="actViewDiffNewTab"/>
+    <addaction name="actViewFile"/>
+    <addaction name="actViewFileNewTab"/>
+    <addaction name="actExternalDiff"/>
+    <addaction name="actExternalEditor"/>
+    <addaction name="actShowTree"/>
+    <addaction name="actSplitView"/>
+    <addaction name="actToggleLogsDiff"/>
+    <addaction name="actShowDescHeader"/>
+    <addaction name="actFilterTree"/>
    </widget>
-   <addaction name="File"/>
-   <addaction name="Edit"/>
-   <addaction name="View"/>
-   <addaction name="Actions"/>
+   <addaction name="mnuFile"/>
+   <addaction name="mnuEdit"/>
+   <addaction name="mnuView"/>
+   <addaction name="mnuActions"/>
    <addaction name="separator"/>
-   <addaction name="Help"/>
+   <addaction name="mnuHelp"/>
   </widget>
-  <action name="ActOpenRepo">
+  <action name="actOpenRepo">
    <property name="icon">
     <iconset theme="document-open-folder" resource="icons.qrc">
      <normaloff>:/icons/resources/folder_open.png</normaloff>:/icons/resources/folder_open.png</iconset>
@@ -206,9 +206,10 @@
     <string>Ctrl+O</string>
    </property>
   </action>
-  <action name="ActExit">
+  <action name="actExit">
    <property name="icon">
-    <iconset theme="application-exit"/>
+    <iconset theme="application-exit">
+     <normaloff>.</normaloff>.</iconset>
    </property>
    <property name="text">
     <string>E&amp;xit</string>
@@ -220,7 +221,7 @@
     <string>Q</string>
    </property>
   </action>
-  <action name="ActAbout">
+  <action name="actAbout">
    <property name="icon">
     <iconset resource="icons.qrc">
      <normaloff>:/icons/resources/qgit.png</normaloff>:/icons/resources/qgit.png</iconset>
@@ -235,7 +236,7 @@
     <string/>
    </property>
   </action>
-  <action name="ActMailFormatPatch">
+  <action name="actMailFormatPatch">
    <property name="enabled">
     <bool>false</bool>
    </property>
@@ -253,7 +254,7 @@
     <string>Save a patch series to be sent by e-mail</string>
    </property>
   </action>
-  <action name="ActHelp">
+  <action name="actHelp">
    <property name="icon">
     <iconset theme="help-contents" resource="icons.qrc">
      <normaloff>:/icons/resources/help.png</normaloff>:/icons/resources/help.png</iconset>
@@ -268,7 +269,7 @@
     <string>F1</string>
    </property>
   </action>
-  <action name="ActSettings">
+  <action name="actSettings">
    <property name="icon">
     <iconset theme="configure" resource="icons.qrc">
      <normaloff>:/icons/resources/configure.png</normaloff>:/icons/resources/configure.png</iconset>
@@ -283,7 +284,7 @@
     <enum>QAction::PreferencesRole</enum>
    </property>
   </action>
-  <action name="ActCommit">
+  <action name="actCommit">
    <property name="enabled">
     <bool>false</bool>
    </property>
@@ -304,12 +305,13 @@
     <string>!</string>
    </property>
   </action>
-  <action name="ActTag">
+  <action name="actTag">
    <property name="enabled">
     <bool>false</bool>
    </property>
    <property name="icon">
-    <iconset theme="tag"/>
+    <iconset theme="tag">
+     <normaloff>.</normaloff>.</iconset>
    </property>
    <property name="text">
     <string>Make &amp;tag...</string>
@@ -324,9 +326,10 @@
     <string>Ctrl+T</string>
    </property>
   </action>
-  <action name="ActOpenRepoNewWindow">
+  <action name="actOpenRepoNewWindow">
    <property name="icon">
-    <iconset theme="window-new"/>
+    <iconset theme="window-new">
+     <normaloff>.</normaloff>.</iconset>
    </property>
    <property name="text">
     <string>Open in a &amp;new window...</string>
@@ -338,9 +341,10 @@
     <string>Ctrl+N</string>
    </property>
   </action>
-  <action name="ActClose">
+  <action name="actClose">
    <property name="icon">
-    <iconset theme="window-close"/>
+    <iconset theme="window-close">
+     <normaloff>.</normaloff>.</iconset>
    </property>
    <property name="text">
     <string>&amp;Close</string>
@@ -352,7 +356,7 @@
     <string>Alt+W</string>
    </property>
   </action>
-  <action name="ActMailApplyPatch">
+  <action name="actMailApplyPatch">
    <property name="enabled">
     <bool>false</bool>
    </property>
@@ -367,7 +371,7 @@
     <string>Apply a patch series</string>
    </property>
   </action>
-  <action name="ActPush">
+  <action name="actPush">
    <property name="enabled">
     <bool>false</bool>
    </property>
@@ -384,7 +388,7 @@
     <string>PgUp</string>
    </property>
   </action>
-  <action name="ActPop">
+  <action name="actPop">
    <property name="enabled">
     <bool>false</bool>
    </property>
@@ -401,7 +405,7 @@
     <string>PgDown</string>
    </property>
   </action>
-  <action name="ActRefresh">
+  <action name="actRefresh">
    <property name="enabled">
     <bool>false</bool>
    </property>
@@ -419,7 +423,7 @@
     <string>F5</string>
    </property>
   </action>
-  <action name="ActViewDiff">
+  <action name="actViewDiff">
    <property name="enabled">
     <bool>false</bool>
    </property>
@@ -439,7 +443,7 @@
     <string>Ctrl+P</string>
    </property>
   </action>
-  <action name="ActViewFile">
+  <action name="actViewFile">
    <property name="enabled">
     <bool>false</bool>
    </property>
@@ -459,12 +463,13 @@
     <string>Ctrl+A</string>
    </property>
   </action>
-  <action name="ActSaveFile">
+  <action name="actSaveFile">
    <property name="enabled">
     <bool>false</bool>
    </property>
    <property name="icon">
-    <iconset theme="document-save-as"/>
+    <iconset theme="document-save-as">
+     <normaloff>.</normaloff>.</iconset>
    </property>
    <property name="text">
     <string>Save file &amp;as...</string>
@@ -479,7 +484,7 @@
     <string>Ctrl+S</string>
    </property>
   </action>
-  <action name="ActFilterTree">
+  <action name="actFilterTree">
    <property name="checkable">
     <bool>true</bool>
    </property>
@@ -500,7 +505,7 @@
     <string>Filter by tree selection, multiple selections allowed</string>
    </property>
   </action>
-  <action name="ActShowTree">
+  <action name="actShowTree">
    <property name="checkable">
     <bool>true</bool>
    </property>
@@ -524,12 +529,13 @@
     <string>T</string>
    </property>
   </action>
-  <action name="ActDelete">
+  <action name="actDelete">
    <property name="enabled">
     <bool>false</bool>
    </property>
    <property name="icon">
-    <iconset theme="edit-delete"/>
+    <iconset theme="edit-delete">
+     <normaloff>.</normaloff>.</iconset>
    </property>
    <property name="text">
     <string>&amp;Delete references...</string>
@@ -541,7 +547,7 @@
     <string>Remove selected reference names</string>
    </property>
   </action>
-  <action name="ActCheckWorkDir">
+  <action name="actCheckWorkDir">
    <property name="checkable">
     <bool>true</bool>
    </property>
@@ -549,7 +555,8 @@
     <bool>false</bool>
    </property>
    <property name="icon">
-    <iconset theme="folder-sync"/>
+    <iconset theme="folder-sync">
+     <normaloff>.</normaloff>.</iconset>
    </property>
    <property name="text">
     <string>&amp;Check working directory</string>
@@ -561,7 +568,7 @@
     <string>Check working directory</string>
    </property>
   </action>
-  <action name="ActMarkDiffToSha">
+  <action name="actMarkDiffToSha">
    <property name="text">
     <string>&amp;Mark for diff</string>
    </property>
@@ -572,7 +579,7 @@
     <string>Mark selected revision to diff against</string>
    </property>
   </action>
-  <action name="ActExternalDiff">
+  <action name="actExternalDiff">
    <property name="enabled">
     <bool>false</bool>
    </property>
@@ -586,7 +593,7 @@
     <string>Ctrl+D</string>
    </property>
   </action>
-  <action name="ActExternalEditor">
+  <action name="actExternalEditor">
    <property name="enabled">
     <bool>false</bool>
    </property>
@@ -600,7 +607,7 @@
     <string>Ctrl+E</string>
    </property>
   </action>
-  <action name="ActViewRev">
+  <action name="actViewRev">
    <property name="enabled">
     <bool>false</bool>
    </property>
@@ -617,7 +624,7 @@
     <string>Ctrl+R</string>
    </property>
   </action>
-  <action name="ActSplitView">
+  <action name="actSplitView">
    <property name="icon">
     <iconset theme="view-split-top-bottom" resource="icons.qrc">
      <normaloff>:/icons/resources/view_top_bottom.png</normaloff>:/icons/resources/view_top_bottom.png</iconset>
@@ -635,9 +642,10 @@
     <string>S</string>
    </property>
   </action>
-  <action name="ActFind">
+  <action name="actFind">
    <property name="icon">
-    <iconset theme="edit-find"/>
+    <iconset theme="edit-find">
+     <normaloff>.</normaloff>.</iconset>
    </property>
    <property name="text">
     <string>&amp;Find...</string>
@@ -649,7 +657,7 @@
     <string>Ctrl+F</string>
    </property>
   </action>
-  <action name="ActFindNext">
+  <action name="actFindNext">
    <property name="text">
     <string>Find &amp;next</string>
    </property>
@@ -663,7 +671,7 @@
     <string>F3</string>
    </property>
   </action>
-  <action name="ActForward">
+  <action name="actForward">
    <property name="enabled">
     <bool>false</bool>
    </property>
@@ -681,7 +689,7 @@
     <string>Alt+Right</string>
    </property>
   </action>
-  <action name="ActBack">
+  <action name="actBack">
    <property name="enabled">
     <bool>false</bool>
    </property>
@@ -699,7 +707,7 @@
     <string>Alt+Left</string>
    </property>
   </action>
-  <action name="ActCustomActionSetup">
+  <action name="actCustomActionSetup">
    <property name="icon">
     <iconset theme="bookmarks" resource="icons.qrc">
      <normaloff>:/icons/resources/bookmark.png</normaloff>:/icons/resources/bookmark.png</iconset>
@@ -714,12 +722,13 @@
     <enum>QAction::NoRole</enum>
    </property>
   </action>
-  <action name="ActViewFileNewTab">
+  <action name="actViewFileNewTab">
    <property name="enabled">
     <bool>false</bool>
    </property>
    <property name="icon">
-    <iconset theme="tab-new"/>
+    <iconset theme="tab-new">
+     <normaloff>.</normaloff>.</iconset>
    </property>
    <property name="text">
     <string>View file in new tab</string>
@@ -731,12 +740,13 @@
     <string>Ctrl+Shift+A</string>
    </property>
   </action>
-  <action name="ActViewDiffNewTab">
+  <action name="actViewDiffNewTab">
    <property name="enabled">
     <bool>false</bool>
    </property>
    <property name="icon">
-    <iconset theme="tab-new"/>
+    <iconset theme="tab-new">
+     <normaloff>.</normaloff>.</iconset>
    </property>
    <property name="text">
     <string>View patch in new tab</string>
@@ -748,7 +758,7 @@
     <string>Ctrl+Shift+P</string>
    </property>
   </action>
-  <action name="ActSearchAndFilter">
+  <action name="actSearchAndFilter">
    <property name="checkable">
     <bool>true</bool>
    </property>
@@ -766,7 +776,7 @@
     <string>Toggle filter</string>
    </property>
   </action>
-  <action name="ActSearchAndHighlight">
+  <action name="actSearchAndHighlight">
    <property name="checkable">
     <bool>true</bool>
    </property>
@@ -784,7 +794,7 @@
     <string>Toggle match highlight</string>
    </property>
   </action>
-  <action name="ActShowDescHeader">
+  <action name="actShowDescHeader">
    <property name="checkable">
     <bool>true</bool>
    </property>
@@ -804,7 +814,7 @@
     <string>H</string>
    </property>
   </action>
-  <action name="ActToggleLogsDiff">
+  <action name="actToggleLogsDiff">
    <property name="text">
     <string>Toggle message/diff</string>
    </property>
@@ -818,7 +828,7 @@
     <string>M</string>
    </property>
   </action>
-  <action name="ActRangeDlg">
+  <action name="actRangeDlg">
    <property name="icon">
     <iconset theme="edit-select" resource="icons.qrc">
      <normaloff>:/icons/resources/range_select.png</normaloff>:/icons/resources/range_select.png</iconset>
@@ -830,9 +840,10 @@
     <string>Show 'Select range' dialog</string>
    </property>
   </action>
-  <action name="ActAmend">
+  <action name="actAmend">
    <property name="icon">
-    <iconset theme="edit-entry"/>
+    <iconset theme="edit-entry">
+     <normaloff>.</normaloff>.</iconset>
    </property>
    <property name="text">
     <string>&amp;Amend commit...</string>
@@ -844,7 +855,7 @@
     <string>@</string>
    </property>
   </action>
-  <action name="ActBranch">
+  <action name="actBranch">
    <property name="enabled">
     <bool>false</bool>
    </property>
@@ -858,7 +869,7 @@
     <string>Ctrl+B</string>
    </property>
   </action>
-  <action name="ActCheckout">
+  <action name="actCheckout">
    <property name="text">
     <string>&amp;Checkout...</string>
    </property>
@@ -884,683 +895,11 @@
    <class>TabWidget</class>
    <extends>QTabWidget</extends>
    <header>tabwidget.h</header>
+   <container>1</container>
   </customwidget>
  </customwidgets>
  <resources>
   <include location="icons.qrc"/>
  </resources>
- <connections>
-  <connection>
-   <sender>ActAbout</sender>
-   <signal>triggered()</signal>
-   <receiver>MainBase</receiver>
-   <slot>ActAbout_activated()</slot>
-   <hints>
-    <hint type="sourcelabel">
-     <x>-1</x>
-     <y>-1</y>
-    </hint>
-    <hint type="destinationlabel">
-     <x>20</x>
-     <y>20</y>
-    </hint>
-   </hints>
-  </connection>
-  <connection>
-   <sender>ActCheckWorkDir</sender>
-   <signal>toggled(bool)</signal>
-   <receiver>MainBase</receiver>
-   <slot>ActCheckWorkDir_toggled(bool)</slot>
-   <hints>
-    <hint type="sourcelabel">
-     <x>-1</x>
-     <y>-1</y>
-    </hint>
-    <hint type="destinationlabel">
-     <x>20</x>
-     <y>20</y>
-    </hint>
-   </hints>
-  </connection>
-  <connection>
-   <sender>ActCheckout</sender>
-   <signal>triggered()</signal>
-   <receiver>MainBase</receiver>
-   <slot>ActCheckout_activated()</slot>
-   <hints>
-    <hint type="sourcelabel">
-     <x>-1</x>
-     <y>-1</y>
-    </hint>
-    <hint type="destinationlabel">
-     <x>20</x>
-     <y>20</y>
-    </hint>
-   </hints>
-  </connection>
-  <connection>
-   <sender>ActClose</sender>
-   <signal>triggered()</signal>
-   <receiver>MainBase</receiver>
-   <slot>ActClose_activated()</slot>
-   <hints>
-    <hint type="sourcelabel">
-     <x>-1</x>
-     <y>-1</y>
-    </hint>
-    <hint type="destinationlabel">
-     <x>20</x>
-     <y>20</y>
-    </hint>
-   </hints>
-  </connection>
-  <connection>
-   <sender>ActCommit</sender>
-   <signal>triggered()</signal>
-   <receiver>MainBase</receiver>
-   <slot>ActCommit_activated()</slot>
-   <hints>
-    <hint type="sourcelabel">
-     <x>-1</x>
-     <y>-1</y>
-    </hint>
-    <hint type="destinationlabel">
-     <x>20</x>
-     <y>20</y>
-    </hint>
-   </hints>
-  </connection>
-  <connection>
-   <sender>ActExit</sender>
-   <signal>triggered()</signal>
-   <receiver>MainBase</receiver>
-   <slot>ActExit_activated()</slot>
-   <hints>
-    <hint type="sourcelabel">
-     <x>-1</x>
-     <y>-1</y>
-    </hint>
-    <hint type="destinationlabel">
-     <x>20</x>
-     <y>20</y>
-    </hint>
-   </hints>
-  </connection>
-  <connection>
-   <sender>ActExternalDiff</sender>
-   <signal>triggered()</signal>
-   <receiver>MainBase</receiver>
-   <slot>ActExternalDiff_activated()</slot>
-   <hints>
-    <hint type="sourcelabel">
-     <x>-1</x>
-     <y>-1</y>
-    </hint>
-    <hint type="destinationlabel">
-     <x>20</x>
-     <y>20</y>
-    </hint>
-   </hints>
-  </connection>
-  <connection>
-   <sender>ActExternalEditor</sender>
-   <signal>triggered()</signal>
-   <receiver>MainBase</receiver>
-   <slot>ActExternalEditor_activated()</slot>
-   <hints>
-    <hint type="sourcelabel">
-     <x>-1</x>
-     <y>-1</y>
-    </hint>
-    <hint type="destinationlabel">
-     <x>20</x>
-     <y>20</y>
-    </hint>
-   </hints>
-  </connection>
-  <connection>
-   <sender>ActFilterTree</sender>
-   <signal>toggled(bool)</signal>
-   <receiver>MainBase</receiver>
-   <slot>ActFilterTree_toggled(bool)</slot>
-   <hints>
-    <hint type="sourcelabel">
-     <x>-1</x>
-     <y>-1</y>
-    </hint>
-    <hint type="destinationlabel">
-     <x>20</x>
-     <y>20</y>
-    </hint>
-   </hints>
-  </connection>
-  <connection>
-   <sender>ActHelp</sender>
-   <signal>triggered()</signal>
-   <receiver>MainBase</receiver>
-   <slot>ActHelp_activated()</slot>
-   <hints>
-    <hint type="sourcelabel">
-     <x>-1</x>
-     <y>-1</y>
-    </hint>
-    <hint type="destinationlabel">
-     <x>20</x>
-     <y>20</y>
-    </hint>
-   </hints>
-  </connection>
-  <connection>
-   <sender>ActMailApplyPatch</sender>
-   <signal>triggered()</signal>
-   <receiver>MainBase</receiver>
-   <slot>ActMailApplyPatch_activated()</slot>
-   <hints>
-    <hint type="sourcelabel">
-     <x>-1</x>
-     <y>-1</y>
-    </hint>
-    <hint type="destinationlabel">
-     <x>20</x>
-     <y>20</y>
-    </hint>
-   </hints>
-  </connection>
-  <connection>
-   <sender>ActMailFormatPatch</sender>
-   <signal>triggered()</signal>
-   <receiver>MainBase</receiver>
-   <slot>ActMailFormatPatch_activated()</slot>
-   <hints>
-    <hint type="sourcelabel">
-     <x>-1</x>
-     <y>-1</y>
-    </hint>
-    <hint type="destinationlabel">
-     <x>20</x>
-     <y>20</y>
-    </hint>
-   </hints>
-  </connection>
-  <connection>
-   <sender>ActOpenRepo</sender>
-   <signal>triggered()</signal>
-   <receiver>MainBase</receiver>
-   <slot>ActOpenRepo_activated()</slot>
-   <hints>
-    <hint type="sourcelabel">
-     <x>-1</x>
-     <y>-1</y>
-    </hint>
-    <hint type="destinationlabel">
-     <x>20</x>
-     <y>20</y>
-    </hint>
-   </hints>
-  </connection>
-  <connection>
-   <sender>ActOpenRepoNewWindow</sender>
-   <signal>triggered()</signal>
-   <receiver>MainBase</receiver>
-   <slot>ActOpenRepoNewWindow_activated()</slot>
-   <hints>
-    <hint type="sourcelabel">
-     <x>-1</x>
-     <y>-1</y>
-    </hint>
-    <hint type="destinationlabel">
-     <x>20</x>
-     <y>20</y>
-    </hint>
-   </hints>
-  </connection>
-  <connection>
-   <sender>ActPop</sender>
-   <signal>triggered()</signal>
-   <receiver>MainBase</receiver>
-   <slot>ActPop_activated()</slot>
-   <hints>
-    <hint type="sourcelabel">
-     <x>-1</x>
-     <y>-1</y>
-    </hint>
-    <hint type="destinationlabel">
-     <x>20</x>
-     <y>20</y>
-    </hint>
-   </hints>
-  </connection>
-  <connection>
-   <sender>ActPush</sender>
-   <signal>triggered()</signal>
-   <receiver>MainBase</receiver>
-   <slot>ActPush_activated()</slot>
-   <hints>
-    <hint type="sourcelabel">
-     <x>-1</x>
-     <y>-1</y>
-    </hint>
-    <hint type="destinationlabel">
-     <x>20</x>
-     <y>20</y>
-    </hint>
-   </hints>
-  </connection>
-  <connection>
-   <sender>ActRefresh</sender>
-   <signal>triggered()</signal>
-   <receiver>MainBase</receiver>
-   <slot>ActRefresh_activated()</slot>
-   <hints>
-    <hint type="sourcelabel">
-     <x>-1</x>
-     <y>-1</y>
-    </hint>
-    <hint type="destinationlabel">
-     <x>20</x>
-     <y>20</y>
-    </hint>
-   </hints>
-  </connection>
-  <connection>
-   <sender>ActSaveFile</sender>
-   <signal>triggered()</signal>
-   <receiver>MainBase</receiver>
-   <slot>ActSaveFile_activated()</slot>
-   <hints>
-    <hint type="sourcelabel">
-     <x>-1</x>
-     <y>-1</y>
-    </hint>
-    <hint type="destinationlabel">
-     <x>20</x>
-     <y>20</y>
-    </hint>
-   </hints>
-  </connection>
-  <connection>
-   <sender>ActSettings</sender>
-   <signal>triggered()</signal>
-   <receiver>MainBase</receiver>
-   <slot>ActSettings_activated()</slot>
-   <hints>
-    <hint type="sourcelabel">
-     <x>-1</x>
-     <y>-1</y>
-    </hint>
-    <hint type="destinationlabel">
-     <x>20</x>
-     <y>20</y>
-    </hint>
-   </hints>
-  </connection>
-  <connection>
-   <sender>ActShowTree</sender>
-   <signal>toggled(bool)</signal>
-   <receiver>MainBase</receiver>
-   <slot>ActShowTree_toggled(bool)</slot>
-   <hints>
-    <hint type="sourcelabel">
-     <x>-1</x>
-     <y>-1</y>
-    </hint>
-    <hint type="destinationlabel">
-     <x>20</x>
-     <y>20</y>
-    </hint>
-   </hints>
-  </connection>
-  <connection>
-   <sender>ActBranch</sender>
-   <signal>triggered()</signal>
-   <receiver>MainBase</receiver>
-   <slot>ActBranch_activated()</slot>
-   <hints>
-    <hint type="sourcelabel">
-     <x>-1</x>
-     <y>-1</y>
-    </hint>
-    <hint type="destinationlabel">
-     <x>20</x>
-     <y>20</y>
-    </hint>
-   </hints>
-  </connection>
-  <connection>
-   <sender>ActTag</sender>
-   <signal>triggered()</signal>
-   <receiver>MainBase</receiver>
-   <slot>ActTag_activated()</slot>
-   <hints>
-    <hint type="sourcelabel">
-     <x>-1</x>
-     <y>-1</y>
-    </hint>
-    <hint type="destinationlabel">
-     <x>20</x>
-     <y>20</y>
-    </hint>
-   </hints>
-  </connection>
-  <connection>
-   <sender>ActDelete</sender>
-   <signal>triggered()</signal>
-   <receiver>MainBase</receiver>
-   <slot>ActDelete_activated()</slot>
-   <hints>
-    <hint type="sourcelabel">
-     <x>-1</x>
-     <y>-1</y>
-    </hint>
-    <hint type="destinationlabel">
-     <x>20</x>
-     <y>20</y>
-    </hint>
-   </hints>
-  </connection>
-  <connection>
-   <sender>ActViewFile</sender>
-   <signal>triggered()</signal>
-   <receiver>MainBase</receiver>
-   <slot>ActViewFile_activated()</slot>
-   <hints>
-    <hint type="sourcelabel">
-     <x>-1</x>
-     <y>-1</y>
-    </hint>
-    <hint type="destinationlabel">
-     <x>20</x>
-     <y>20</y>
-    </hint>
-   </hints>
-  </connection>
-  <connection>
-   <sender>ActViewDiff</sender>
-   <signal>triggered()</signal>
-   <receiver>MainBase</receiver>
-   <slot>ActViewDiff_activated()</slot>
-   <hints>
-    <hint type="sourcelabel">
-     <x>-1</x>
-     <y>-1</y>
-    </hint>
-    <hint type="destinationlabel">
-     <x>20</x>
-     <y>20</y>
-    </hint>
-   </hints>
-  </connection>
-  <connection>
-   <sender>ActViewRev</sender>
-   <signal>triggered()</signal>
-   <receiver>MainBase</receiver>
-   <slot>ActViewRev_activated()</slot>
-   <hints>
-    <hint type="sourcelabel">
-     <x>-1</x>
-     <y>-1</y>
-    </hint>
-    <hint type="destinationlabel">
-     <x>20</x>
-     <y>20</y>
-    </hint>
-   </hints>
-  </connection>
-  <connection>
-   <sender>ActSplitView</sender>
-   <signal>triggered()</signal>
-   <receiver>MainBase</receiver>
-   <slot>ActSplitView_activated()</slot>
-   <hints>
-    <hint type="sourcelabel">
-     <x>-1</x>
-     <y>-1</y>
-    </hint>
-    <hint type="destinationlabel">
-     <x>20</x>
-     <y>20</y>
-    </hint>
-   </hints>
-  </connection>
-  <connection>
-   <sender>ActFind</sender>
-   <signal>triggered()</signal>
-   <receiver>MainBase</receiver>
-   <slot>ActFind_activated()</slot>
-   <hints>
-    <hint type="sourcelabel">
-     <x>-1</x>
-     <y>-1</y>
-    </hint>
-    <hint type="destinationlabel">
-     <x>20</x>
-     <y>20</y>
-    </hint>
-   </hints>
-  </connection>
-  <connection>
-   <sender>ActFindNext</sender>
-   <signal>triggered()</signal>
-   <receiver>MainBase</receiver>
-   <slot>ActFindNext_activated()</slot>
-   <hints>
-    <hint type="sourcelabel">
-     <x>-1</x>
-     <y>-1</y>
-    </hint>
-    <hint type="destinationlabel">
-     <x>20</x>
-     <y>20</y>
-    </hint>
-   </hints>
-  </connection>
-  <connection>
-   <sender>ActBack</sender>
-   <signal>triggered()</signal>
-   <receiver>MainBase</receiver>
-   <slot>ActBack_activated()</slot>
-   <hints>
-    <hint type="sourcelabel">
-     <x>-1</x>
-     <y>-1</y>
-    </hint>
-    <hint type="destinationlabel">
-     <x>20</x>
-     <y>20</y>
-    </hint>
-   </hints>
-  </connection>
-  <connection>
-   <sender>ActForward</sender>
-   <signal>triggered()</signal>
-   <receiver>MainBase</receiver>
-   <slot>ActForward_activated()</slot>
-   <hints>
-    <hint type="sourcelabel">
-     <x>-1</x>
-     <y>-1</y>
-    </hint>
-    <hint type="destinationlabel">
-     <x>20</x>
-     <y>20</y>
-    </hint>
-   </hints>
-  </connection>
-  <connection>
-   <sender>ActCustomActionSetup</sender>
-   <signal>triggered()</signal>
-   <receiver>MainBase</receiver>
-   <slot>ActCustomActionSetup_activated()</slot>
-   <hints>
-    <hint type="sourcelabel">
-     <x>-1</x>
-     <y>-1</y>
-    </hint>
-    <hint type="destinationlabel">
-     <x>20</x>
-     <y>20</y>
-    </hint>
-   </hints>
-  </connection>
-  <connection>
-   <sender>ActViewFileNewTab</sender>
-   <signal>triggered()</signal>
-   <receiver>MainBase</receiver>
-   <slot>ActViewFileNewTab_activated()</slot>
-   <hints>
-    <hint type="sourcelabel">
-     <x>-1</x>
-     <y>-1</y>
-    </hint>
-    <hint type="destinationlabel">
-     <x>20</x>
-     <y>20</y>
-    </hint>
-   </hints>
-  </connection>
-  <connection>
-   <sender>ActViewDiffNewTab</sender>
-   <signal>triggered()</signal>
-   <receiver>MainBase</receiver>
-   <slot>ActViewDiffNewTab_activated()</slot>
-   <hints>
-    <hint type="sourcelabel">
-     <x>-1</x>
-     <y>-1</y>
-    </hint>
-    <hint type="destinationlabel">
-     <x>20</x>
-     <y>20</y>
-    </hint>
-   </hints>
-  </connection>
-  <connection>
-   <sender>tabWdg</sender>
-   <signal>currentChanged(int)</signal>
-   <receiver>MainBase</receiver>
-   <slot>tabWdg_currentChanged(int)</slot>
-   <hints>
-    <hint type="sourcelabel">
-     <x>20</x>
-     <y>20</y>
-    </hint>
-    <hint type="destinationlabel">
-     <x>20</x>
-     <y>20</y>
-    </hint>
-   </hints>
-  </connection>
-  <connection>
-   <sender>ActSearchAndFilter</sender>
-   <signal>toggled(bool)</signal>
-   <receiver>MainBase</receiver>
-   <slot>ActSearchAndFilter_toggled(bool)</slot>
-   <hints>
-    <hint type="sourcelabel">
-     <x>-1</x>
-     <y>-1</y>
-    </hint>
-    <hint type="destinationlabel">
-     <x>487</x>
-     <y>238</y>
-    </hint>
-   </hints>
-  </connection>
-  <connection>
-   <sender>ActSearchAndHighlight</sender>
-   <signal>toggled(bool)</signal>
-   <receiver>MainBase</receiver>
-   <slot>ActSearchAndHighlight_toggled(bool)</slot>
-   <hints>
-    <hint type="sourcelabel">
-     <x>-1</x>
-     <y>-1</y>
-    </hint>
-    <hint type="destinationlabel">
-     <x>487</x>
-     <y>238</y>
-    </hint>
-   </hints>
-  </connection>
-  <connection>
-   <sender>ActShowDescHeader</sender>
-   <signal>triggered()</signal>
-   <receiver>MainBase</receiver>
-   <slot>ActShowDescHeader_activated()</slot>
-   <hints>
-    <hint type="sourcelabel">
-     <x>-1</x>
-     <y>-1</y>
-    </hint>
-    <hint type="destinationlabel">
-     <x>487</x>
-     <y>238</y>
-    </hint>
-   </hints>
-  </connection>
-  <connection>
-   <sender>ActToggleLogsDiff</sender>
-   <signal>triggered()</signal>
-   <receiver>MainBase</receiver>
-   <slot>ActToggleLogsDiff_activated()</slot>
-   <hints>
-    <hint type="sourcelabel">
-     <x>-1</x>
-     <y>-1</y>
-    </hint>
-    <hint type="destinationlabel">
-     <x>452</x>
-     <y>238</y>
-    </hint>
-   </hints>
-  </connection>
-  <connection>
-   <sender>ActRangeDlg</sender>
-   <signal>triggered()</signal>
-   <receiver>MainBase</receiver>
-   <slot>ActRangeDlg_activated()</slot>
-   <hints>
-    <hint type="sourcelabel">
-     <x>-1</x>
-     <y>-1</y>
-    </hint>
-    <hint type="destinationlabel">
-     <x>452</x>
-     <y>238</y>
-    </hint>
-   </hints>
-  </connection>
-  <connection>
-   <sender>ActAmend</sender>
-   <signal>triggered()</signal>
-   <receiver>MainBase</receiver>
-   <slot>ActAmend_activated()</slot>
-   <hints>
-    <hint type="sourcelabel">
-     <x>-1</x>
-     <y>-1</y>
-    </hint>
-    <hint type="destinationlabel">
-     <x>452</x>
-     <y>238</y>
-    </hint>
-   </hints>
-  </connection>
-  <connection>
-   <sender>ActMarkDiffToSha</sender>
-   <signal>triggered()</signal>
-   <receiver>MainBase</receiver>
-   <slot>ActMarkDiffToSha_activated()</slot>
-   <hints>
-    <hint type="sourcelabel">
-     <x>-1</x>
-     <y>-1</y>
-    </hint>
-    <hint type="destinationlabel">
-     <x>452</x>
-     <y>238</y>
-    </hint>
-   </hints>
-  </connection>
- </connections>
+ <connections/>
 </ui>

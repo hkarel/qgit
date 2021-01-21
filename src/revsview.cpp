@@ -214,12 +214,12 @@ void RevsView::setTabLogDiffVisible(bool b) {
 void RevsView::viewPatch(bool newTab) {
 
     if (!newTab && linkedPatchView) {
-        m()->tabWdg->setCurrentWidget(linkedPatchView->tabPage());
+        m()->tabWidget->setCurrentWidget(linkedPatchView->tabPage());
         return;
     }
     PatchView* pv = new PatchView(m(), git);
-    m()->tabWdg->addTab(pv->tabPage(), "&Patch");
-    m()->tabWdg->setCurrentWidget(pv->tabPage());
+    m()->tabWidget->addTab(pv->tabPage(), "&Patch");
+    m()->tabWidget->setCurrentWidget(pv->tabPage());
 
     if (!newTab) { // linkedPatchView == NULL
         linkedPatchView = pv;
@@ -279,7 +279,7 @@ void RevsView::on_flagChanged(uint flag) {
 
 bool RevsView::doUpdate(bool force) {
 
-    force = force || m()->lineEditSHA->text().isEmpty();
+    force = force || m()->lineSHA->text().isEmpty();
 
     bool found = tab()->listViewLog->update();
 
@@ -347,7 +347,7 @@ bool RevsView::doUpdate(bool force) {
 
 void RevsView::updateLineEditSHA(bool clear) {
 
-    QLineEdit* l = m()->lineEditSHA;
+    QLineEdit* l = m()->lineSHA;
     const QString sha = st.sha();
 
     if (clear) {
@@ -367,8 +367,8 @@ void RevsView::updateLineEditSHA(bool clear) {
             l->insert(sha);
         }
     }
-    m()->ActBack->setEnabled(l->isUndoAvailable());
-    m()->ActForward->setEnabled(l->isRedoAvailable());
+    m()->actBack->setEnabled(l->isUndoAvailable());
+    m()->actForward->setEnabled(l->isRedoAvailable());
 }
 
 void RevsView::on_lanesContextMenuRequested(const QStringList& parents, const QStringList& children) {

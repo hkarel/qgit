@@ -82,7 +82,7 @@ Product {
             "help.ui",
             "mainimpl.cpp",
             "mainimpl.h",
-            "mainview.ui",
+            "mainwindow.ui",
             "patchview.cpp",
             "patchview.h",
             "patchview.ui",

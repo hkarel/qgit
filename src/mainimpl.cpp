@@ -61,19 +61,19 @@ MainImpl::MainImpl(const QString& cd, QWidget* p) : QMainWindow(p) {
     // Add alternative shortcut for 'Amend' action
     QList<QKeySequence> actAmendShort;
     actAmendShort << QKeySequence("@") << QKeySequence("\"");
-    ActAmend->setShortcuts(actAmendShort);
+    actAmend->setShortcuts(actAmendShort);
 
     // manual setup widgets not buildable with Qt designer
-    lineEditSHA = new QLineEdit(NULL);
-    lineEditFilter = new QLineEdit(NULL);
-    cmbSearch = new QComboBox(NULL);
+    lineSHA = new QLineEdit(NULL);
+    lineFilter = new QLineEdit(NULL);
+    cboxSearch = new QComboBox(NULL);
     QString list("Short log,Log msg,Author,SHA1,File,Patch,Patch (regExp)");
-    cmbSearch->addItems(list.split(","));
-    toolBar->addWidget(lineEditSHA);
-    QAction* act = toolBar->insertWidget(ActSearchAndFilter, lineEditFilter);
-    toolBar->insertWidget(act, cmbSearch);
-    chk_connect_a(lineEditSHA, SIGNAL(returnPressed()), this, SLOT(lineEditSHA_returnPressed()));
-    chk_connect_a(lineEditFilter, SIGNAL(returnPressed()), this, SLOT(lineEditFilter_returnPressed()));
+    cboxSearch->addItems(list.split(","));
+    toolBar->addWidget(lineSHA);
+    QAction* act = toolBar->insertWidget(actSearchAndFilter, lineFilter);
+    toolBar->insertWidget(act, cboxSearch);
+    chk_connect_a(lineSHA, SIGNAL(returnPressed()), this, SLOT(lineSHA_returnPressed()));
+    chk_connect_a(lineFilter, SIGNAL(returnPressed()), this, SLOT(lineFilter_returnPressed()));
 
     // create light and dark colors for alternate background
     ODD_LINE_COL = palette().color(QPalette::Base);
@@ -143,15 +143,15 @@ MainImpl::MainImpl(const QString& cd, QWidget* p) : QMainWindow(p) {
     qgit::TYPE_WRITER_FONT.fromString(fontDescr);
 
     // set-up tab view
-    delete tabWdg->currentWidget(); // cannot be done in Qt Designer
+    delete tabWidget->currentWidget(); // cannot be done in Qt Designer
     rv = new RevsView(this, git, true); // set has main domain
-    tabWdg->addTab(rv->tabPage(), "&Rev list");
+    tabWidget->addTab(rv->tabPage(), "&Rev list");
 
 	// hide close button for rev list tab
-    QTabBar* const tabBar = tabWdg->tabBar();
+    QTabBar* const tabBar = tabWidget->tabBar();
     tabBar->setTabButton(0, QTabBar::RightSide, NULL);
     tabBar->setTabButton(0, QTabBar::LeftSide, NULL);
-    chk_connect_a(tabWdg, SIGNAL(tabCloseRequested(int)), this, SLOT(tabBar_tabCloseRequested(int)));
+    //chk_connect_a(tabWidget, SIGNAL(tabCloseRequested(int)), this, SLOT(tabWidget_tabCloseRequested(int)));
 
     // set-up file names loading progress bar
     pbFileNamesLoading = new QProgressBar(statusBar());
@@ -164,17 +164,17 @@ MainImpl::MainImpl(const QString& cd, QWidget* p) : QMainWindow(p) {
     treeView->hide();
 
     // set-up menu for recent visited repositories
-    chk_connect_a(File, SIGNAL(triggered(QAction*)), this, SLOT(openRecent_triggered(QAction*)));
+    chk_connect_a(mnuFile, SIGNAL(triggered(QAction*)), this, SLOT(openRecent_triggered(QAction*)));
     doUpdateRecentRepoMenu("");
 
     // set-up menu for custom actions
-    chk_connect_a(Actions, SIGNAL(triggered(QAction*)), this, SLOT(customAction_triggered(QAction*)));
+    chk_connect_a(mnuActions, SIGNAL(triggered(QAction*)), this, SLOT(customAction_triggered(QAction*)));
     doUpdateCustomActionMenu();
 
-    // manual adjust lineEditSHA width
+    // manual adjust lineSHA width
     QString tmp(qgit::SHA_END_LENGTH, '8');
-    int wd = lineEditSHA->fontMetrics().boundingRect(tmp).width();
-    lineEditSHA->setMinimumWidth(wd);
+    int wd = lineSHA->fontMetrics().boundingRect(tmp).width();
+    lineSHA->setMinimumWidth(wd);
 
     // disable all actions
     updateGlobalActions(false);
@@ -197,8 +197,8 @@ MainImpl::MainImpl(const QString& cd, QWidget* p) : QMainWindow(p) {
     chk_connect_a(rv->tab()->fileList, SIGNAL(itemDoubleClicked(QListWidgetItem*)),
                   this, SLOT(fileList_itemDoubleClicked(QListWidgetItem*)));
 
-    chk_connect_a(treeView, SIGNAL(itemDoubleClicked(QTreeWidgetItem*, int)),
-                  this, SLOT(treeView_doubleClicked(QTreeWidgetItem*, int)));
+    //chk_connect_a(treeView, SIGNAL(itemDoubleClicked(QTreeWidgetItem*, int)),
+    //              this, SLOT(treeView_doubleClicked(QTreeWidgetItem*, int)));
 
     // use most recent repo as startup dir if it exists and user opted to do so
     QStringList recents;
@@ -280,22 +280,22 @@ void MainImpl::initWithEventLoopActive() {
 
 void MainImpl::highlightAbbrevSha(const QString& abbrevSha) {
     // reset any previous highlight
-    if (ActSearchAndHighlight->isChecked())
-        ActSearchAndHighlight->toggle();
+    if (actSearchAndHighlight->isChecked())
+        actSearchAndHighlight->toggle();
 
     // set to highlight on SHA matching
-    cmbSearch->setCurrentIndex(CS_SHA1);
+    cboxSearch->setCurrentIndex(CS_SHA1);
 
     // set substring to search for
-    lineEditFilter->setText(abbrevSha);
+    lineFilter->setText(abbrevSha);
 
     // go with highlighting
-    ActSearchAndHighlight->toggle();
+    actSearchAndHighlight->toggle();
 }
 
-void MainImpl::lineEditSHA_returnPressed() {
+void MainImpl::lineSHA_returnPressed() {
 
-    QString text = lineEditSHA->text().trimmed();
+    QString text = lineSHA->text().trimmed();
     if (text.isEmpty())
         return;
 
@@ -305,32 +305,32 @@ void MainImpl::lineEditSHA_returnPressed() {
         rv->st.setSha(sha);
         UPDATE_DOMAIN(rv);
     } else { // try a multiple match search
-        highlightAbbrevSha(lineEditSHA->text());
+        highlightAbbrevSha(lineSHA->text());
         goMatch(0);
     }
 }
 
-void MainImpl::ActBack_activated() {
+void MainImpl::on_actBack_triggered(bool) {
 
-    lineEditSHA->undo(); // first for insert(text)
-    if (lineEditSHA->text().isEmpty())
-        lineEditSHA->undo(); // double undo, see RevsView::updateLineEditSHA()
+    lineSHA->undo(); // first for insert(text)
+    if (lineSHA->text().isEmpty())
+        lineSHA->undo(); // double undo, see RevsView::updatelineSHA()
 
-    lineEditSHA_returnPressed();
+    lineSHA_returnPressed();
 }
 
-void MainImpl::ActForward_activated() {
+void MainImpl::on_actForward_triggered(bool) {
 
-    lineEditSHA->redo();
-    if (lineEditSHA->text().isEmpty())
-        lineEditSHA->redo();
+    lineSHA->redo();
+    if (lineSHA->text().isEmpty())
+        lineSHA->redo();
 
-    lineEditSHA_returnPressed();
+    lineSHA_returnPressed();
 }
 
 // *************************** ExternalDiffViewer ***************************
 
-void MainImpl::ActExternalDiff_activated() {
+void MainImpl::on_actExternalDiff_triggered(bool) {
 
     QStringList args;
     QStringList filenames;
@@ -417,7 +417,7 @@ void MainImpl::getExternalDiffArgs(QStringList* args, QStringList* filenames) {
 
 // *************************** ExternalEditor ***************************
 
-void MainImpl::ActExternalEditor_activated() {
+void MainImpl::on_actExternalEditor_triggered(bool) {
 
     const QStringList &args = getExternalEditorArgs();
     ExternalEditorProc* externalEditor = new ExternalEditorProc(this);
@@ -475,16 +475,16 @@ void MainImpl::setRepository(const QString& newDir, bool refresh, bool keepSelec
     setRepositoryBusy = true;
 
     // check for a refresh or open of a new repository while in filtered view
-    if (ActFilterTree->isChecked() && passedArgs == NULL)
+    if (actFilterTree->isChecked() && passedArgs == NULL)
         // toggle() triggers a refresh and a following setRepository()
         // call that is filtered out by setRepositoryBusy guard flag
-        ActFilterTree->toggle(); // triggers ActFilterTree_toggled()
+        actFilterTree->toggle(); // triggers actFilterTree_toggled()
 
     try {
         EM_REGISTER(exExiting);
 
         bool archiveChanged;
-                git->getBaseDir(newDir, curDir, archiveChanged);
+        git->getBaseDir(newDir, curDir, archiveChanged);
 
         git->stop(archiveChanged); // stop all pending processes, non blocking
 
@@ -500,7 +500,7 @@ void MainImpl::setRepository(const QString& newDir, bool refresh, bool keepSelec
         // disable all actions
         updateGlobalActions(false);
         updateContextActions("", "", false, false);
-        ActCommit_setEnabled(false);
+        actCommit_setEnabled(false);
 
         // tree name should be set before init because in case of
         // StGIT archives the first revs are sent before init returns
@@ -518,12 +518,13 @@ void MainImpl::setRepository(const QString& newDir, bool refresh, bool keepSelec
 		if (curBranch.length()) curBranch = " [" + curBranch + "]";
 		setWindowTitle(curDir + curBranch + " - QGit");
 
-		if (ActFilterTree->isChecked())
-            setWindowTitle(windowTitle() + " - FILTER ON < " +
-                           passedArgs->join(" ") + " >");
+        if (actFilterTree->isChecked() && passedArgs) {
+            QString msg = " - FILTER ON < %1 >";
+            setWindowTitle(windowTitle() + msg.arg(passedArgs->join(" ")));
+        }
 
         updateCommitMenu(ok && git->isStGITStack());
-        ActCheckWorkDir->setChecked(qgit::flags().test(DIFF_INDEX_F)); // could be changed in Git::init()
+        actCheckWorkDir->setChecked(qgit::flags().test(DIFF_INDEX_F)); // could be changed in Git::init()
 
         if (ok) {
             updateGlobalActions(true);
@@ -557,14 +558,14 @@ exit:
 
 void MainImpl::updateGlobalActions(bool b) {
 
-    ActRefresh->setEnabled(b);
-    ActCheckWorkDir->setEnabled(b);
-    ActViewRev->setEnabled(b);
-    ActViewDiff->setEnabled(b);
-    ActViewDiffNewTab->setEnabled(b && firstTab<PatchView>());
-    ActShowTree->setEnabled(b);
-    ActMailApplyPatch->setEnabled(b);
-    ActMailFormatPatch->setEnabled(b);
+    actRefresh->setEnabled(b);
+    actCheckWorkDir->setEnabled(b);
+    actViewRev->setEnabled(b);
+    actViewDiff->setEnabled(b);
+    actViewDiffNewTab->setEnabled(b && firstTab<PatchView>());
+    actShowTree->setEnabled(b);
+    actMailApplyPatch->setEnabled(b);
+    actMailFormatPatch->setEnabled(b);
 
     rv->setEnabled(b);
 }
@@ -598,12 +599,12 @@ void MainImpl::updateContextActions(const QString& newRevSha, const QString& new
     bool pathActionsEnabled = !newFileName.isEmpty();
     bool fileActionsEnabled = (pathActionsEnabled && !isDir);
 
-    ActViewFile->setEnabled(fileActionsEnabled);
-    ActViewFileNewTab->setEnabled(fileActionsEnabled && firstTab<FileView>());
-    ActExternalDiff->setEnabled(fileActionsEnabled);
-    ActExternalEditor->setEnabled(fileActionsEnabled);
-    ActSaveFile->setEnabled(fileActionsEnabled);
-    ActFilterTree->setEnabled(pathActionsEnabled || ActFilterTree->isChecked());
+    actViewFile->setEnabled(fileActionsEnabled);
+    actViewFileNewTab->setEnabled(fileActionsEnabled && firstTab<FileView>());
+    actExternalDiff->setEnabled(fileActionsEnabled);
+    actExternalEditor->setEnabled(fileActionsEnabled);
+    actSaveFile->setEnabled(fileActionsEnabled);
+    actFilterTree->setEnabled(pathActionsEnabled || actFilterTree->isChecked());
 
 //    bool isTag       = false;
     bool isUnApplied = false;
@@ -618,27 +619,27 @@ void MainImpl::updateContextActions(const QString& newRevSha, const QString& new
         isUnApplied = r->isUnApplied;
         isApplied = r->isApplied;
     }
-    ActMarkDiffToSha->setEnabled(newRevSha != ZERO_SHA);
-    ActCheckout->setEnabled(found && (newRevSha != ZERO_SHA) && !isUnApplied);
-    ActBranch->setEnabled(found && (newRevSha != ZERO_SHA) && !isUnApplied);
-    ActTag->setEnabled(found && (newRevSha != ZERO_SHA) && !isUnApplied);
-    ActDelete->setEnabled(ref_type != 0);
-    ActPush->setEnabled(found && isUnApplied && git->isNothingToCommit());
-    ActPop->setEnabled(found && isApplied && git->isNothingToCommit());
+    actMarkDiffToSha->setEnabled(newRevSha != ZERO_SHA);
+    actCheckout->setEnabled(found && (newRevSha != ZERO_SHA) && !isUnApplied);
+    actBranch->setEnabled(found && (newRevSha != ZERO_SHA) && !isUnApplied);
+    actTag->setEnabled(found && (newRevSha != ZERO_SHA) && !isUnApplied);
+    actDelete->setEnabled(ref_type != 0);
+    actPush->setEnabled(found && isUnApplied && git->isNothingToCommit());
+    actPop->setEnabled(found && isApplied && git->isNothingToCommit());
 }
 
 // ************************* cross-domain update Actions ***************************
 
 void MainImpl::listViewLog_doubleClicked(const QModelIndex& index) {
 
-    if (index.isValid() && ActViewDiff->isEnabled())
-        ActViewDiff->activate(QAction::Trigger);
+    if (index.isValid() && actViewDiff->isEnabled())
+        actViewDiff->activate(QAction::Trigger);
 }
 
 void MainImpl::histListView_doubleClicked(const QModelIndex& index) {
 
-    if (index.isValid() && ActViewRev->isEnabled())
-        ActViewRev->activate(QAction::Trigger);
+    if (index.isValid() && actViewRev->isEnabled())
+        actViewRev->activate(QAction::Trigger);
 }
 
 void MainImpl::fileList_itemDoubleClicked(QListWidgetItem* item) {
@@ -648,29 +649,29 @@ void MainImpl::fileList_itemDoubleClicked(QListWidgetItem* item) {
         return;
 
     if (qgit::flags().test(OPEN_IN_EDITOR_F)) {
-        if (item && ActExternalEditor->isEnabled())
-            ActExternalEditor->activate(QAction::Trigger);
+        if (item && actExternalEditor->isEnabled())
+            actExternalEditor->activate(QAction::Trigger);
     } else {
         bool isMainView = (item && item->listWidget() == rv->tab()->fileList);
-        if (isMainView && ActViewDiff->isEnabled())
-            ActViewDiff->activate(QAction::Trigger);
+        if (isMainView && actViewDiff->isEnabled())
+            actViewDiff->activate(QAction::Trigger);
 
-        if (item && !isMainView && ActViewFile->isEnabled())
-            ActViewFile->activate(QAction::Trigger);
+        if (item && !isMainView && actViewFile->isEnabled())
+            actViewFile->activate(QAction::Trigger);
     }
 }
 
-void MainImpl::treeView_doubleClicked(QTreeWidgetItem* item, int) {
+void MainImpl::on_treeView_itemDoubleClicked(QTreeWidgetItem* item, int) {
     if (qgit::flags().test(OPEN_IN_EDITOR_F)) {
-        if (item && ActExternalEditor->isEnabled())
-            ActExternalEditor->activate(QAction::Trigger);
+        if (item && actExternalEditor->isEnabled())
+            actExternalEditor->activate(QAction::Trigger);
     } else {
-        if (item && ActViewFile->isEnabled())
-            ActViewFile->activate(QAction::Trigger);
+        if (item && actViewFile->isEnabled())
+            actViewFile->activate(QAction::Trigger);
     }
 }
 
-void MainImpl::tabBar_tabCloseRequested(int index) {
+void MainImpl::on_tabWidget_tabCloseRequested(int index) {
 
     Domain* t;
 	switch (tabType(&t, index)) {
@@ -678,18 +679,18 @@ void MainImpl::tabBar_tabCloseRequested(int index) {
         break;
     case TAB_PATCH:
         t->deleteWhenDone();
-        ActViewDiffNewTab->setEnabled(ActViewDiff->isEnabled() && firstTab<PatchView>());
+        actViewDiffNewTab->setEnabled(actViewDiff->isEnabled() && firstTab<PatchView>());
         break;
     case TAB_FILE:
         t->deleteWhenDone();
-        ActViewFileNewTab->setEnabled(ActViewFile->isEnabled() && firstTab<FileView>());
+        actViewFileNewTab->setEnabled(actViewFile->isEnabled() && firstTab<FileView>());
         break;
     default:
         log_warn << "Unknown current page";
     }
 }
 
-void MainImpl::ActRangeDlg_activated() {
+void MainImpl::on_actRangeDlg_triggered(bool) {
 
     QString args;
     RangeSelectImpl rs(this, &args, false, git);
@@ -700,22 +701,22 @@ void MainImpl::ActRangeDlg_activated() {
     }
 }
 
-void MainImpl::ActViewRev_activated() {
+void MainImpl::on_actViewRev_triggered(bool) {
 
     Domain* t;
     if (currentTabType(&t) == TAB_FILE) {
         rv->st = t->st;
         UPDATE_DOMAIN(rv);
     }
-    tabWdg->setCurrentWidget(rv->tabPage());
+    tabWidget->setCurrentWidget(rv->tabPage());
 }
 
-void MainImpl::ActViewFile_activated() {
+void MainImpl::on_actViewFile_triggered(bool) {
 
     openFileTab(firstTab<FileView>());
 }
 
-void MainImpl::ActViewFileNewTab_activated() {
+void MainImpl::on_actViewFileNewTab_triggered(bool) {
 
     openFileTab();
 }
@@ -724,21 +725,21 @@ void MainImpl::openFileTab(FileView* fv) {
 
     if (!fv) {
         fv = new FileView(this, git);
-        tabWdg->addTab(fv->tabPage(), "File");
+        tabWidget->addTab(fv->tabPage(), "File");
 
         chk_connect_a(fv->tab()->histListView, SIGNAL(doubleClicked(const QModelIndex&)),
                       this, SLOT(histListView_doubleClicked(const QModelIndex&)));
 
         chk_connect_a(this, SIGNAL(closeAllTabs()), fv, SLOT(on_closeAllTabs()));
 
-        ActViewFileNewTab->setEnabled(ActViewFile->isEnabled());
+        actViewFileNewTab->setEnabled(actViewFile->isEnabled());
     }
-    tabWdg->setCurrentWidget(fv->tabPage());
+    tabWidget->setCurrentWidget(fv->tabPage());
     fv->st = rv->st;
     UPDATE_DOMAIN(fv);
 }
 
-void MainImpl::ActViewDiff_activated() {
+void MainImpl::on_actViewDiff_triggered(bool) {
 
     Domain* t;
     if (currentTabType(&t) == TAB_FILE) {
@@ -746,15 +747,15 @@ void MainImpl::ActViewDiff_activated() {
         UPDATE_DOMAIN(rv);
     }
     rv->viewPatch(false);
-    ActViewDiffNewTab->setEnabled(true);
+    actViewDiffNewTab->setEnabled(true);
 
-    if (ActSearchAndFilter->isChecked() || ActSearchAndHighlight->isChecked()) {
-        bool isRegExp = (cmbSearch->currentIndex() == CS_PATCH_REGEXP);
-        emit highlightPatch(lineEditFilter->text(), isRegExp);
+    if (actSearchAndFilter->isChecked() || actSearchAndHighlight->isChecked()) {
+        bool isRegExp = (cboxSearch->currentIndex() == CS_PATCH_REGEXP);
+        emit highlightPatch(lineFilter->text(), isRegExp);
     }
 }
 
-void MainImpl::ActViewDiffNewTab_activated() {
+void MainImpl::on_actViewDiffNewTab_triggered(bool) {
 
     rv->viewPatch(true);
 }
@@ -766,13 +767,13 @@ bool MainImpl::eventFilter(QObject* obj, QEvent* ev) {
         QWheelEvent* e = static_cast<QWheelEvent*>(ev);
         if (e->modifiers() == Qt::AltModifier) {
 
-            int idx = tabWdg->currentIndex();
+            int idx = tabWidget->currentIndex();
             if (e->delta() < 0)
-                idx = (++idx == tabWdg->count() ? 0 : idx);
+                idx = (++idx == tabWidget->count() ? 0 : idx);
             else
-                idx = (--idx < 0 ? tabWdg->count() - 1 : idx);
+                idx = (--idx < 0 ? tabWidget->count() - 1 : idx);
 
-            tabWdg->setCurrentIndex(idx);
+            tabWidget->setCurrentIndex(idx);
             return true;
         }
     }
@@ -887,7 +888,7 @@ void MainImpl::merge(const QStringList &shas, const QString &into)
 	if (git->merge(into, shas, &output)) {
 		refreshRepo(true);
 		statusBar()->showMessage(QString("Successfully merged into %1").arg(into));
-		ActCommit_activated();
+        on_actCommit_triggered(false);
 	} else if (!output.isEmpty()) {
 		QMessageBox::warning(this, "git merge failed",
 		                     QString("\n\nGit says: \n\n" + output));
@@ -934,52 +935,52 @@ void MainImpl::newRevsAdded(const FileHistory* fh, const QVector<ShaString>&) {
     if (!git->isMainHistory(fh))
         return;
 
-    if (ActSearchAndFilter->isChecked())
-        ActSearchAndFilter_toggled(true); // filter again on new arrived data
+    if (actSearchAndFilter->isChecked())
+        on_actSearchAndFilter_triggered(true); // filter again on new arrived data
 
-    if (ActSearchAndHighlight->isChecked())
-        ActSearchAndHighlight_toggled(true); // filter again on new arrived data
+    if (actSearchAndHighlight->isChecked())
+        on_actSearchAndHighlight_triggered(true); // filter again on new arrived data
 
     // first rev could be a StGIT unapplied patch so check more then once
-    if (   !ActCommit->isEnabled()
+    if (   !actCommit->isEnabled()
         && (!git->isNothingToCommit() || git->isUnknownFiles()))
-        ActCommit_setEnabled(true);
+        actCommit_setEnabled(true);
 }
 
-void MainImpl::lineEditFilter_returnPressed() {
+void MainImpl::lineFilter_returnPressed() {
 
-    ActSearchAndFilter->setChecked(true);
+    actSearchAndFilter->setChecked(true);
 }
 
-void MainImpl::ActSearchAndFilter_toggled(bool isOn) {
+void MainImpl::on_actSearchAndFilter_triggered(bool isOn) {
 
-    ActSearchAndHighlight->setEnabled(!isOn);
-    ActSearchAndFilter->setEnabled(false);
+    actSearchAndHighlight->setEnabled(!isOn);
+    actSearchAndFilter->setEnabled(false);
     filterList(isOn, false); // blocking call
-    ActSearchAndFilter->setEnabled(true);
+    actSearchAndFilter->setEnabled(true);
 }
 
-void MainImpl::ActSearchAndHighlight_toggled(bool isOn) {
+void MainImpl::on_actSearchAndHighlight_triggered(bool isOn) {
 
-    ActSearchAndFilter->setEnabled(!isOn);
-    ActSearchAndHighlight->setEnabled(false);
+    actSearchAndFilter->setEnabled(!isOn);
+    actSearchAndHighlight->setEnabled(false);
     filterList(isOn, true); // blocking call
-    ActSearchAndHighlight->setEnabled(true);
+    actSearchAndHighlight->setEnabled(true);
 }
 
 void MainImpl::filterList(bool isOn, bool onlyHighlight) {
 
-    lineEditFilter->setEnabled(!isOn);
-    cmbSearch->setEnabled(!isOn);
+    lineFilter->setEnabled(!isOn);
+    cboxSearch->setEnabled(!isOn);
 
-    const QString& filter(lineEditFilter->text());
+    const QString& filter(lineFilter->text());
     if (filter.isEmpty())
         return;
 
     ShaSet shaSet;
     bool patchNeedsUpdate, isRegExp;
     patchNeedsUpdate = isRegExp = false;
-    int idx = cmbSearch->currentIndex(), colNum = 0;
+    int idx = cboxSearch->currentIndex(), colNum = 0;
     if (isOn) {
         switch (idx) {
         case CS_SHORT_LOG:
@@ -1008,7 +1009,7 @@ void MainImpl::filterList(bool isOn, bool onlyHighlight) {
                 isRegExp = (idx == CS_PATCH_REGEXP);
                 if (!git->getPatchFilter(filter, isRegExp, shaSet)) {
                     QApplication::restoreOverrideCursor();
-                    ActSearchAndFilter->toggle();
+                    actSearchAndFilter->toggle();
                     return;
                 }
                 patchNeedsUpdate = (shaSet.count() > 0);
@@ -1081,13 +1082,13 @@ bool MainImpl::event(QEvent* e) {
 
 int MainImpl::currentTabType(Domain** t) {
 
-	return tabType(t, tabWdg->currentIndex());
+    return tabType(t, tabWidget->currentIndex());
 }
 
 int MainImpl::tabType(Domain** t, int index) {
 
     *t = NULL;
-	QWidget* curPage = tabWdg->widget(index);
+    QWidget* curPage = tabWidget->widget(index);
     if (curPage == rv->tabPage()) {
         *t = rv;
         return TAB_REV;
@@ -1112,7 +1113,7 @@ int MainImpl::tabType(Domain** t, int index) {
     return -1;
 }
 
-void MainImpl::tabWdg_currentChanged(int w) {
+void MainImpl::on_tabWidget_currentChanged(int w) {
 
     if (w == -1)
         return;
@@ -1183,10 +1184,10 @@ void MainImpl::shortCutActivated() {
             goMatch(1);
         }
         else if (key == Qt::Key_Left) {
-            ActBack_activated();
+            on_actBack_triggered(false);
         }
         else if (key == Qt::Key_Right) {
-            ActForward_activated();
+            on_actForward_triggered(false);
         }
         else if (key == (Qt::CTRL | Qt::Key_Plus)) {
             adjustFontSize(1); //TODO replace magic constant
@@ -1207,14 +1208,14 @@ void MainImpl::shortCutActivated() {
             scrollTextEdit(1);
         }
         else if (key == Qt::Key_R) {
-            tabWdg->setCurrentWidget(rv->tabPage());
+            tabWidget->setCurrentWidget(rv->tabPage());
         }
         else if (key == Qt::Key_P || key == Qt::Key_F) {
-            QWidget* cp = tabWdg->currentWidget();
+            QWidget* cp = tabWidget->currentWidget();
             Domain* d = (key == Qt::Key_P)
                         ? static_cast<Domain*>(firstTab<PatchView>(cp))
                         : static_cast<Domain*>(firstTab<FileView>(cp));
-            if (d) tabWdg->setCurrentWidget(d->tabPage());
+            if (d) tabWidget->setCurrentWidget(d->tabPage());
         }
     }
 }
@@ -1226,7 +1227,7 @@ void MainImpl::consoleDestroyed(QObject*)
 
 void MainImpl::goMatch(int delta) {
 
-    if (ActSearchAndHighlight->isChecked())
+    if (actSearchAndHighlight->isChecked())
         rv->tab()->listViewLog->scrollToNextHighlighted(delta);
 	else
 		rv->tab()->listViewLog->scrollToNext(delta);
@@ -1304,8 +1305,8 @@ void MainImpl::fileNamesLoad(int status, int value) {
 
 void MainImpl::updateCommitMenu(bool isStGITStack) {
 
-    ActCommit->setText(isStGITStack ? "Commit St&GIT patch..." : "&Commit...");
-    ActAmend->setText(isStGITStack ? "Refresh St&GIT patch..." : "&Amend commit...");
+    actCommit->setText(isStGITStack ? "Commit St&GIT patch..." : "&Commit...");
+    actAmend->setText(isStGITStack ? "Refresh St&GIT patch..." : "&Amend commit...");
 }
 
 void MainImpl::updateRecentRepoMenu(const QString& newEntry) {
@@ -1321,9 +1322,9 @@ void MainImpl::updateRecentRepoMenu(const QString& newEntry) {
 
 void MainImpl::doUpdateRecentRepoMenu(const QString& newEntry) {
 
-    for (QAction* act : File->actions()) {
+    for (QAction* act : mnuFile->actions()) {
         if (act->data().toString().startsWith("RECENT"))
-            File->removeAction(act);
+            mnuFile->removeAction(act);
     }
 
     QStringList recents;
@@ -1339,7 +1340,7 @@ void MainImpl::doUpdateRecentRepoMenu(const QString& newEntry) {
     idx = 1;
     QStringList newRecents;
     for (const QString& s : recents) {
-        QAction* newAction = File->addAction(QString::number(idx++) + " " + s);
+        QAction* newAction = mnuFile->addAction(QString::number(idx++) + " " + s);
         newAction->setData(QString("RECENT ") + s);
         newRecents << s;
         if (idx > MAX_RECENT_REPOS)
@@ -1390,40 +1391,40 @@ void MainImpl::doContexPopup(const QString& sha) {
     bool isPatchPage = (tt == TAB_PATCH);
     bool isFilePage = (tt == TAB_FILE);
 
-    if (isFilePage && ActViewRev->isEnabled())
-        contextMenu.addAction(ActViewRev);
+    if (isFilePage && actViewRev->isEnabled())
+        contextMenu.addAction(actViewRev);
 
-    if (!isPatchPage && ActViewDiff->isEnabled())
-        contextMenu.addAction(ActViewDiff);
+    if (!isPatchPage && actViewDiff->isEnabled())
+        contextMenu.addAction(actViewDiff);
 
-    if (isRevPage && ActViewDiffNewTab->isEnabled())
-        contextMenu.addAction(ActViewDiffNewTab);
+    if (isRevPage && actViewDiffNewTab->isEnabled())
+        contextMenu.addAction(actViewDiffNewTab);
 
-    if (!isFilePage && ActExternalDiff->isEnabled())
-        contextMenu.addAction(ActExternalDiff);
+    if (!isFilePage && actExternalDiff->isEnabled())
+        contextMenu.addAction(actExternalDiff);
 
-    if (isFilePage && ActExternalEditor->isEnabled())
-        contextMenu.addAction(ActExternalEditor);
+    if (isFilePage && actExternalEditor->isEnabled())
+        contextMenu.addAction(actExternalEditor);
 
     if (isRevPage) {
         updateRevVariables(sha);
 
-        if (ActCommit->isEnabled() && (sha == ZERO_SHA))
-            contextMenu.addAction(ActCommit);
-        if (ActCheckout->isEnabled())
-            contextMenu.addAction(ActCheckout);
-        if (ActBranch->isEnabled())
-            contextMenu.addAction(ActBranch);
-        if (ActTag->isEnabled())
-            contextMenu.addAction(ActTag);
-        if (ActDelete->isEnabled())
-            contextMenu.addAction(ActDelete);
-        if (ActMailFormatPatch->isEnabled())
-            contextMenu.addAction(ActMailFormatPatch);
-        if (ActPush->isEnabled())
-            contextMenu.addAction(ActPush);
-        if (ActPop->isEnabled())
-            contextMenu.addAction(ActPop);
+        if (actCommit->isEnabled() && (sha == ZERO_SHA))
+            contextMenu.addAction(actCommit);
+        if (actCheckout->isEnabled())
+            contextMenu.addAction(actCheckout);
+        if (actBranch->isEnabled())
+            contextMenu.addAction(actBranch);
+        if (actTag->isEnabled())
+            contextMenu.addAction(actTag);
+        if (actDelete->isEnabled())
+            contextMenu.addAction(actDelete);
+        if (actMailFormatPatch->isEnabled())
+            contextMenu.addAction(actMailFormatPatch);
+        if (actPush->isEnabled())
+            contextMenu.addAction(actPush);
+        if (actPop->isEnabled())
+            contextMenu.addAction(actPop);
 
 		contextMenu.addSeparator();
 
@@ -1467,30 +1468,30 @@ void MainImpl::doFileContexPopup(const QString& fileName, int type) {
     bool isDir = treeView->isDir(fileName);
 
     if (type == POPUP_FILE_EV)
-        if (!isPatchPage && ActViewDiff->isEnabled())
-            contextMenu.addAction(ActViewDiff);
+        if (!isPatchPage && actViewDiff->isEnabled())
+            contextMenu.addAction(actViewDiff);
 
-    if (!isDir && ActViewFile->isEnabled())
-        contextMenu.addAction(ActViewFile);
+    if (!isDir && actViewFile->isEnabled())
+        contextMenu.addAction(actViewFile);
 
-    if (!isDir && ActViewFileNewTab->isEnabled())
-        contextMenu.addAction(ActViewFileNewTab);
+    if (!isDir && actViewFileNewTab->isEnabled())
+        contextMenu.addAction(actViewFileNewTab);
 
-    if (!isRevPage && (type == POPUP_FILE_EV) && ActViewRev->isEnabled())
-        contextMenu.addAction(ActViewRev);
+    if (!isRevPage && (type == POPUP_FILE_EV) && actViewRev->isEnabled())
+        contextMenu.addAction(actViewRev);
 
-    if (ActFilterTree->isEnabled())
-        contextMenu.addAction(ActFilterTree);
+    if (actFilterTree->isEnabled())
+        contextMenu.addAction(actFilterTree);
 
     if (!isDir) {
-        if (ActSaveFile->isEnabled())
-            contextMenu.addAction(ActSaveFile);
-        if ((type == POPUP_FILE_EV) && ActExternalDiff->isEnabled())
-            contextMenu.addAction(ActExternalDiff);
-        if ((type == POPUP_FILE_EV) && ActExternalEditor->isEnabled())
-            contextMenu.addAction(ActExternalEditor);
-        if (ActExternalEditor->isEnabled())
-            contextMenu.addAction(ActExternalEditor);
+        if (actSaveFile->isEnabled())
+            contextMenu.addAction(actSaveFile);
+        if ((type == POPUP_FILE_EV) && actExternalDiff->isEnabled())
+            contextMenu.addAction(actExternalDiff);
+        if ((type == POPUP_FILE_EV) && actExternalEditor->isEnabled())
+            contextMenu.addAction(actExternalEditor);
+        if (actExternalEditor->isEnabled())
+            contextMenu.addAction(actExternalEditor);
     }
     contextMenu.exec(QCursor::pos());
 }
@@ -1505,7 +1506,7 @@ void MainImpl::goRef_triggered(QAction* act) {
     UPDATE_DOMAIN(rv);
 }
 
-void MainImpl::ActSplitView_activated() {
+void MainImpl::on_actSplitView_triggered(bool) {
 
     Domain* t;
     switch (currentTabType(&t)) {
@@ -1530,7 +1531,7 @@ void MainImpl::ActSplitView_activated() {
     }
 }
 
-void MainImpl::ActToggleLogsDiff_activated() {
+void MainImpl::on_actToggleLogsDiff_triggered(bool) {
 
     Domain* t;
     if (currentTabType(&t) == TAB_REV) {
@@ -1541,29 +1542,29 @@ void MainImpl::ActToggleLogsDiff_activated() {
 
 const QString MainImpl::getRevisionDesc(const QString& sha) {
 
-    bool showHeader = ActShowDescHeader->isChecked();
+    bool showHeader = actShowDescHeader->isChecked();
     return git->getDesc(sha, shortLogRE, longLogRE, showHeader, NULL);
 }
 
-void MainImpl::ActShowDescHeader_activated() {
+void MainImpl::on_actShowDescHeader_triggered(bool) {
 
     // each open tab get his description,
     // could be different for each tab
     emit updateRevDesc();
 }
 
-void MainImpl::ActShowTree_toggled(bool b) {
+void MainImpl::on_actShowTree_triggered(bool b) {
 
     if (b) {
         treeView->show();
         UPDATE_DOMAIN(rv);
     } else {
-        saveGeometry();
+        //saveGeometry();
         treeView->hide();
     }
 }
 
-void MainImpl::ActSaveFile_activated() {
+void MainImpl::on_actSaveFile_triggered(bool) {
 
     QFileInfo f(rv->st.fileName());
     const QString fileName(QFileDialog::getSaveFileName(this, "Save file as", f.fileName()));
@@ -1596,7 +1597,7 @@ void MainImpl::openRecent_triggered(QAction* act) {
     }
 }
 
-void MainImpl::ActOpenRepo_activated() {
+void MainImpl::on_actOpenRepo_triggered(bool) {
 
     const QString dirName(QFileDialog::getExistingDirectory(this, "Choose a directory", curDir));
     if (!dirName.isEmpty()) {
@@ -1605,7 +1606,7 @@ void MainImpl::ActOpenRepo_activated() {
     }
 }
 
-void MainImpl::ActOpenRepoNewWindow_activated() {
+void MainImpl::on_actOpenRepoNewWindow_triggered(bool) {
 
     const QString dirName(QFileDialog::getExistingDirectory(this, "Choose a directory", curDir));
     if (!dirName.isEmpty()) {
@@ -1620,12 +1621,12 @@ void MainImpl::refreshRepo(bool b) {
     setRepository(curDir, true, b);
 }
 
-void MainImpl::ActRefresh_activated() {
+void MainImpl::on_actRefresh_triggered(bool) {
 
     refreshRepo(true);
 }
 
-void MainImpl::ActMailFormatPatch_activated() {
+void MainImpl::on_actMailFormatPatch_triggered(bool) {
 
     QStringList selectedItems;
     rv->tab()->listViewLog->getSelectedItems(selectedItems);
@@ -1672,7 +1673,7 @@ bool MainImpl::askApplyPatchParameters(bool* workDirOnly, bool* fold) {
     return (ret != 0);
 }
 
-void MainImpl::ActMailApplyPatch_activated() {
+void MainImpl::on_actMailApplyPatch_triggered(bool) {
 
     QString outDir = curDir;
     config::base().getValue("patch.last_dir", outDir);
@@ -1701,9 +1702,9 @@ void MainImpl::ActMailApplyPatch_activated() {
     refreshRepo(false);
 }
 
-void MainImpl::ActCheckWorkDir_toggled(bool b) {
+void MainImpl::on_actCheckWorkDir_triggered(bool b) {
 
-    if (!ActCheckWorkDir->isEnabled()) // to avoid looping with setChecked()
+    if (!actCheckWorkDir->isEnabled()) // to avoid looping with setChecked()
         return;
 
     qgit::flags().set(DIFF_INDEX_F, b);
@@ -1711,7 +1712,7 @@ void MainImpl::ActCheckWorkDir_toggled(bool b) {
     refreshRepo(keepSelection);
 }
 
-void MainImpl::ActSettings_activated() {
+void MainImpl::on_actSettings_triggered(bool) {
 
     SettingsImpl setView(this, git);
     chk_connect_a(&setView, SIGNAL(typeWriterFontChanged()),
@@ -1722,12 +1723,12 @@ void MainImpl::ActSettings_activated() {
 
     setView.exec();
 
-    // update ActCheckWorkDir if necessary
-    if (ActCheckWorkDir->isChecked() != qgit::flags().test(DIFF_INDEX_F))
-        ActCheckWorkDir->toggle();
+    // update actCheckWorkDir if necessary
+    if (actCheckWorkDir->isChecked() != qgit::flags().test(DIFF_INDEX_F))
+        actCheckWorkDir->toggle();
 }
 
-void MainImpl::ActCustomActionSetup_activated() {
+void MainImpl::on_actCustomActionSetup_triggered(bool) {
 
     CustomActionImpl ca {this};
      if (ca.exec() == QDialog::Accepted)
@@ -1736,11 +1737,11 @@ void MainImpl::ActCustomActionSetup_activated() {
 
 void MainImpl::doUpdateCustomActionMenu() {
 
-    QAction* setupAct = Actions->actions().first(); // is never empty
-    Actions->removeAction(setupAct);
-    Actions->clear();
-    Actions->addAction(setupAct);
-    Actions->addSeparator();
+    QAction* setupAct = mnuActions->actions().first(); // is never empty
+    mnuActions->removeAction(setupAct);
+    mnuActions->clear();
+    mnuActions->addAction(setupAct);
+    mnuActions->addSeparator();
 
     YamlConfig::Func loadFunc =
         [this](YamlConfig* conf, YAML::Node& actions, bool /*logWarn*/)
@@ -1752,7 +1753,7 @@ void MainImpl::doUpdateCustomActionMenu() {
             conf->getValue(actions[i], "command", cad->command);
             conf->getValue(actions[i], "refresh", cad->refresh);
 
-            QAction* act = Actions->addAction(cad->name);
+            QAction* act = mnuActions->addAction(cad->name);
             act->setMenuRole(QAction::NoRole);
             act->setData(qVariantFromValue(cad));
         }
@@ -1781,7 +1782,7 @@ void MainImpl::customAction_triggered(QAction* act) {
 //        cmd.insert(pos, " %lineedit:cmdline args%");
 //    }
 
-    updateRevVariables(lineEditSHA->text());
+    updateRevVariables(lineSHA->text());
     InputDialog dlg(cmd, revision_variables, "Run custom action: " + actionName, this);
     if (!dlg.empty() && dlg.exec() != QDialog::Accepted) return;
     try {
@@ -1816,7 +1817,7 @@ void MainImpl::customAction_exited(qgit::CustomActionData::Ptr cad) {
         QTimer::singleShot(10, this, SLOT(refreshRepo())); // outside of event handler
 }
 
-void MainImpl::ActCommit_activated() {
+void MainImpl::on_actCommit_triggered(bool) {
 
     CommitImpl* c = new CommitImpl(git, false); // has Qt::WA_DeleteOnClose attribute
     chk_connect_a(this, SIGNAL(closeAllWindows()), c, SLOT(close()));
@@ -1824,7 +1825,7 @@ void MainImpl::ActCommit_activated() {
     c->show();
 }
 
-void MainImpl::ActAmend_activated() {
+void MainImpl::on_actAmend_triggered(bool) {
 
     CommitImpl* c = new CommitImpl(git, true); // has Qt::WA_DeleteOnClose attribute
     chk_connect_a(this, SIGNAL(closeAllWindows()), c, SLOT(close()));
@@ -1840,15 +1841,15 @@ void MainImpl::changesCommitted(bool ok) {
         statusBar()->showMessage("Failed to commit changes");
 }
 
-void MainImpl::ActCommit_setEnabled(bool b) {
+void MainImpl::actCommit_setEnabled(bool b) {
 
     // pop and push commands fail if there are local changes,
     // so in this case we disable ActPop and ActPush
     if (b) {
-        ActPush->setEnabled(false);
-        ActPop->setEnabled(false);
+        actPush->setEnabled(false);
+        actPop->setEnabled(false);
     }
-    ActCommit->setEnabled(b);
+    actCommit->setEnabled(b);
 }
 
 /** Checkout supports various operation modes:
@@ -1856,9 +1857,9 @@ void MainImpl::ActCommit_setEnabled(bool b) {
  *  - create and checkout a new branch
  *  - resetting an existing branch to a new sha
  */
-void MainImpl::ActCheckout_activated()
+void MainImpl::on_actCheckout_triggered(bool)
 {
-    QString sha = lineEditSHA->text(), rev = sha;
+    QString sha = lineSHA->text(), rev = sha;
     const QString branchKey("local branch name");
     QString cmd = "git checkout -q ";
 
@@ -1920,12 +1921,12 @@ void MainImpl::ActCheckout_activated()
     QApplication::restoreOverrideCursor();
 }
 
-void MainImpl::ActBranch_activated() {
+void MainImpl::on_actBranch_triggered(bool) {
 
     doBranchOrTag(false);
 }
 
-void MainImpl::ActTag_activated() {
+void MainImpl::on_actTag_triggered(bool) {
 
     doBranchOrTag(true);
 }
@@ -1937,7 +1938,7 @@ const QStringList& stripNames(QStringList& names) {
 }
 
 void MainImpl::doBranchOrTag(bool isTag) {
-    const QString sha = lineEditSHA->text();
+    const QString sha = lineSHA->text();
     QString refDesc = isTag ? "tag" : "branch";
     QString dlgTitle = "Create " + refDesc + " - QGit";
 
@@ -2002,7 +2003,7 @@ static void groupRef(const QString& ref, RefGroupMap& groups) {
     l << name;
 }
 
-void MainImpl::ActDelete_activated() {
+void MainImpl::on_actDelete_triggered(bool) {
 
     const QString &selected_name = revision_variables.value(SELECTED_NAME).toString();
     const QStringList &tags = revision_variables.value(REV_TAGS).toStringList();
@@ -2072,7 +2073,7 @@ void MainImpl::ActDelete_activated() {
     if (!ok) statusBar()->showMessage("Failed, to remove some refs.");
 }
 
-void MainImpl::ActPush_activated() {
+void MainImpl::on_actPush_triggered(bool) {
 
     QStringList selectedItems;
     rv->tab()->listViewLog->getSelectedItems(selectedItems);
@@ -2102,7 +2103,7 @@ void MainImpl::ActPush_activated() {
     refreshRepo(false);
 }
 
-void MainImpl::ActPop_activated() {
+void MainImpl::on_actPop_triggered(bool) {
 
     QStringList selectedItems;
     rv->tab()->listViewLog->getSelectedItems(selectedItems);
@@ -2116,9 +2117,9 @@ void MainImpl::ActPop_activated() {
     refreshRepo(false);
 }
 
-void MainImpl::ActFilterTree_toggled(bool b) {
+void MainImpl::on_actFilterTree_triggered(bool b) {
 
-    if (!ActFilterTree->isEnabled()) {
+    if (!actFilterTree->isEnabled()) {
         //dbs("ASSERT ActFilterTree_toggled while disabled");
         return;
     }
@@ -2138,7 +2139,7 @@ void MainImpl::ActFilterTree_toggled(bool b) {
         refreshRepo(true);
 }
 
-void MainImpl::ActFindNext_activated() {
+void MainImpl::on_actFindNext_triggered(bool) {
 
     QTextEdit* te = getCurrentTextEdit();
     if (!te || textToFind.isEmpty())
@@ -2164,7 +2165,7 @@ void MainImpl::ActFindNext_activated() {
     }
 }
 
-void MainImpl::ActFind_activated() {
+void MainImpl::on_actFind_triggered(bool) {
 
     QTextEdit* te = getCurrentTextEdit();
     if (!te)
@@ -2183,10 +2184,10 @@ void MainImpl::ActFind_activated() {
         return;
 
     textToFind = str; // update with valid data only
-    ActFindNext_activated();
+    on_actFindNext_triggered(false);
 }
 
-void MainImpl::ActHelp_activated() {
+void MainImpl::on_actHelp_triggered(bool) {
 
     QDialog* dlg = new QDialog();
     dlg->setAttribute(Qt::WA_DeleteOnClose);
@@ -2198,13 +2199,13 @@ void MainImpl::ActHelp_activated() {
     dlg->raise();
 }
 
-void MainImpl::ActMarkDiffToSha_activated()
+void MainImpl::on_actMarkDiffToSha_triggered(bool)
 {
     ListView* lv = rv->tab()->listViewLog;
-    lv->markDiffToSha(lineEditSHA->text());
+    lv->markDiffToSha(lineSHA->text());
 }
 
-void MainImpl::ActAbout_activated() {
+void MainImpl::on_actAbout_triggered(bool) {
 
     static const char* aboutMsg =
     "<p><b>QGit version " VERSION_PROJECT " (Gitrev:&nbsp;" GIT_REVISION ") </b></p>"
@@ -2281,7 +2282,7 @@ void MainImpl::closeEvent(QCloseEvent* ce) {
         // if not all processes have been deleted, there is
         // still some run() call not returned somewhere, it is
         // not safe to delete run() callers objects now
-        QTimer::singleShot(100, this, SLOT(ActClose_activated()));
+        QTimer::singleShot(100, this, SLOT(actClose_triggered(bool)));
         ce->ignore();
         return;
     }
@@ -2290,13 +2291,13 @@ void MainImpl::closeEvent(QCloseEvent* ce) {
     QWidget::closeEvent(ce);
 }
 
-void MainImpl::ActClose_activated() {
+void MainImpl::on_actClose_triggered(bool) {
 
     //close();
-    tabBar_tabCloseRequested(tabWdg->currentIndex());
+    on_tabWidget_tabCloseRequested(tabWidget->currentIndex());
 }
 
-void MainImpl::ActExit_activated() {
+void MainImpl::on_actExit_triggered(bool) {
 
     qApp->closeAllWindows();
 }
