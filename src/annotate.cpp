@@ -71,7 +71,7 @@ void Annotate::on_deleteWhenDone() {
     if (!(annotateRunning || EM_IS_PENDING(exAnnCanceled)))
         deleteLater();
     else
-        QTimer::singleShot(20, this, SLOT(on_deleteWhenDone()));
+        QTimer::singleShot(20, this, &Annotate::on_deleteWhenDone);
 }
 
 bool Annotate::start(const FileHistory* _fh) {
@@ -97,7 +97,7 @@ bool Annotate::start(const FileHistory* _fh) {
 
     // annotating the file history could be time consuming,
     // so return now and use a timer to start annotation
-    QTimer::singleShot(100, this, SLOT(slotComputeDiffs()));
+    QTimer::singleShot(100, this, &Annotate::slotComputeDiffs);
     return true;
 }
 

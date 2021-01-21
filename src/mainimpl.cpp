@@ -232,7 +232,7 @@ MainImpl::MainImpl(const QString& cd, QWidget* p) : QMainWindow(p) {
 
     // MainImpl c'tor is called before to enter event loop,
     // but some stuff requires event loop to init properly
-    QTimer::singleShot(10, this, SLOT(initWithEventLoopActive()));
+    QTimer::singleShot(10, this, &MainImpl::initWithEventLoopActive);
 }
 
 void MainImpl::loadGeometry()
@@ -1814,7 +1814,7 @@ void MainImpl::customAction_triggered(QAction* act) {
 void MainImpl::customAction_exited(qgit::CustomActionData::Ptr cad) {
 
     if (cad->refresh)
-        QTimer::singleShot(10, this, SLOT(refreshRepo())); // outside of event handler
+        QTimer::singleShot(10, this, [this]() {refreshRepo(true);}); // outside of event handler
 }
 
 void MainImpl::on_actCommit_triggered(bool) {
@@ -2282,7 +2282,7 @@ void MainImpl::closeEvent(QCloseEvent* ce) {
         // if not all processes have been deleted, there is
         // still some run() call not returned somewhere, it is
         // not safe to delete run() callers objects now
-        QTimer::singleShot(100, this, SLOT(actClose_triggered(bool)));
+        QTimer::singleShot(100, this, [this]() {on_actClose_triggered(false);});
         ce->ignore();
         return;
     }

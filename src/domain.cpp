@@ -149,7 +149,7 @@ void Domain::on_deleteWhenDone() {
     if (!EM_IS_PENDING(exDeleteRequest))
         deleteLater();
     else
-        QTimer::singleShot(20, this, SLOT(on_deleteWhenDone()));
+        QTimer::singleShot(20, this, &Domain::on_deleteWhenDone);
 }
 
 void Domain::setThrowOnDelete(bool b) {

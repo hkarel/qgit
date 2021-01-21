@@ -2429,7 +2429,7 @@ void Git::on_loaded(FileHistory* fh, ulong byteSize, int loadTime,
             if (isMainHistory(fh)) {
                 // wait the dust to settle down before to start
                 // background file names loading for new revisions
-                QTimer::singleShot(500, this, SLOT(loadFileNames()));
+                QTimer::singleShot(500, this, &Git::loadFileNames);
             }
         }
     }
