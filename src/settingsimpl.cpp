@@ -449,5 +449,5 @@ void SettingsImpl::on_lineTemplate_textChanged(const QString& s) {
 
 void SettingsImpl::on_lineCommitExtraOptions_textChanged(const QString& s) {
 
-    config::base().setValue("commit/args", s);
+    config::base().setValue("commit.args", s);
 }

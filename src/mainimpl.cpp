@@ -1714,14 +1714,14 @@ void MainImpl::on_actCheckWorkDir_triggered(bool b) {
 
 void MainImpl::on_actSettings_triggered(bool) {
 
-    SettingsImpl setView(this, git);
-    chk_connect_a(&setView, SIGNAL(typeWriterFontChanged()),
+    SettingsImpl setings {this, git};
+    chk_connect_a(&setings, SIGNAL(typeWriterFontChanged()),
                   this, SIGNAL(typeWriterFontChanged()));
 
-    chk_connect_a(&setView, SIGNAL(flagChanged(uint)),
+    chk_connect_a(&setings, SIGNAL(flagChanged(uint)),
                   this, SIGNAL(flagChanged(uint)));
 
-    setView.exec();
+    setings.exec();
 
     // update actCheckWorkDir if necessary
     if (actCheckWorkDir->isChecked() != qgit::flags().test(DIFF_INDEX_F))

@@ -25,14 +25,15 @@ signals:
 
 public slots:
     virtual void closeEvent(QCloseEvent*);
-    void pushButtonCommit_clicked();
-    void pushButtonAmend_clicked();
-    void pushButtonCancel_clicked();
-    void pushButtonUpdateCache_clicked();
-    void pushButtonSettings_clicked();
-    void textEditMsg_cursorPositionChanged();
+    void btnCommit_clicked();
+    void btnAmend_clicked();
+
+    void on_btnCancel_clicked();
+    void on_btnUpdateCache_clicked();
+    void on_btnSettings_clicked();
 
 private slots:
+    void textMsg_cursorPositionChanged();
     void contextMenuPopup(const QPoint&);
     void checkAll();
     void unCheckAll();

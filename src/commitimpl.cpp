@@ -35,7 +35,7 @@ CommitImpl::CommitImpl(Git* g, bool amend) : git(g) {
     // adjust GUI
     setAttribute(Qt::WA_DeleteOnClose);
     setupUi(this);
-    textEditMsg->setFont(TYPE_WRITER_FONT);
+    textMsg->setFont(TYPE_WRITER_FONT);
 
     QString commitTmpl;
     config::base().getValue("commit.template_file_path", commitTmpl);
@@ -57,38 +57,38 @@ CommitImpl::CommitImpl(Git* g, bool amend) : git(g) {
         else if (f->statusCmp(i, RevFile::DELETED))
             myColor = Qt::red;
 
-        QTreeWidgetItem* item = new QTreeWidgetItem(treeWidgetFiles);
+        QTreeWidgetItem* item = new QTreeWidgetItem(treeFiles);
         item->setText(0, git->filePath(*f, i));
         item->setText(1, inIndex ? "Updated in index" : "Not updated in index");
         item->setCheckState(0, inIndex || !isNew ? Qt::Checked : Qt::Unchecked);
         item->setForeground(0, myColor);
     }
-    treeWidgetFiles->resizeColumnToContents(0);
+    treeFiles->resizeColumnToContents(0);
 
     // compute cursor offsets. Take advantage of fixed width font
-    textEditMsg->setPlainText("\nx\nx"); // cursor doesn't move on empty text
-    textEditMsg->moveCursor(QTextCursor::Start);
-    textEditMsg->verticalScrollBar()->setValue(0);
-    textEditMsg->horizontalScrollBar()->setValue(0);
-    int y0 = textEditMsg->cursorRect().y();
-    int x0 = textEditMsg->cursorRect().x();
-    textEditMsg->moveCursor(QTextCursor::Down);
-    textEditMsg->moveCursor(QTextCursor::Right);
-    textEditMsg->verticalScrollBar()->setValue(0);
-    int y1 = textEditMsg->cursorRect().y();
-    int x1 = textEditMsg->cursorRect().x();
+    textMsg->setPlainText("\nx\nx"); // cursor doesn't move on empty text
+    textMsg->moveCursor(QTextCursor::Start);
+    textMsg->verticalScrollBar()->setValue(0);
+    textMsg->horizontalScrollBar()->setValue(0);
+    int y0 = textMsg->cursorRect().y();
+    int x0 = textMsg->cursorRect().x();
+    textMsg->moveCursor(QTextCursor::Down);
+    textMsg->moveCursor(QTextCursor::Right);
+    textMsg->verticalScrollBar()->setValue(0);
+    int y1 = textMsg->cursorRect().y();
+    int x1 = textMsg->cursorRect().x();
     ofsX = x1 - x0;
     ofsY = y1 - y0;
-    textEditMsg->moveCursor(QTextCursor::Start);
-    textEditMsg_cursorPositionChanged();
+    textMsg->moveCursor(QTextCursor::Start);
+    textMsg_cursorPositionChanged();
 
     if (lastMsgBeforeError.isEmpty()) {
-        // setup textEditMsg with old commit message to be amended
-        QString status("");
+        // setup textMsg with old commit message to be amended
+        QString status;
         if (amend)
             status = git->getLastCommitMsg();
 
-        // setup textEditMsg with default value if user opted to do so (default)
+        // setup textMsg with default value if user opted to do so (default)
         if (qgit::flags().test(USE_CMT_MSG_F))
             status += git->getNewCommitMsg();
 
@@ -98,8 +98,8 @@ CommitImpl::CommitImpl(Git* g, bool amend) : git(g) {
     } else
         msg = lastMsgBeforeError;
 
-    textEditMsg->setPlainText(msg);
-    textEditMsg->setFocus();
+    textMsg->setPlainText(msg);
+    textMsg->setFocus();
 
     // if message is not changed we avoid calling refresh
     // to change patch name in stgCommit()
@@ -108,32 +108,31 @@ CommitImpl::CommitImpl(Git* g, bool amend) : git(g) {
     // setup button functions
     if (amend) {
         if (git->isStGITStack()) {
-            pushButtonOk->setText("&Add to top");
-            pushButtonOk->setShortcut(QKeySequence("Alt+A"));
-            pushButtonOk->setToolTip("Refresh top stack patch");
+            btnCommit->setText("&Add to top");
+            btnCommit->setShortcut(QKeySequence("Alt+A"));
+            btnCommit->setToolTip("Refresh top stack patch");
         } else {
-            pushButtonOk->setText("&Amend");
-            pushButtonOk->setShortcut(QKeySequence("Alt+A"));
-            pushButtonOk->setToolTip("Amend latest commit");
+            btnCommit->setText("&Amend");
+            btnCommit->setShortcut(QKeySequence("Alt+A"));
+            btnCommit->setToolTip("Amend latest commit");
         }
-        chk_connect_a(pushButtonOk, SIGNAL(clicked()),
-                      this, SLOT(pushButtonAmend_clicked()));
+        chk_connect_a(btnCommit, SIGNAL(clicked()),
+                      this, SLOT(btnAmend_clicked()));
     } else {
         if (git->isStGITStack()) {
-            pushButtonOk->setText("&New patch");
-            pushButtonOk->setShortcut(QKeySequence("Alt+N"));
-            pushButtonOk->setToolTip("Create a new patch");
+            btnCommit->setText("&New patch");
+            btnCommit->setShortcut(QKeySequence("Alt+N"));
+            btnCommit->setToolTip("Create a new patch");
         }
-        chk_connect_a(pushButtonOk, SIGNAL(clicked()),
-                      this, SLOT(pushButtonCommit_clicked()));
+        chk_connect_a(btnCommit, SIGNAL(clicked()),
+                      this, SLOT(btnCommit_clicked()));
     }
-    chk_connect_a(treeWidgetFiles, SIGNAL(customContextMenuRequested(const QPoint&)),
+    chk_connect_a(treeFiles, SIGNAL(customContextMenuRequested(const QPoint&)),
                   this, SLOT(contextMenuPopup(const QPoint&)));
-    chk_connect_a(textEditMsg, SIGNAL(cursorPositionChanged()),
-                  this, SLOT(textEditMsg_cursorPositionChanged()));
+    chk_connect_a(textMsg, SIGNAL(cursorPositionChanged()),
+                  this, SLOT(textMsg_cursorPositionChanged()));
 
-    textEditMsg->installEventFilter(this);
-
+    textMsg->installEventFilter(this);
     loadGeometry();
 }
 
@@ -185,7 +184,7 @@ void CommitImpl::unCheckAll() { checkUncheck(false); }
 
 void CommitImpl::checkUncheck(bool checkAll) {
 
-    QTreeWidgetItemIterator it(treeWidgetFiles);
+    QTreeWidgetItemIterator it {treeFiles};
     while (*it) {
         (*it)->setCheckState(0, checkAll ? Qt::Checked : Qt::Unchecked);
         ++it;
@@ -196,7 +195,7 @@ bool CommitImpl::getFiles(QStringList& selFiles) {
 
     // check for files to commit
     selFiles.clear();
-    QTreeWidgetItemIterator it(treeWidgetFiles);
+    QTreeWidgetItemIterator it {treeFiles};
     while (*it) {
         if ((*it)->checkState(0) == Qt::Checked)
             selFiles.append((*it)->text(0));
@@ -224,7 +223,7 @@ bool CommitImpl::checkFiles(QStringList& selFiles) {
 
 bool CommitImpl::checkMsg(QString& msg) {
 
-    msg = textEditMsg->toPlainText();
+    msg = textMsg->toPlainText();
     msg.remove(QRegExp("(^|\\n)\\s*#[^\\n]*")); // strip comments
     msg.replace(QRegExp("[ \\t\\r\\f\\v]+\\n"), "\n"); // strip line trailing cruft
     msg = msg.trimmed();
@@ -304,18 +303,18 @@ bool CommitImpl::checkConfirm(const QString& msg, const QString& patchName, cons
         return msgBox.exec() != QMessageBox::No;
 }
 
-void CommitImpl::pushButtonSettings_clicked() {
+void CommitImpl::on_btnSettings_clicked() {
 
     SettingsImpl setView(this, git, 3);
     setView.exec();
 }
 
-void CommitImpl::pushButtonCancel_clicked() {
+void CommitImpl::on_btnCancel_clicked() {
 
     close();
 }
 
-void CommitImpl::pushButtonCommit_clicked() {
+void CommitImpl::btnCommit_clicked() {
 
     QStringList selFiles; // retrieve selected files
     if (!checkFiles(selFiles))
@@ -349,14 +348,14 @@ void CommitImpl::pushButtonCommit_clicked() {
     close();
 }
 
-void CommitImpl::pushButtonAmend_clicked() {
+void CommitImpl::btnAmend_clicked() {
 
     QStringList selFiles; // retrieve selected files
     getFiles(selFiles);
     // FIXME: If there are no files AND no changes to message, we should not
     // commit. Disabling the commit button in such case might be preferable.
 
-    QString msg(textEditMsg->toPlainText());
+    QString msg(textMsg->toPlainText());
     if (msg == origMsg && selFiles.isEmpty()) {
         warnNoFiles();
         return;
@@ -388,7 +387,7 @@ void CommitImpl::pushButtonAmend_clicked() {
     close();
 }
 
-void CommitImpl::pushButtonUpdateCache_clicked() {
+void CommitImpl::on_btnUpdateCache_clicked() {
 
     QStringList selFiles;
     if (!checkFiles(selFiles))
@@ -401,20 +400,20 @@ void CommitImpl::pushButtonUpdateCache_clicked() {
     close();
 }
 
-void CommitImpl::textEditMsg_cursorPositionChanged() {
+void CommitImpl::textMsg_cursorPositionChanged() {
 
     int col_pos, line_pos;
     computePosition(col_pos, line_pos);
     QString lineNumber = QString("Line: %1 Col: %2")
                                  .arg(line_pos + 1).arg(col_pos + 1);
-    textLabelLineCol->setText(lineNumber);
+    labelLineCol->setText(lineNumber);
 }
 
 void CommitImpl::computePosition(int &col_pos, int &line_pos) {
 
-    QRect r = textEditMsg->cursorRect();
-    int vs = textEditMsg->verticalScrollBar()->value();
-    int hs = textEditMsg->horizontalScrollBar()->value();
+    QRect r = textMsg->cursorRect();
+    int vs = textMsg->verticalScrollBar()->value();
+    int hs = textMsg->horizontalScrollBar()->value();
 
     // when in start position r.x() = -r.width() / 2
     col_pos = (r.x() + hs + r.width() / 2) / ofsX;
@@ -423,7 +422,7 @@ void CommitImpl::computePosition(int &col_pos, int &line_pos) {
 
 bool CommitImpl::eventFilter(QObject* obj, QEvent* event) {
 
-    if (obj == textEditMsg) {
+    if (obj == textMsg) {
         if (event->type() == QEvent::KeyPress) {
              QKeyEvent* keyEvent = static_cast<QKeyEvent*>(event);
              if (( keyEvent->key() == Qt::Key_Return
@@ -431,7 +430,7 @@ bool CommitImpl::eventFilter(QObject* obj, QEvent* event) {
                  )
                  && keyEvent->modifiers() & Qt::ControlModifier) {
 
-                QMetaObject::invokeMethod(pushButtonOk, "clicked", Qt::QueuedConnection);
+                QMetaObject::invokeMethod(btnCommit, "clicked", Qt::QueuedConnection);
                 return true;
              }
          }
