@@ -8,7 +8,6 @@ Product {
     type: "staticlibrary"
 
     Depends { name: "cpp" }
-  //Depends { name: "RapidJson" }
     Depends { name: "Yaml" }
     Depends { name: "Qt"; submodules: ["core", "network", "sql"] }
 

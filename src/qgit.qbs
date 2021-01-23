@@ -1,4 +1,6 @@
 import qbs
+import qbs.File
+import qbs.FileInfo
 
 Product {
     name: "QGit"
@@ -10,15 +12,9 @@ Product {
     Depends { name: "cpp" }
     Depends { name: "SharedLib" }
     Depends { name: "Yaml" }
-    Depends { name: "Qt"; submodules: ["core"] }
-    Depends {
-        name: "Qt.gui";
-        condition: Qt.core.versionMajor < 5
-    }
-    Depends {
-        name: "Qt.widgets";
-        condition: Qt.core.versionMajor >= 5
-    }
+    Depends { name: "Qt"; submodules: ["core", "widgets"] }
+
+    Depends { productTypes: ["trigrams-generator"] }
 
     cpp.defines: project.cppDefines
     cpp.cxxFlags: {
@@ -44,6 +40,11 @@ Product {
 
     // Suppression a Qt warnings
     cpp.systemIncludePaths: Qt.core.cpp.includePaths
+
+    cpp.dynamicLibraries: [
+        "pthread",
+        "hunspell",
+    ]
 
     Group {
         name: "resources"
@@ -110,6 +111,84 @@ Product {
             "todo.txt",
         ]
     }
+
+    Group {
+        name: "spellcheck"
+        files: [
+            "spellcheck/highlighter.cpp",
+            "spellcheck/highlighter.h",
+            "spellcheck/spellcheck.cpp",
+            "spellcheck/spellcheck.h",
+        ]
+    }
+
+    Group {
+        fileTags: "trigrams"
+        files: FileInfo.joinPaths(product.sourceDirectory, "spellcheck/sonnet/trigrams/*")
+    }
+
+    Group {
+        fileTagsFilter: ["trigrams-map"]
+        fileTags: ["qt.core.resource_data"]
+    }
+    Qt.core.resourceFileBaseName: "trigrams"
+    Qt.core.resourcePrefix: "trigrams"
+
+    Rule {
+        id: idtrigrams
+        inputs: ["trigrams"]
+        explicitlyDependsOnFromDependencies: ["trigrams-generator"]
+
+        Artifact {
+            fileTags: ["trigrams-map"]
+            filePath: FileInfo.joinPaths(project.buildDirectory, "trigrams", input.baseName + ".tmap")
+        }
+        prepare: {
+            var runUtl = explicitlyDependsOn["trigrams-generator"][0].filePath
+            var outputFile = FileInfo.joinPaths(project.buildDirectory, "trigrams", input.baseName + ".tmap");
+
+//            console.info("=== runUtl ===");
+//            console.info(input);
+//            console.info(inputs);
+//            console.info(runUtl);
+//            console.info(input.filePath);
+//            console.info(outputFile);
+
+            var cmd = new Command(runUtl, [input.filePath, outputFile]);
+            cmd.description = "sonnet parse trigrams";
+            cmd.highlight = "filegen";
+            return cmd;
+        }
+    }
+
+//    Rule {
+//        id: idtrigrams
+//        inputs: ["trigrams"]
+//        //explicitlyDependsOnFromDependencies: ["trigrams-generator"]
+
+//        Artifact {
+//            fileTags: ["trigrams-map"]
+//            filePath: FileInfo.joinPaths(project.buildDirectory, "trigrams", input.baseName + ".tmap")
+//        }
+//        prepare: {
+//            var runUtl = FileInfo.joinPaths(project.buildDirectory, "bin/parsetrigrams");
+//            var outputFile = FileInfo.joinPaths(project.buildDirectory, "trigrams", input.baseName + ".tmap");
+
+//            File.makePath(FileInfo.joinPaths(project.buildDirectory, "trigrams"));
+
+////            console.info("=== runUtl ===");
+////            console.info(input);
+////            console.info(inputs);
+////            console.info(runUtl);
+////            console.info(input.filePath);
+////            console.info(outputFile);
+
+//            var cmd = new Command(runUtl, [input.filePath, outputFile]);
+//            cmd.description = "sonnet parse trigrams";
+//            cmd.highlight = "filegen";
+//            return cmd;
+//        }
+//    }
 
     files: [
         "annotate.cpp",

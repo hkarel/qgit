@@ -7,15 +7,18 @@
 #ifndef COMMITIMPL_H
 #define COMMITIMPL_H
 
-#include "ui_commit.h"
 #include "common.h"
+#include "ui_commit.h"
+
+#include "spellcheck/highlighter.h"
 
 class Git;
+
 
 class CommitImpl : public QWidget, public Ui_CommitBase {
 Q_OBJECT
 public:
-    explicit CommitImpl(Git* g, bool amend);
+    CommitImpl(Git* g, bool amend);
 
     void loadGeometry();
     void saveGeometry();
@@ -53,6 +56,8 @@ private:
     Git* git;
     QString origMsg;
     int ofsX, ofsY;
+
+    SpellHighlighter* spellHighlight = {nullptr};
 
     static QString lastMsgBeforeError;
 };

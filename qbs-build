@@ -147,7 +147,8 @@ build_dir=./build/$build_subdir
 [ "$rebuild" = "yes"  ] && rm -rf $build_dir
 
 set -e
-qbs build \
+#qbs build \
+qbs dump-nodes-tree \
     --file qgit.qbs \
     --build-directory ./build \
     --command-echo-mode command-line \

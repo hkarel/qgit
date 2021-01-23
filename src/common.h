@@ -183,6 +183,9 @@ extern const QString ALL_MERGE_FILES;
 //extern const QString EXT_DIFF_DEF;
 //extern const QString EXT_EDITOR_DEF;
 
+extern const QString SPELL_CHECK_DIR;
+extern const QString SPELL_CHECK_DIR_EX;
+
 // settings booleans
 enum FlagType
 {
@@ -205,6 +208,7 @@ enum FlagType
     OPEN_IN_EDITOR_F   = 1 << 16,
     ENABLE_DRAGNDROP_F = 1 << 17,
     COMMIT_CONFIRM_F   = 1 << 18,
+    SPELL_CHECK_F      = 1 << 19,
 };
 const int FLAGS_DEF = USE_CMT_MSG_F | RANGE_SELECT_F | SMART_LBL_F
                       | VERIFY_CMT_F | SIGN_PATCH_F | LOG_DIFF_TAB_F

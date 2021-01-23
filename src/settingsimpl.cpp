@@ -6,17 +6,19 @@
     Copyright: See COPYING file that comes with this distribution
 
 */
-#include <QTextCodec>
-#include <QFileDialog>
-#include <QFontDialog>
+#include "settingsimpl.h"
 #include "common.h"
 #include "git.h"
-#include "settingsimpl.h"
+#include "spellcheck/spellcheck.h"
 
 #include "shared/logger/logger.h"
 #include "shared/logger/format.h"
 #include "shared/config/appl_conf.h"
 #include "shared/qt/logger_operators.h"
+
+#include <QTextCodec>
+#include <QFileDialog>
+#include <QFontDialog>
 
 /*
 By default, there are two entries in the search path:
@@ -46,22 +48,6 @@ SettingsImpl::SettingsImpl(QWidget* p, Git* g, int defTab) : QDialog(p), git(g) 
 
     setupUi(this);
 
-//    int f = flags(FLAGS_KEY);
-//    chkDiffCache->setChecked(f & DIFF_INDEX_F);
-//    chkNumbers->setChecked(f & NUMBERS_F);
-//    chkSign->setChecked(f & SIGN_PATCH_F);
-//    chkCommitSign->setChecked(f & SIGN_CMT_F);
-//    chkCommitVerify->setChecked(f & VERIFY_CMT_F);
-//    chkCommitUseDefMsg->setChecked(f & USE_CMT_MSG_F);
-//    chkRangeSelectDialog->setChecked(f & RANGE_SELECT_F);
-//    chkReopenLastRepo->setChecked(f & REOPEN_REPO_F);
-//    chkOpenInEditor->setChecked(f & OPEN_IN_EDITOR_F);
-//    chkRelativeDate->setChecked(f & REL_DATE_F);
-//    chkLogDiffTab->setChecked(f & LOG_DIFF_TAB_F);
-//    chkSmartLabels->setChecked(f & SMART_LBL_F);
-//    chkMsgOnNewSHA->setChecked(f & MSG_ON_NEW_F);
-//    chkEnableDragnDrop->setChecked(f & ENABLE_DRAGNDROP_F);
-
     qgit::FlagType f = qgit::flags();
 
     chkDiffCache->setChecked(f & DIFF_INDEX_F);
@@ -79,12 +65,14 @@ SettingsImpl::SettingsImpl(QWidget* p, Git* g, int defTab) : QDialog(p), git(g) 
     chkSmartLabels->setChecked(f & SMART_LBL_F);
     chkMsgOnNewSHA->setChecked(f & MSG_ON_NEW_F);
     chkEnableDragnDrop->setChecked(f & ENABLE_DRAGNDROP_F);
+    chkEnableDragnDrop->setChecked(f & ENABLE_DRAGNDROP_F);
+    chkSpellCheck->setChecked(f & SPELL_CHECK_F);
 
     QString FPOpt;
     config::base().getValue("patch.args", FPOpt);
 
     QString APOpt;
-    config::base().getValue("patch.args_2", APOpt);
+    config::base().getValue("patch.args2", APOpt);
 
     QString extDiff;
     config::base().getValue("general.external_diff_viewer", extDiff);
@@ -122,9 +110,29 @@ SettingsImpl::SettingsImpl(QWidget* p, Git* g, int defTab) : QDialog(p), git(g) 
 
     setupCodecsCombo();
     on_chkDiffCache_toggled(chkDiffCache->isChecked());
-    tabDialog->setCurrentIndex(defTab);
+//    tabDialog->setCurrentIndex(defTab);
     userInfo();
     on_cboxGitConfigSource_activated(0);
+
+    if (spellCheck().initialized() == -1)
+        spellCheck().init();
+
+    for (const QString& dict : spellCheck().dictNames())
+    {
+        QListWidgetItem* item = new QListWidgetItem(dict);
+        item->setFlags(item->flags() | Qt::ItemIsUserCheckable);
+        item->setCheckState(Qt::Unchecked);
+        //item->setData(Qt::UserRole, qVariantFromValue(cad));
+        lstSpellLang->addItem(item);
+    }
+
+    QList<QString> langs;
+    config::base().getValue("spell_check.langs", langs);
+    for (int i = 0; i < lstSpellLang->count(); ++i) {
+        QListWidgetItem* item = lstSpellLang->item(i);
+        if (langs.contains(item->text()))
+            item->setCheckState(Qt::Checked);
+    }
 
     loadGeometry();
 }
@@ -277,7 +285,6 @@ void SettingsImpl::setupCodecsCombo() {
 
 void SettingsImpl::on_cboxIconSize_activated(int i) {
 
-    //writeSetting(ICON_SIZE_INDEX, i);
     config::base().setValue("general.icon_size_index", i);
 }
 
@@ -333,6 +340,15 @@ void SettingsImpl::done(int r)
 {
     QDialog::done(r);
     if (r == QDialog::Accepted) {
+        if (lstSpellLang->count()) {
+            QList<QString> langs;
+            for (int i = 0; i < lstSpellLang->count(); ++i) {
+                QListWidgetItem* item = lstSpellLang->item(i);
+                if (item->checkState() == Qt::Checked)
+                    langs.append(item->text());
+            }
+            config::base().setValue("spell_check.langs", langs);
+        }
         qgit::flags().save(); // Call config::base().save() inside
     }
     else
@@ -418,6 +434,11 @@ void SettingsImpl::on_chkCommitUseDefMsg_toggled(bool b) {
     changeFlag(USE_CMT_MSG_F, b);
 }
 
+void SettingsImpl::on_chkSpellCheck_toggled(bool b) {
+
+    changeFlag(SPELL_CHECK_F, b);
+}
+
 void SettingsImpl::on_lineExternalDiffViewer_textChanged(const QString& s) {
 
     config::base().setValue("general.external_diff_viewer", s);
@@ -430,7 +451,7 @@ void SettingsImpl::on_lineExternalEditor_textChanged(const QString& s) {
 
 void SettingsImpl::on_lineApplyPatchExtraOptions_textChanged(const QString& s) {
 
-    config::base().setValue("patch.args_2", s);
+    config::base().setValue("patch.args2", s);
 }
 
 void SettingsImpl::on_lineFormatPatchExtraOptions_textChanged(const QString& s) {

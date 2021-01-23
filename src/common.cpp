@@ -179,6 +179,9 @@ const QString ALL_MERGE_FILES = "ALL_MERGE_FILES";
 //const QString EXT_DIFF_DEF    = "kompare";
 //const QString EXT_EDITOR_DEF  = "emacs";
 
+const QString SPELL_CHECK_DIR    = "/usr/share/hunspell/";
+const QString SPELL_CHECK_DIR_EX = "~/.config/enchant/";
+
 // cache file
 const QString BAK_EXT          = ".bak";
 const QString C_DAT_FILE       = "/qgit_cache.dat";

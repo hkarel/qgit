@@ -6,6 +6,7 @@
 */
 #include "common.h"
 #include "mainimpl.h"
+#include "spellcheck/spellcheck.h"
 
 #include "shared/defmac.h"
 #include "shared/utils.h"
@@ -127,6 +128,7 @@ int main(int argc, char* argv[])
     bool ret = app.exec();
 
     freeMimePix();
+    spellCheck().deinit();
 
     if (config::base().changed())
         config::base().save();

@@ -5,6 +5,19 @@
 
     Copyright: See COPYING file that comes with this distribution
 */
+
+#include "commitimpl.h"
+#include "git.h"
+#include "settingsimpl.h"
+#include "exceptionmanager.h"
+#include "spellcheck/spellcheck.h"
+
+#include "shared/defmac.h"
+#include "shared/logger/logger.h"
+#include "shared/logger/format.h"
+#include "shared/config/appl_conf.h"
+#include "shared/qt/logger_operators.h"
+
 #include <QTextCodec>
 #include <QMenu>
 #include <QRegExp>
@@ -14,17 +27,6 @@
 #include <QToolTip>
 #include <QScrollBar>
 #include <QKeyEvent>
-#include "exceptionmanager.h"
-#include "common.h"
-#include "git.h"
-#include "settingsimpl.h"
-#include "commitimpl.h"
-
-#include "shared/defmac.h"
-#include "shared/logger/logger.h"
-#include "shared/logger/format.h"
-#include "shared/config/appl_conf.h"
-#include "shared/qt/logger_operators.h"
 
 using namespace qgit;
 
@@ -33,8 +35,9 @@ QString CommitImpl::lastMsgBeforeError;
 CommitImpl::CommitImpl(Git* g, bool amend) : git(g) {
 
     // adjust GUI
-    setAttribute(Qt::WA_DeleteOnClose);
     setupUi(this);
+    setAttribute(Qt::WA_DeleteOnClose);
+
     textMsg->setFont(TYPE_WRITER_FONT);
 
     QString commitTmpl;
@@ -97,6 +100,16 @@ CommitImpl::CommitImpl(Git* g, bool amend) : git(g) {
             msg.prepend("\n\n"); // two first lines is empty
     } else
         msg = lastMsgBeforeError;
+
+    if (qgit::flags().test(SPELL_CHECK_F))
+    {
+        bool init = true;
+        if (spellCheck().initialized() != 1)
+            init = spellCheck().init();
+
+        if (init)
+            spellHighlight = new SpellHighlighter(textMsg);
+    }
 
     textMsg->setPlainText(msg);
     textMsg->setFocus();
@@ -427,7 +440,7 @@ void CommitImpl::computePosition(int& columns, int& line) {
 
     // when in start position r.x() = -r.width() / 2
     columns = (ofsX) ? ((r.x() + hs + r.width() / 2) / ofsX) : 0;
-    line    = (ofsY) ? ((r.y() + vs) / ofsY) : 0;
+    line = (ofsY) ? ((r.y() + vs) / ofsY) : 0;
 }
 
 bool CommitImpl::eventFilter(QObject* obj, QEvent* event) {

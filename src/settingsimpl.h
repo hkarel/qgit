@@ -40,6 +40,7 @@ protected slots:
     void on_chkCommitSign_toggled(bool b);
     void on_chkCommitVerify_toggled(bool b);
     void on_chkCommitUseDefMsg_toggled(bool b);
+    void on_chkSpellCheck_toggled(bool b);
     void on_lineExternalDiffViewer_textChanged(const QString& s);
     void on_lineExternalEditor_textChanged(const QString& s);
     void on_lineApplyPatchExtraOptions_textChanged(const QString& s);

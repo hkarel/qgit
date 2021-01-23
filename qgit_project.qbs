@@ -3,10 +3,10 @@ import "qbs/imports/QbsUtl/qbsutl.js" as QbsUtl
 
 Project {
     name: "QGit (Project)"
-    minimumQbsVersion: "1.12.0"
+    minimumQbsVersion: "1.18.0"
     qbsSearchPaths: ["qbs"]
 
-    readonly property string minimumQtVersion: "4.8.6"
+    readonly property string minimumQtVersion: "5.12.6"
     readonly property bool conversionWarnEnabled: true
 
     readonly property var projectVersion: projectProbe.projectVersion
@@ -63,8 +63,10 @@ Project {
     property string cxxLanguageVersion: "c++17"
 
     references: [
-        "src/shared/shared.qbs",
-        "src/yaml/yaml.qbs",
         "src/qgit.qbs",
+        "src/shared/shared.qbs",
+        "src/spellcheck/sonnet/gentrigrams.qbs",
+        "src/spellcheck/sonnet/parsetrigrams.qbs",
+        "src/yaml/yaml.qbs",
     ]
 }
