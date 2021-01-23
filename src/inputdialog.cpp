@@ -96,7 +96,7 @@ InputDialog::InputDialog(const QString &cmd, const VariableMap &variables,
     this->setWindowTitle(title);
     QGridLayout *layout = new QGridLayout(this);
 
-    QRegExp re("%(([a-z_]+)([[]([a-z ,]+)[]])?:)?([^%=]+)(=[^%]+)?%");
+    static const QRegExp re {R"(%(([a-z_]+)([[]([a-z ,]+)[]])?:)?([^%=]+)(=[^%]+)?%)"};
     int start = 0;
     int row = 0;
     while ((start = re.indexIn(cmd, start)) != -1) {

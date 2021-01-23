@@ -83,18 +83,17 @@ void RangeSelectImpl::orderRefs(const QStringList& src, QStringList& dst) {
 // releases as example v.2.6.18-rc4 before v.2.6.18
 
     // match a (dotted) number + something else + a number + EOL
-    QRegExp re("[\\d\\.]+([^\\d\\.]+\\d+$)");
+    static const QRegExp re {R"([\d\.]+([^\d\.]+\d+$))"};
 
     // in ASCII the space ' ' (32) comes before '!' (33) and both
     // before the rest, we need this to correctly order a sequence like
     //
     //    [v1.5, v1.5-rc1, v1.5.1] --> [v1.5.1, v1.5, v1.5-rc1]
 
-    const QString rcMark(" $$%%");   // an impossible to find string starting with a space
-    const QString noRcMark("!$$%%"); // an impossible to find string starting with a '!'
+    static const QString rcMark   {" $$%%"}; // an impossible to find string starting with a space
+    static const QString noRcMark {"!$$%%"}; // an impossible to find string starting with a '!'
 
     typedef QMap<QString, QString> OrderedMap;
-    QRegExp verRE("([^\\d])(\\d{1,2})(?=[^\\d])");
     OrderedMap map;
 
     for (const QString& s : src) {
@@ -111,8 +110,9 @@ void RangeSelectImpl::orderRefs(const QStringList& src, QStringList& dst) {
         //     [v1.10.3, v1.5.1, v1.7.2] --> [v.1.10.3, v1.7.2, v1.5.1]
         // QMap automatically sorts by keys, so we only have to iterate over it
         // and return the original strings (stored as the data() in the map)
+        static const QRegExp verRE {R"(([^\d])(\d{1,2})(?=[^\d]))"};
         while (tmpStr.contains(verRE))
-            tmpStr.replace(verRE, "\\10\\2");
+            tmpStr.replace(verRE, R"(\10\2)");
 
         map[tmpStr] = s;
     }

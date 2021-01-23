@@ -25,7 +25,7 @@ RevDesc::RevDesc(QWidget* p) : QTextBrowser(p), d(NULL) {
 
 void RevDesc::on_anchorClicked(const QUrl& link) {
 
-    QRegExp re("[0-9a-f]{40}", Qt::CaseInsensitive);
+    static const QRegExp re {R"([0-9a-f]{40})", Qt::CaseInsensitive};
     if (re.exactMatch(link.toString())) {
 
         setSource(QUrl()); // override default navigation behavior

@@ -998,8 +998,11 @@ const QString Git::getNewCommitMsg() {
         log_warn << "ZERO_SHA not found";
         return "";
     }
+
+    static const QRegExp re {R"(\n([^#\n]?))"};
+
     QString status = c->longLog();
-    status.prepend('\n').replace(QRegExp("\\n([^#\\n]?)"), "\n#\\1"); // comment all the lines
+    status.prepend('\n').replace(re, "\n#\\1"); // comment all the lines
 
     if (isMergeHead) {
         QFile file(QDir(gitDir).absoluteFilePath("MERGE_MSG"));
@@ -1016,7 +1019,7 @@ const QString Git::getNewCommitMsg() {
 }
 
 //CT TODO utility function; can go elsewhere
-const QString Git::colorMatch(const QString& txt, QRegExp& regExp) {
+QString Git::colorMatch(const QString& txt, const QRegExp& regExp) {
 
     QString text = qt4and5escaping(txt);
 
@@ -1049,7 +1052,7 @@ const QString Git::formatList(const QStringList& sl, const QString& name, bool i
     return ls;
 }
 
-const QString Git::getDesc(const QString& sha, QRegExp& shortLogRE, QRegExp& longLogRE,
+const QString Git::getDesc(const QString& sha, const QRegExp& shortLogRE, const QRegExp& longLogRE,
                            bool showHeader, FileHistory* fh) {
 
     if (sha.isEmpty())
@@ -1114,8 +1117,9 @@ const QString Git::getDesc(const QString& sha, QRegExp& shortLogRE, QRegExp& lon
     // sha if there isn't a leading trailing space or an open parenthesis and,
     // in that case, before the space must not be a ':' character.
     // It's an ugly heuristic, but seems to work in most cases.
-    QRegExp reSHA("..[0-9a-f]{21,40}|[^:][\\s(][0-9a-f]{6,20}", Qt::CaseInsensitive);
-    reSHA.setMinimal(false);
+    static QRegExp reSHA {R"(..[0-9a-f]{21,40}|[^:][\s(][0-9a-f]{6,20})", Qt::CaseInsensitive};
+    if (reSHA.isMinimal())
+        reSHA.setMinimal(false);
     int pos = 0;
     while ((pos = text.indexOf(reSHA, pos)) != -1) {
 
@@ -1291,7 +1295,7 @@ const QString Git::getNewestFileName(const QStringList& branches, const QString&
 void Git::getFileFilter(const QString& path, ShaSet& shaSet) const {
 
     shaSet.clear();
-    QRegExp rx(path, Qt::CaseInsensitive, QRegExp::Wildcard);
+    QRegExp rx {path, Qt::CaseInsensitive, QRegExp::Wildcard};
     for (const ShaString& sha : revData->revOrder) {
 
         if (!revsFiles.contains(sha))

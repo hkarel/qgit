@@ -223,9 +223,12 @@ bool CommitImpl::checkFiles(QStringList& selFiles) {
 
 bool CommitImpl::checkMsg(QString& msg) {
 
+    static const QRegExp re1 {R"((^|\n)\s*#[^\n]*)"};
+    static const QRegExp re2 {R"([ \t\r\f\v]+\n)"};
+
     msg = textMsg->toPlainText();
-    msg.remove(QRegExp("(^|\\n)\\s*#[^\\n]*")); // strip comments
-    msg.replace(QRegExp("[ \\t\\r\\f\\v]+\\n"), "\n"); // strip line trailing cruft
+    msg.remove(re1);         // strip comments
+    msg.replace(re2, "\n");  // strip line trailing cruft
     msg = msg.trimmed();
     if (msg.isEmpty()) {
         QMessageBox::warning(this, "Commit changes - QGit",
@@ -234,8 +237,8 @@ bool CommitImpl::checkMsg(QString& msg) {
         return false;
     }
     // split subject from message body
-    QString subj(msg.section('\n', 0, 0, QString::SectionIncludeTrailingSep));
-    QString body(msg.section('\n', 1).trimmed());
+    QString subj = msg.section('\n', 0, 0, QString::SectionIncludeTrailingSep);
+    QString body = msg.section('\n', 1).trimmed();
     msg = subj + '\n' + body + '\n';
     return true;
 }
