@@ -30,6 +30,7 @@ protected slots:
     void on_chkRangeSelectDialog_toggled(bool b);
     void on_chkReopenLastRepo_toggled(bool b);
     void on_chkOpenInEditor_toggled(bool b);
+    void on_chkCommitConfirm_toggled(bool b);
     void on_chkRelativeDate_toggled(bool b);
     void on_chkLogDiffTab_toggled(bool b);
     void on_chkSmartLabels_toggled(bool b);

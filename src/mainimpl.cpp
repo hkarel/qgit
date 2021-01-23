@@ -662,6 +662,7 @@ void MainImpl::fileList_itemDoubleClicked(QListWidgetItem* item) {
 }
 
 void MainImpl::on_treeView_itemDoubleClicked(QTreeWidgetItem* item, int) {
+
     if (qgit::flags().test(OPEN_IN_EDITOR_F)) {
         if (item && actExternalEditor->isEnabled())
             actExternalEditor->activate(QAction::Trigger);

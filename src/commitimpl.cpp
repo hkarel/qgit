@@ -267,7 +267,8 @@ bool CommitImpl::checkPatchName(QString& patchName) {
     return false;
 }
 
-bool CommitImpl::checkConfirm(const QString& msg, const QString& patchName, const QStringList& selFiles, bool amend) {
+bool CommitImpl::checkConfirm(const QString& msg, const QString& patchName,
+                              const QStringList& selFiles, bool amend) {
 
 //    QTextCodec* tc = QTextCodec::codecForCStrings();
 //    QTextCodec::setCodecForCStrings(0); // set temporary Latin-1
@@ -327,13 +328,15 @@ void CommitImpl::btnCommit_clicked() {
     if (!checkMsg(msg))
         return;
 
-    QString patchName(msg.section('\n', 0, 0)); // the subject
+    QString patchName = msg.section('\n', 0, 0); // the subject
     if (git->isStGITStack() && !checkPatchName(patchName))
         return;
 
     // ask for confirmation
-    if (!checkConfirm(msg, patchName, selFiles, !Git::optAmend))
-        return;
+    if (qgit::flags().test(COMMIT_CONFIRM_F)) {
+        if (!checkConfirm(msg, patchName, selFiles, !Git::optAmend))
+            return;
+    }
 
     // ok, let's go
     QApplication::setOverrideCursor(QCursor(Qt::WaitCursor));
@@ -358,22 +361,26 @@ void CommitImpl::btnAmend_clicked() {
     // FIXME: If there are no files AND no changes to message, we should not
     // commit. Disabling the commit button in such case might be preferable.
 
-    QString msg(textMsg->toPlainText());
+    QString msg = textMsg->toPlainText();
     if (msg == origMsg && selFiles.isEmpty()) {
         warnNoFiles();
         return;
     }
 
-    if (msg == origMsg && git->isStGITStack())
+    if (msg == origMsg && git->isStGITStack()) {
         msg = "";
-    else if (!checkMsg(msg))
+    }
+    else if (!checkMsg(msg)) {
         // We are going to replace the message, so it better isn't empty
         return;
+    }
 
     // ask for confirmation
-    // FIXME: We don't need patch name for refresh, do we?
-    if (!checkConfirm(msg, "", selFiles, Git::optAmend))
-        return;
+    if (qgit::flags().test(COMMIT_CONFIRM_F)) {
+        // FIXME: We don't need patch name for refresh, do we?
+        if (!checkConfirm(msg, "", selFiles, Git::optAmend))
+            return;
+    }
 
     // ok, let's go
     QApplication::setOverrideCursor(QCursor(Qt::WaitCursor));

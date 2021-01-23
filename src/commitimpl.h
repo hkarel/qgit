@@ -45,7 +45,8 @@ private:
     bool checkFiles(QStringList& selFiles);
     bool checkMsg(QString& msg);
     bool checkPatchName(QString& patchName);
-    bool checkConfirm(const QString& msg, const QString& patchName, const QStringList& selFiles, bool amend);
+    bool checkConfirm(const QString& msg, const QString& patchName,
+                      const QStringList& selFiles, bool amend);
     void computePosition(int &col_pos, int &line_pos);
     bool eventFilter(QObject* obj, QEvent* event);
 
