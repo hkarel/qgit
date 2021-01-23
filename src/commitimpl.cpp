@@ -412,22 +412,22 @@ void CommitImpl::on_btnUpdateCache_clicked() {
 
 void CommitImpl::textMsg_cursorPositionChanged() {
 
-    int col_pos, line_pos;
-    computePosition(col_pos, line_pos);
+    int column, line;
+    computePosition(column, line);
     QString lineNumber = QString("Line: %1 Col: %2")
-                                 .arg(line_pos + 1).arg(col_pos + 1);
+                                 .arg(line + 1).arg(column + 1);
     labelLineCol->setText(lineNumber);
 }
 
-void CommitImpl::computePosition(int &col_pos, int &line_pos) {
+void CommitImpl::computePosition(int& columns, int& line) {
 
     QRect r = textMsg->cursorRect();
     int vs = textMsg->verticalScrollBar()->value();
     int hs = textMsg->horizontalScrollBar()->value();
 
     // when in start position r.x() = -r.width() / 2
-    col_pos = (r.x() + hs + r.width() / 2) / ofsX;
-    line_pos = (r.y() + vs) / ofsY;
+    columns = (ofsX) ? ((r.x() + hs + r.width() / 2) / ofsX) : 0;
+    line    = (ofsY) ? ((r.y() + vs) / ofsY) : 0;
 }
 
 bool CommitImpl::eventFilter(QObject* obj, QEvent* event) {

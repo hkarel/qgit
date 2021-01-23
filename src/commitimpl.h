@@ -47,7 +47,7 @@ private:
     bool checkPatchName(QString& patchName);
     bool checkConfirm(const QString& msg, const QString& patchName,
                       const QStringList& selFiles, bool amend);
-    void computePosition(int &col_pos, int &line_pos);
+    void computePosition(int& columns, int& line);
     bool eventFilter(QObject* obj, QEvent* event);
 
     Git* git;

@@ -124,12 +124,6 @@ Press &lt;Ctrl+Enter&gt; to commit changes</string>
            <property name="lineWrapMode">
             <enum>QTextEdit::NoWrap</enum>
            </property>
-           <property name="readOnly">
-            <bool>false</bool>
-           </property>
-           <property name="acceptRichText">
-            <bool>false</bool>
-           </property>
           </widget>
          </item>
         </layout>
