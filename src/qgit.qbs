@@ -24,8 +24,8 @@ Product {
             "-pedantic",
         ]);
 
-        if (qbs.buildVariant !== "debug")
-            cxx.push("-s");
+        //if (qbs.buildVariant !== "debug")
+        //    cxx.push("-s");
 
         if (project.conversionWarnEnabled)
             cxx.push("-Wconversion");

@@ -28,7 +28,6 @@ if [ ! -e $script_dir/setup/os_detect ]; then
 fi
 . $script_dir/setup/os_detect
 
-
 function display_help()
 {
 cat << EOF
@@ -147,9 +146,8 @@ build_dir=./build/$build_subdir
 [ "$rebuild" = "yes"  ] && rm -rf $build_dir
 
 set -e
-#qbs build \
-qbs dump-nodes-tree \
-    --file qgit.qbs \
+qbs build \
+    --file qgit_project.qbs \
     --build-directory ./build \
     --command-echo-mode command-line \
     --jobs $jobs \
@@ -211,13 +209,16 @@ chmod    u=rwx,go=rx $package_dir/DEBIAN/post*
 #chmod   u=rwx,go=rx $package_dir/DEBIAN/pre*
 chmod    u=rwx,go=rx $package_dir//usr/bin/qgit
 
-# if [ "$build_mode" = "release" ]; then
-#     set +e
-#     echo "Removing debug info ... "
-#     for f in $(find $package_dir/opt/aisexpert/lib -type f); do strip_debug_info $f; done
-#     for f in $(find $package_dir/opt/aisexpert/bin -type f); do strip_debug_info $f; done
-#     set -e
-# fi
+. $script_dir/setup/strip_debug_info
+
+if [ "$build_mode" = "release" ]; then
+    set +e
+    echo "Removing debug info ... "
+    for f in $(find $package_dir/usr/bin -type f); do strip_debug_info $f; done
+    #for f in $(find $package_dir/opt/qgit/bin -type f); do strip_debug_info $f; done
+    #for f in $(find $package_dir/opt/qgit/lib -type f); do strip_debug_info $f; done
+    set -e
+fi
 
 # Packet size
 installed_size=$(du -s $package_dir | sed -r 's/([0-9]+).*/\1/')
