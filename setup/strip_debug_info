@@ -1,3 +1,4 @@
+#!/bin/bash
 
 function strip_debug_info()
 {

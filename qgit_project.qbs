@@ -8,6 +8,7 @@ Project {
 
     readonly property string minimumQtVersion: "5.12.6"
     readonly property bool conversionWarnEnabled: true
+    readonly property bool standaloneBuild: false
 
     readonly property var projectVersion: projectProbe.projectVersion
     readonly property string projectGitRevision: projectProbe.projectGitRevision
@@ -68,5 +69,6 @@ Project {
         "src/spellcheck/sonnet/gentrigrams.qbs",
         "src/spellcheck/sonnet/parsetrigrams.qbs",
         "src/yaml/yaml.qbs",
+        "setup/package_build.qbs",
     ]
 }

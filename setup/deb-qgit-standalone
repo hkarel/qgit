@@ -1,0 +1,77 @@
+#!/bin/bash
+
+#
+# Deb package formation for qgit
+#
+package_dir=$script_dir/build/${build_subdir}/deb/qgit
+echo -e "\npackage_dir: $package_dir"
+
+package_name="qgit-${full_package_vers}-standalone-${os_arch}.deb"
+echo "package_name: $package_name"
+
+rm -rf $package_dir
+
+mkdir -p $package_dir/DEBIAN
+mkdir -p $package_dir/usr/bin
+mkdir -p $package_dir/usr/share/applications
+mkdir -p $package_dir/usr/share/icons/hicolor/48x48/apps
+mkdir -p $package_dir/opt/qgit/bin
+mkdir -p $package_dir/opt/qgit/lib
+mkdir -p $package_dir/opt/qgit/plugins/platforms
+#mkdir -p $package_dir/opt/qgit/plugins/imageformats
+#mkdir -p $package_dir/opt/qgit/plugins/xcbglintegrations
+
+cp    $script_dir/setup/deb/qgit/DEBIAN/*     $package_dir/DEBIAN
+cp    $script_dir/qgit.desktop                $package_dir/usr/share/applications
+cp    $script_dir/src/resources/qgit.png      $package_dir/usr/share/icons/hicolor/48x48/apps
+cp -d $script_dir/setup/qgit_standalone_link  $package_dir/usr/bin/qgit
+cp    $script_dir/setup/qt.conf               $package_dir/opt/qgit/bin
+cp    $build_dir/bin/qgit                     $package_dir/opt/qgit/bin
+
+# Copy main Qt libs
+for f in $(cat ${build_dir}/package_build_info); do
+    [ -n "$f" ] && cp -P $f $package_dir/opt/qgit/lib
+done
+rm -f $package_dir/opt/qgit/lib/*-gdb.py
+
+# Copy Qt plugins
+for f in $(cat ${build_dir}/package_build_info2 | head -n1); do
+    [ -n "$f" ] && cp -r -P $f/platforms/libqxcb.so    $package_dir/opt/qgit/plugins/platforms
+    #[ -n "$f" ] && cp -r -P $f/imageformats/*.so       $package_dir/opt/qgit/plugins/imageformats
+    #[ -n "$f" ] && cp -r -P $f/xcbglintegrations/*.so  $package_dir/opt/qgit/plugins/xcbglintegrations
+done
+
+chmod -R go-w        $package_dir
+chmod    u=rwx,go=rx $package_dir/DEBIAN/post*
+#chmod   u=rwx,go=rx $package_dir/DEBIAN/pre*
+chmod -R u=rwX,go=rX $package_dir/opt/qgit
+chmod    u=rwx,go=rx $package_dir/opt/qgit/bin/qgit
+chmod    ugo-x       $package_dir/opt/qgit/lib/*
+chmod -R u=rwX,go=rX $package_dir/opt/qgit/plugins
+
+if [ "$build_mode" = "release" ]; then
+    set +e
+    echo "Removing debug info ... "
+    for f in $(find $package_dir/opt/qgit/bin     -type f); do strip_debug_info $f; done
+    for f in $(find $package_dir/opt/qgit/lib     -type f); do strip_debug_info $f; done
+    for f in $(find $package_dir/opt/qgit/plugins -type f); do strip_debug_info $f; done
+    set -e
+fi
+
+# deb-packet size
+installed_size=$(du -s $package_dir | sed -r 's/([0-9]+).*/\1/')
+echo "installed_size: $installed_size"
+
+packet_depends=$(cat <<-EOS
+	libc6, libstdc++6, git, libhunspell-dev (>= 1.6.2)
+EOS
+)
+
+os_arch_control=$os_arch
+[ "${os_arch:0:3}" = "arm" ] && os_arch_control=armhf
+
+sed -e "s/%VERSION%/${package_vers}-${package_date}git${gitrev}/" \
+    -e "s/%ARCHITECTURE%/${os_arch_control}/" \
+    -e "s/%INSTALLED_SIZE%/${installed_size}/" \
+    -e "s/%DEPENDS%/${packet_depends}/" \
+    -i $package_dir/DEBIAN/control

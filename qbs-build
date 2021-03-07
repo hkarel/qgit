@@ -12,6 +12,10 @@ print_help=
 build_mode=release
 need_packages=
 
+standalone=no
+standalone_build=false
+qbs_profile=qgit
+
 build_package=
 
 install_qgit=
@@ -36,9 +40,9 @@ Usage: ${0##*/} [OPTION]
   -r   full rebuild of project
   -d   build in 'debug' mode
   -D   build deb packages
+  -s   build project with standalone profile
   -i   install qgit
   -R   remove installation qgit and exit
-
 EOF
 }
 
@@ -63,6 +67,12 @@ do
             build_package=yes
             shift
             ;;
+        -s)
+            standalone=yes
+            standalone_build=true
+            qbs_profile=qgit_standalone
+            shift
+            ;;
         -i)
             install_qgit=yes
             shift
@@ -71,7 +81,6 @@ do
             remove_qgit=yes
             shift
             ;;
-
         -*)
             echo "Error: Unknown option: $1" >&2
             exit 1
@@ -120,10 +129,7 @@ if [ "$build_package" = "yes" -o "$install_qgit" = "yes" ]; then
     check_need_package 'debconf'
     check_need_package 'debhelper'
     check_need_package 'lintian'
-
-    if [ "$os_id" = "ubuntu" -a "$os_ver" \> "15.10" ]; then
-        check_need_package 'hashdeep'
-    fi
+    check_need_package 'hashdeep'
 fi
 
 if [ -n "$need_packages" ]; then
@@ -140,8 +146,9 @@ if [ ! -x /usr/bin/md5deep ]; then
 fi
 
 git_branch=$(git status -b -s | head -n1 | sed 's/\./ /' | cut -d' ' -f2 | sed 's/\//_/g')
-build_subdir=${build_mode}-${git_branch}
-build_dir=./build/$build_subdir
+build_config=${build_mode}-${git_branch}
+build_subdir=${build_config}
+build_dir=$script_dir/build/$build_subdir
 
 [ "$rebuild" = "yes"  ] && rm -rf $build_dir
 
@@ -153,96 +160,46 @@ qbs build \
     --jobs $jobs \
     --no-install \
     qbs.buildVariant:$build_mode \
-    config:$build_subdir \
-    profile:qgit
+    project.standaloneBuild:$standalone_build \
+    config:$build_config \
+    profile:$qbs_profile
 
-not_exit=
-if [ "$build_package" = "yes" -o "$install_qgit" = "yes" ]; then
-    not_exit=yes
-fi
-[ "$not_exit" != "yes" ] && exit 0
 
-#
-# Creating a deb-package
-#
-package_vers=$(head -n1 VERSION)
-echo "package_vers: $package_vers"
+echo "Build is complete (configuration: ${build_config})"
 
-#package_date=$(date +%Y%m%d%H%M)
-package_date=$(date +%Y%m%d)
-echo "package_date: $package_date"
-
-gitrev=$(git log -1 --pretty=%h)
-echo "gitrev: $gitrev"
-
-if [ "$build_package" != "yes" -a "$install_qgit" != "yes" ]; then
-    exit 0
+if [ "$build_package" != "yes" ]; then
+    [ "$install_qgit" != "yes" ] && exit 0
 fi
 
 #
 # Generating deb-package
 #
-package_dir=$script_dir/build/${build_subdir}/deb/qgit
-echo -e "\npackage_dir: $package_dir"
+package_vers=$(head -n1 VERSION)
+package_date=$(date +%Y%m%d)
+gitrev=$(git log -1 --pretty=%h)
+package_release=${package_date}git${gitrev}
+full_package_vers=${package_vers}-${package_release}
 
-if [ "$os_id" = "ubuntu" -a "$os_ver" \> "18.10" ]; then
-    package_name="qgit-${package_vers}-${package_date}git${gitrev}-${os_id}${os_ver}-${os_arch}.deb"
-else
-    package_name="qgit-${package_vers}-${package_date}git${gitrev}-${os_arch}.deb"
-fi
-echo "package_name: $package_name"
+echo "---"
+echo "package_vers ........ $package_vers"
+echo "package_date ........ $package_date"
+echo "gitrev .............. $gitrev"
+echo "package_release ..... $package_release"
+echo "full_package_vers ... $full_package_vers"
 
-rm -rf $package_dir
-
-mkdir -p $package_dir/DEBIAN
-mkdir -p $package_dir/usr/bin
-mkdir -p $package_dir/usr/share/applications
-mkdir -p $package_dir/usr/share/icons/hicolor/48x48/apps
-
-cp $script_dir/setup/deb/qgit/DEBIAN/*           $package_dir/DEBIAN
-cp $script_dir/qgit.desktop                      $package_dir/usr/share/applications
-cp $script_dir/src/resources/qgit.png            $package_dir/usr/share/icons/hicolor/48x48/apps
-cp $build_dir/bin/qgit                           $package_dir/usr/bin
-
-chmod -R go-w        $package_dir
-chmod    u=rwx,go=rx $package_dir/DEBIAN/post*
-#chmod   u=rwx,go=rx $package_dir/DEBIAN/pre*
-chmod    u=rwx,go=rx $package_dir//usr/bin/qgit
-
+# Debug information removal function
 . $script_dir/setup/strip_debug_info
 
-if [ "$build_mode" = "release" ]; then
-    set +e
-    echo "Removing debug info ... "
-    for f in $(find $package_dir/usr/bin -type f); do strip_debug_info $f; done
-    #for f in $(find $package_dir/opt/qgit/bin -type f); do strip_debug_info $f; done
-    #for f in $(find $package_dir/opt/qgit/lib -type f); do strip_debug_info $f; done
-    set -e
-fi
-
-# Packet size
-installed_size=$(du -s $package_dir | sed -r 's/([0-9]+).*/\1/')
-echo "installed_size: $installed_size"
-
-if [ "$os_id" = "ubuntu" -a "$os_ver" \> "18.10" ]; then
-	packet_depends=$(cat <<-EOS
-		libc6, libstdc++6, libqt5core5a, libqt5gui5, libqt5widgets5, git
-	EOS
-	)
+if [ "$standalone" = "yes" ]; then
+    . $script_dir/setup/deb-qgit-standalone
+elif [ "$os_id" = "ubuntu" -a "$os_ver" \> "19.10" ]; then
+    # for Ubuntu 20.04 and above
+    . $script_dir/setup/deb-qgit
 else
-	packet_depends=$(cat <<-EOS
-		libc6, libstdc++6, libqtcore4, libqtgui4, git
-	EOS
-	)
+    echo "Unsupported OS: $os_id $os_ver"
+    echo "Try using 'standalone' mode"
+    exit 1
 fi
-
-os_arch_control=$os_arch
-[ "${os_arch:0:3}" = "arm" ] && os_arch_control=armhf
-sed -e "s/%VERSION%/${package_vers}-${package_date}git${gitrev}/" \
-    -e "s/%ARCHITECTURE%/${os_arch_control}/" \
-    -e "s/%INSTALLED_SIZE%/${installed_size}/" \
-    -e "s/%DEPENDS%/${packet_depends}/" \
-    -i $package_dir/DEBIAN/control
 
 # Deb-package checksums
 cd $package_dir
@@ -283,4 +240,3 @@ if [ "$install_qgit" = "yes" ]; then
     sudo dpkg -i ${build_dir}/$package_name
     echo "QGit installation is complete"
 fi
-

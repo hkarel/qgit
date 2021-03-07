@@ -1,6 +1,6 @@
 import qbs
-import qbs.File
 import qbs.FileInfo
+import QbsUtl
 
 Product {
     name: "QGit"
@@ -10,6 +10,7 @@ Product {
     destinationDirectory: "./bin"
 
     Depends { name: "cpp" }
+    Depends { name: "cppstdlib" }
     Depends { name: "SharedLib" }
     Depends { name: "Yaml" }
     Depends { name: "Qt"; submodules: ["core", "widgets"] }
@@ -34,12 +35,22 @@ Product {
     }
     cpp.cxxLanguageVersion: project.cxxLanguageVersion
 
+//    cpp.driverLinkerFlags: [
+//        // Using RPATH instead of RUNPATH
+//        "-Wl,--disable-new-dtags",
+//    ]
+
     cpp.includePaths: [
         "./",
     ]
 
     // Suppression a Qt warnings
     cpp.systemIncludePaths: Qt.core.cpp.includePaths
+
+    cpp.rpaths: QbsUtl.concatPaths(
+        cppstdlib.path
+       ,"$ORIGIN/../lib"
+    )
 
     cpp.dynamicLibraries: [
         "pthread",
@@ -160,35 +171,6 @@ Product {
             return cmd;
         }
     }
-
-//    Rule {
-//        id: idtrigrams
-//        inputs: ["trigrams"]
-//        //explicitlyDependsOnFromDependencies: ["trigrams-generator"]
-
-//        Artifact {
-//            fileTags: ["trigrams-map"]
-//            filePath: FileInfo.joinPaths(project.buildDirectory, "trigrams", input.baseName + ".tmap")
-//        }
-//        prepare: {
-//            var runUtl = FileInfo.joinPaths(project.buildDirectory, "bin/parsetrigrams");
-//            var outputFile = FileInfo.joinPaths(project.buildDirectory, "trigrams", input.baseName + ".tmap");
-
-//            File.makePath(FileInfo.joinPaths(project.buildDirectory, "trigrams"));
-
-////            console.info("=== runUtl ===");
-////            console.info(input);
-////            console.info(inputs);
-////            console.info(runUtl);
-////            console.info(input.filePath);
-////            console.info(outputFile);
-
-//            var cmd = new Command(runUtl, [input.filePath, outputFile]);
-//            cmd.description = "sonnet parse trigrams";
-//            cmd.highlight = "filegen";
-//            return cmd;
-//        }
-//    }
 
     files: [
         "annotate.cpp",
