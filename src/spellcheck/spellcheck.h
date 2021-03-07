@@ -50,11 +50,11 @@ private:
         struct Compare
         {
           // Sort
-          int operator() (const HunsItem* item1, const HunsItem* item2, void*) const
+          int operator() (const HunsItem* item1, const HunsItem* item2) const
             {return QString::compare(item1->dictName, item2->dictName);}
 
           // Find
-          int operator() (const QString* dictName, const HunsItem* item2, void*) const
+          int operator() (const QString* dictName, const HunsItem* item2) const
             {return QString::compare(*dictName, item2->dictName);}
         };
 

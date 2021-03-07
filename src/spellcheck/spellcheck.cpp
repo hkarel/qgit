@@ -120,19 +120,19 @@ double langWeight(const QStringList& wordTrigtams,
 
 //    struct Compare
 //    {
-////        int operator() (const TrigramItem* ti1, const TrigramItem* ti2, void*) const
+////        int operator() (const TrigramItem* ti1, const TrigramItem* ti2) const
 ////            {return ti1->trigtam.compare(ti2->trigtam);}
 
-////        int operator() (const QString* trigtam, const TrigramItem* ti2, void*) const
+////        int operator() (const QString* trigtam, const TrigramItem* ti2) const
 ////            {return trigtam->compare(ti2->trigtam);}
 
-//        int operator() (const TrigramItem* ti1, const TrigramItem* ti2, void*) const {
+//        int operator() (const TrigramItem* ti1, const TrigramItem* ti2) const {
 //            LIST_COMPARE_MULTI_ITEM(ti1->trigtam[0], ti2->trigtam[0])
 //            LIST_COMPARE_MULTI_ITEM(ti1->trigtam[1], ti2->trigtam[1])
 //            LIST_COMPARE_MULTI_ITEM(ti1->trigtam[2], ti2->trigtam[2])
 //            return 0;
 //        }
-//        int operator() (const QString* trigtam, const TrigramItem* ti2, void*) const {
+//        int operator() (const QString* trigtam, const TrigramItem* ti2) const {
 
 ////            if (trigtam->compare(ti2->trigtam) == 0)
 ////                break_point
@@ -146,10 +146,10 @@ double langWeight(const QStringList& wordTrigtams,
 
 //    struct Compare2
 //    {
-//        int operator() (const TrigramItem* ti1, const TrigramItem* ti2, void*) const
+//        int operator() (const TrigramItem* ti1, const TrigramItem* ti2) const
 //            {return LIST_COMPARE_ITEM(ti1->hash, ti2->hash);}
 
-//        int operator() (const uint* hash, const TrigramItem* ti2, void*) const
+//        int operator() (const uint* hash, const TrigramItem* ti2) const
 //            {return LIST_COMPARE_ITEM(*hash, ti2->hash);}
 //    };
 //};
@@ -164,19 +164,19 @@ double langWeight(const QStringList& wordTrigtams,
 
 //    struct Compare
 //    {
-//        int operator() (const TrigramItem3* ti1, const TrigramItem3* ti2, void*) const
+//        int operator() (const TrigramItem3* ti1, const TrigramItem3* ti2) const
 //            {return strcmp(ti1->trigtam.c_str(), ti2->trigtam.c_str());}
 
-//        int operator() (const std::string* trigtam, const TrigramItem3* ti2, void*) const
+//        int operator() (const std::string* trigtam, const TrigramItem3* ti2) const
 //            {return strcmp(trigtam->c_str(), ti2->trigtam.c_str());}
 //    };
 
 ////    struct Compare2
 ////    {
-////        int operator() (const TrigramItem* ti1, const TrigramItem* ti2, void*) const
+////        int operator() (const TrigramItem* ti1, const TrigramItem* ti2) const
 ////            {return LIST_COMPARE_ITEM(ti1->hash, ti2->hash);}
 
-////        int operator() (const uint* hash, const TrigramItem* ti2, void*) const
+////        int operator() (const uint* hash, const TrigramItem* ti2) const
 ////            {return LIST_COMPARE_ITEM(*hash, ti2->hash);}
 ////    };
 //};
@@ -740,7 +740,7 @@ QString SpellCheck::langDetect(const QString& word) const
         }
     }
 
-    auto detectSort = [](const DetectItem* item1, const DetectItem* item2, void*) -> int
+    auto detectSort = [](const DetectItem* item1, const DetectItem* item2) -> int
     {
         LIST_COMPARE_MULTI_ITEM(item1->trigramCount,  item2->trigramCount)
         LIST_COMPARE_MULTI_ITEM(item1->trigramWeight, item2->trigramWeight)

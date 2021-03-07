@@ -120,7 +120,7 @@ int main(int argc, char *argv[])
         list.addCopy({it.key(), it.value()});
 
     qDebug() << "Sorting...";
-    auto srtFunc = [](const Item* i1, const Item* i2, void*)
+    auto srtFunc = [](const Item* i1, const Item* i2)
     {
         LIST_COMPARE_MULTI_ITEM(i1->frequency, i2->frequency)
         LIST_COMPARE_MULTI_ITEM(i2->trigram,   i1->trigram)
