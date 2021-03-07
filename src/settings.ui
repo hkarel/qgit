@@ -33,7 +33,7 @@
    <item>
     <widget class="QTabWidget" name="tabDialog">
      <property name="currentIndex">
-      <number>6</number>
+      <number>0</number>
      </property>
      <widget class="QWidget" name="General">
       <attribute name="title">

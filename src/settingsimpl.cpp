@@ -110,7 +110,7 @@ SettingsImpl::SettingsImpl(QWidget* p, Git* g, int defTab) : QDialog(p), git(g) 
 
     setupCodecsCombo();
     on_chkDiffCache_toggled(chkDiffCache->isChecked());
-//    tabDialog->setCurrentIndex(defTab);
+    tabDialog->setCurrentIndex(defTab);
     userInfo();
     on_cboxGitConfigSource_activated(0);
 
