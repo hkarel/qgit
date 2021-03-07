@@ -129,7 +129,7 @@ int main(int argc, char *argv[])
     list.sort(srtFunc, lst::SortMode::Down);
     qDebug() << "Sorted";
 
-    for (int i = 3000; i < list.count(); ++i)
+    for (int i = 5000; i < list.count(); ++i)
         list.remove(i, lst::CompressList::No);
     list.compressList();
     qDebug() << "Weeded";
