@@ -11,6 +11,7 @@ Product {
     destinationDirectory: "./bin"
 
     Depends { name: "cpp" }
+    Depends { name: "SharedLib" }
     Depends { name: "Qt"; submodules: ["core"] }
 
     cpp.defines: project.cppDefines

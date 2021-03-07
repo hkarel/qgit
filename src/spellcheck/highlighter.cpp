@@ -148,7 +148,7 @@ bool SpellHighlighter::getCurrentWord(QString& word, QString& lang) const
     for (const WordPos& wordPos : wordPosList)
     {
         if (cursorPos >= wordPos.start
-            && cursorPos < (wordPos.start + wordPos.length))
+            && cursorPos <= (wordPos.start + wordPos.length))
         {
             word = text.mid(wordPos.start, wordPos.length);
             lang = spellCheck().langDetect(word);

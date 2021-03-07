@@ -8,6 +8,8 @@
  * SPDX-License-Identifier: LGPL-2.1-or-later
  */
 
+#include "shared/list.h"
+
 #include <QFile>
 #include <QHash>
 #include <QString>
@@ -113,25 +115,29 @@ int main(int argc, char *argv[])
     }
     qDebug() << "Model built!";
 
-    QList<Item> list;
+    lst::List<Item> list;
     for (auto it = model.cbegin(); it != model.cend(); ++it)
-        list.append({it.key(), it.value()});
+        list.addCopy({it.key(), it.value()});
 
     qDebug() << "Sorting...";
-    std::sort(list.begin(), list.end(), [](const Item& i1, const Item& i2) {
-        return (i1.frequency > i2.frequency);
-    });
+    auto srtFunc = [](const Item* i1, const Item* i2, void*)
+    {
+        LIST_COMPARE_MULTI_ITEM(i1->frequency, i2->frequency)
+        LIST_COMPARE_MULTI_ITEM(i2->trigram,   i1->trigram)
+        return 0;
+    };
+    list.sort(srtFunc, lst::SortMode::Down);
     qDebug() << "Sorted";
 
-    while (list.count() > 2000)
-        list.removeAt(list.count() - 1);
-
+    for (int i = 3000; i < list.count(); ++i)
+        list.remove(i, lst::CompressList::No);
+    list.compressList();
     qDebug() << "Weeded";
 
     QTextStream outStream {&outFile};
     outStream.setCodec("UTF-8");
-    for (const Item& item : list)
-        outStream << item.trigram  << "\t\t\t" << item.frequency << '\n';
+    for (Item* item : list)
+        outStream << item->trigram  << "\t\t\t" << item->frequency << '\n';
     outFile.close();
 
     return 0;
