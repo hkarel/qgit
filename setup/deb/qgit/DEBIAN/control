@@ -1,7 +1,7 @@
 Package: qgit
 Version: %VERSION%
 Architecture: %ARCHITECTURE%
-Maintainer: Ubuntu Developers <ubuntu-devel-discuss@lists.ubuntu.com>
+Maintainer: Pavel Karelin <hkarel@yandex.ru>
 Installed-Size: %INSTALLED_SIZE%
 Depends:  %DEPENDS%
 Suggests: source-highlight
