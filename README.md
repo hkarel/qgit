@@ -2,6 +2,8 @@
 
 **The main differences from the original version** (https://github.com/tibirna/qgit)
 
+- Added commit spell checker (EN, RU languages)
+- Config file redesigned to yaml format
 - Improved Unicode support
 - Redesigned git-project caching mechanism
 - Significantly accelerated tree building for large projects
