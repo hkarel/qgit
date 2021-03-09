@@ -29,12 +29,13 @@ public slots:
     void on_changeFont(const QFont& f);
 
 protected:
-    virtual void focusInEvent(QFocusEvent*);
+    //virtual void focusInEvent(QFocusEvent*);
     virtual void mouseMoveEvent(QMouseEvent*);
 	bool startDragging(QMouseEvent *e);
 
 private slots:
-    void on_currentItemChanged(QListWidgetItem*, QListWidgetItem*);
+    //void on_currentItemChanged(QListWidgetItem*, QListWidgetItem*);
+    void on_itemClicked(QListWidgetItem *item);
     void on_customContextMenuRequested(const QPoint&);
 
 private:

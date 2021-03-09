@@ -279,9 +279,8 @@ void RevsView::on_flagChanged(uint flag) {
 
 bool RevsView::doUpdate(bool force) {
 
-    force = force || m()->lineSHA->text().isEmpty();
-
     bool found = tab()->listViewLog->update();
+    bool lineSHAisEmpty = m()->lineSHA->text().isEmpty();
 
     if (!found && !st.sha().isEmpty()) {
 
@@ -291,7 +290,7 @@ bool RevsView::doUpdate(bool force) {
 
     } else { // sha could be NULL
 
-        if (st.isChanged(StateInfo::SHA) || force) {
+        if (st.isChanged(StateInfo::SHA) || force || lineSHAisEmpty) {
 
             updateLineEditSHA();
             on_updateRevDesc();
@@ -328,21 +327,24 @@ bool RevsView::doUpdate(bool force) {
             bool isDir = m()->treeView->isDir(st.fileName());
             m()->updateContextActions(st.sha(), st.fileName(), isDir, found);
         }
-        if (st.isChanged() || force) {
-            // activate log or diff tab depending on file selection
-			bool sha_changed = st.sha(true) != st.sha(false);
-            if (!sha_changed) {
-                if (!force) {
-                    // file selected -> show diff tab
-                    tab()->tabLogDiff->setCurrentIndex(1);
-                }
-            }
-            else if (qgit::flags().test(qgit::MSG_ON_NEW_F)) {
-                // commit selected and log set to always show first -> show log tab
+
+        if (qgit::flags().test(qgit::MSG_ON_NEW_F)) {
+            if (st.isChanged(StateInfo::SHA) || force) {
                 tab()->tabLogDiff->setCurrentIndex(0);
             }
-            tab()->textEditDiff->centerOnFileHeader(st);
+            else {
+                tab()->tabLogDiff->setCurrentIndex(1);
+            }
         }
+        else {
+            if (force) {
+                tab()->tabLogDiff->setCurrentIndex(0);
+            }
+            else if (!st.isChanged(StateInfo::SHA)) {
+                 tab()->tabLogDiff->setCurrentIndex(1);
+            }
+        }
+        tab()->textEditDiff->centerOnFileHeader(st);
 
         // at the end update diffs that is the slowest and must be
         // run after update of file list for 'diff to sha' to work

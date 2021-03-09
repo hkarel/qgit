@@ -13,7 +13,7 @@
 #include "common.h"
 
 #define UPDATE_DOMAIN(x)       QApplication::postEvent(x, new UpdateDomainEvent(false))
-#define UPDATE()               QApplication::postEvent(this, new UpdateDomainEvent(false))
+#define UPDATE()               QApplication::postEvent(this, new UpdateDomainEvent(false, true))
 #define UPDATE_DM_MASTER(x, f) QApplication::postEvent(x, new UpdateDomainEvent(true, f))
 
 class Domain;
