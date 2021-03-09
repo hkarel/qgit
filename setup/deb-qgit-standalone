@@ -4,10 +4,10 @@
 # Deb package formation for qgit
 #
 package_dir=$script_dir/build/${build_subdir}/deb/qgit
-echo -e "\npackage_dir: $package_dir"
-
 package_name="qgit-${full_package_vers}-standalone-${os_arch}.deb"
-echo "package_name: $package_name"
+
+echo "package_dir ......... $package_dir"
+echo "package_name ........ $package_name"
 
 rm -rf $package_dir
 
@@ -51,7 +51,7 @@ chmod -R u=rwX,go=rX $package_dir/opt/qgit/plugins
 
 if [ "$build_mode" = "release" ]; then
     set +e
-    echo "Removing debug info ... "
+    echo -e "\nRemoving debug info ... "
     for f in $(find $package_dir/opt/qgit/bin     -type f); do strip_debug_info $f; done
     for f in $(find $package_dir/opt/qgit/lib     -type f); do strip_debug_info $f; done
     for f in $(find $package_dir/opt/qgit/plugins -type f); do strip_debug_info $f; done

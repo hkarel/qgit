@@ -152,6 +152,14 @@ build_dir=$script_dir/build/$build_subdir
 
 [ "$rebuild" = "yes"  ] && rm -rf $build_dir
 
+echo -e "\nQbs profile \"$qbs_profile\":"
+echo "$(qbs config --list profiles.$qbs_profile)"
+echo ""
+if [ -z "$(qbs config --list profiles.$qbs_profile)" ]; then
+    echo "Error: Qbs profile not found"
+    exit 1
+fi
+
 set -e
 qbs build \
     --file qgit_project.qbs \
