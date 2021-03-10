@@ -122,6 +122,7 @@ check_need_package 'qt5-default'
 check_need_package 'qtbase5-dev'
 check_need_package 'qtbase5-dev-tools'
 check_need_package 'qtbase5-private-dev'
+check_need_package 'libhunspell-dev'
 
 if [ "$build_package" = "yes" -o "$install_qgit" = "yes" ]; then
     # Required packages
@@ -152,7 +153,8 @@ build_dir=$script_dir/build/$build_subdir
 
 [ "$rebuild" = "yes"  ] && rm -rf $build_dir
 
-echo -e "\nQbs profile \"$qbs_profile\":"
+# Print QBS profile
+echo -e "\nQbs profile '$qbs_profile':"
 echo "$(qbs config --list profiles.$qbs_profile)"
 echo ""
 if [ -z "$(qbs config --list profiles.$qbs_profile)" ]; then
