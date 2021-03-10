@@ -63,9 +63,10 @@ installed_size=$(du -s $package_dir | sed -r 's/([0-9]+).*/\1/')
 echo "installed_size: $installed_size"
 
 packet_depends=$(cat <<-EOS
-	libc6, libstdc++6, git, libhunspell-dev (>= 1.6.2)
+	libc6, git
 EOS
 )
+#libhunspell-dev (>= 1.6.2)
 
 os_arch_control=$os_arch
 [ "${os_arch:0:3}" = "arm" ] && os_arch_control=armhf

@@ -52,10 +52,19 @@ Product {
        ,"$ORIGIN/../lib"
     )
 
-    cpp.dynamicLibraries: [
-        "pthread",
-        "hunspell",
-    ]
+    cpp.dynamicLibraries: {
+        var libs = ["pthread"];
+        if (!project.standaloneBuild)
+            libs.push("hunspell");
+        return libs;
+    }
+
+    cpp.staticLibraries: {
+        var libs = [];
+        if (project.standaloneBuild)
+            libs.push("/usr/lib/x86_64-linux-gnu/libhunspell.a");
+        return libs;
+    }
 
     Group {
         name: "resources"
