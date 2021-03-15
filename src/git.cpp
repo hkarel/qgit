@@ -1019,7 +1019,7 @@ const QString Git::getNewCommitMsg() {
 }
 
 //CT TODO utility function; can go elsewhere
-QString Git::colorMatch(const QString& txt, const QRegExp& regExp) {
+QString Git::colorMatch(const QString& txt, QRegExp& regExp) {
 
     QString text = qt4and5escaping(txt);
 
@@ -1052,7 +1052,7 @@ const QString Git::formatList(const QStringList& sl, const QString& name, bool i
     return ls;
 }
 
-const QString Git::getDesc(const QString& sha, const QRegExp& shortLogRE, const QRegExp& longLogRE,
+const QString Git::getDesc(const QString& sha, QRegExp& shortLogRE, QRegExp& longLogRE,
                            bool showHeader, FileHistory* fh) {
 
     if (sha.isEmpty())

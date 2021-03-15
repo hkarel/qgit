@@ -97,7 +97,7 @@ public:
     bool getTree(const QString& ts, TreeInfo& ti, bool wd, const QString& treePath);
     static const QString getLocalDate(const QString& gitDate);
     const QString getCurrentBranchName() const {return curBranchName;}
-    const QString getDesc(const QString& sha, const QRegExp& slogRE, const QRegExp& lLogRE, bool showH, FileHistory* fh);
+    const QString getDesc(const QString& sha, QRegExp& slogRE, QRegExp& lLogRE, bool showH, FileHistory* fh);
     const QString getLastCommitMsg();
     const QString getNewCommitMsg();
     const QString getLaneParent(const QString& fromSHA, int laneNum);
@@ -242,7 +242,7 @@ private:
     const QStringList getOthersFiles();
     const QStringList getOtherFiles(const QStringList& selFiles, bool onlyInIndex);
     const QString getNewestFileName(const QStringList& args, const QString& fileName);
-    static QString colorMatch(const QString& txt, const QRegExp& regExp);
+    static QString colorMatch(const QString& txt, QRegExp& regExp);
     void appendFileName(RevFile& rf, const QString& name, FileNamesLoader& fl);
     void flushFileNames(FileNamesLoader& fl);
     void populateFileNamesMap();
