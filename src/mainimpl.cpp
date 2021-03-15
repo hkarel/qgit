@@ -951,6 +951,7 @@ void MainImpl::newRevsAdded(const FileHistory* fh, const QVector<ShaString>&) {
 void MainImpl::lineFilter_returnPressed() {
 
     actSearchAndFilter->setChecked(true);
+    on_actSearchAndFilter_triggered(true);
 }
 
 void MainImpl::on_actSearchAndFilter_triggered(bool isOn) {
