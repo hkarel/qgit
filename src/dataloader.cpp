@@ -67,7 +67,7 @@ void DataLoader::on_cancel() {
 bool DataLoader::start(const QStringList& args, const QString& wd, const QString& buf) {
 
     if (!procFinished) {
-        log_warn << "Called while processing";
+        log_error << "Failed start git process, it already running";
         return false;
     }
     procFinished = false;
@@ -78,11 +78,15 @@ bool DataLoader::start(const QStringList& args, const QString& wd, const QString
 
     if (!createTemporaryFile() || !qgit::startProcess(this, args, buf)) {
         deleteLater();
+
+        log_error << "Failed start git process";
         return false;
     }
     loadTime.start();
     timerCallCounter = 0;
     guiUpdateTimer.start(GUI_UPDATE_INTERVAL);
+
+    log_debug << "Git process started";
     return true;
 }
 
@@ -98,6 +102,8 @@ void DataLoader::on_finished(int, QProcess::ExitStatus) {
 
     if (guiUpdateTimer.isActive()) // no need to wait anymore
         guiUpdateTimer.start(0);
+
+    log_debug << "Git process finished";
 }
 
 void DataLoader::on_timeout() {
@@ -110,10 +116,14 @@ void DataLoader::on_timeout() {
     }
     parsing = true;
 
+    log_debug << "Read new git data";
+
     qint64 len = readNewData();
     if (len == -1) {
         emit loaded(fh, loadedBytes, loadTime.elapsed(), true, "", "");
         deleteLater();
+
+        log_debug << "All git data readed";
         return;
     }
     else if (len > 0) {
@@ -122,10 +132,8 @@ void DataLoader::on_timeout() {
             emit newDataReady(fh);
     }
 
-    if (procFinished) {
-        log_debug << "Exited while parsing";
+    if (procFinished)
         guiUpdateTimer.start(0);
-    }
     else
         guiUpdateTimer.start(GUI_UPDATE_INTERVAL / 2);
 

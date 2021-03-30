@@ -28,16 +28,16 @@ bool Cache::save(const QString& gitDir, const RevFileMap& rfm,
         return false;
     }
 
-    QString path(gitDir + C_DAT_FILE);
-    QString tmpPath(path + BAK_EXT);
+    QString path {gitDir + C_DAT_FILE};
+    QString tmpPath {path + BAK_EXT};
 
     QDir dir;
     if (!dir.exists(gitDir)) {
         log_error << "Git directory not found, unable to save cache";
         return false;
     }
-    QFile f(tmpPath);
-    if (!f.open(QIODevice::WriteOnly | QIODevice::Unbuffered)) {
+    QFile file {tmpPath};
+    if (!file.open(QIODevice::WriteOnly | QIODevice::Unbuffered)) {
         log_error << "Failed open file: " << tmpPath;
         return false;
     }
@@ -46,12 +46,12 @@ bool Cache::save(const QString& gitDir, const RevFileMap& rfm,
 
     // compress in memory before write to file
     QByteArray data;
-    QDataStream stream(&data, QIODevice::WriteOnly);
-    stream.setVersion(QDataStream::Qt_4_8);
+    QDataStream stream {&data, QIODevice::WriteOnly};
+    stream.setVersion(QDataStream::Qt_5_12);
 
     // Write a header with a "magic number" and a version
     stream << (quint32)C_MAGIC;
-    stream << (qint32)C_VERSION;
+    stream << (qint32) C_VERSION;
 
     stream << dirs;
     stream << files;
@@ -79,8 +79,8 @@ bool Cache::save(const QString& gitDir, const RevFileMap& rfm,
 
     log_info << "Compressing data...";
 
-    f.write(qCompress(data, 1)); // no need to encode with compressed data
-    f.close();
+    file.write(qCompress(data, 1)); // no need to encode with compressed data
+    file.close();
 
     // rename C_DAT_FILE + BAK_EXT -> C_DAT_FILE
     if (dir.exists(path)) {
@@ -99,20 +99,25 @@ bool Cache::save(const QString& gitDir, const RevFileMap& rfm,
 bool Cache::load(const QString& gitDir, RevFileMap& rfm, StrVect& dirs, StrVect& files) {
 
     // check for cache file
-    QString path(gitDir + C_DAT_FILE);
-    QFile f(path);
-    if (!f.exists()) {
+    QString path {gitDir + C_DAT_FILE};
+    QFile file {path};
+    if (!file.exists()) {
         log_error << "Unable to load file-cache";
         return true; // no cache file is not an error
     }
 
-    if (!f.open(QIODevice::ReadOnly | QIODevice::Unbuffered)) {
+    if (!file.open(QIODevice::ReadOnly | QIODevice::Unbuffered)) {
         log_error << "Failed open file: " << path;
         return false;
     }
 
-    QDataStream stream(qUncompress(f.readAll()));
-    stream.setVersion(QDataStream::Qt_4_8);
+    log_debug << "Begin load cache: " << path;
+
+    QByteArray ba = qUncompress(file.readAll());
+    file.close();
+
+    QDataStream stream {ba};
+    stream.setVersion(QDataStream::Qt_5_12);
 
     quint32 magic;
     qint32 version;
@@ -120,7 +125,7 @@ bool Cache::load(const QString& gitDir, RevFileMap& rfm, StrVect& dirs, StrVect&
     stream >> version;
     if (magic != C_MAGIC || version != C_VERSION) {
         log_error << "Unable to load file-cache. File version failed";
-        f.close();
+        //f.close();
         return false;
     }
 
@@ -139,7 +144,7 @@ bool Cache::load(const QString& gitDir, RevFileMap& rfm, StrVect& dirs, StrVect&
         stream >> *rf;
         rfm.insert(shav[i], rf);
     }
-    f.close();
 
+    log_debug << "End load cache";
     return true;
 }

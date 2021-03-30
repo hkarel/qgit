@@ -251,7 +251,7 @@ bool startProcess(QProcess* proc, const QStringList& args, const QString& buf = 
 
 // cache file
 const uint C_MAGIC  = 0xA0B0C0D0;
-const int C_VERSION = 16;
+const int C_VERSION = 17;
 
 extern const QString BAK_EXT;
 extern const QString C_DAT_FILE;
