@@ -102,12 +102,12 @@ bool Cache::load(const QString& gitDir, RevFileMap& rfm, StrVect& dirs, StrVect&
     QString path {gitDir + C_DAT_FILE};
     QFile file {path};
     if (!file.exists()) {
-        log_error << "Unable to load file-cache";
+        log_verbose << "Cache-file not found: " << path;
         return true; // no cache file is not an error
     }
 
     if (!file.open(QIODevice::ReadOnly | QIODevice::Unbuffered)) {
-        log_error << "Failed open file: " << path;
+        log_error << "Failed open cache-file: " << path;
         return false;
     }
 
@@ -124,7 +124,8 @@ bool Cache::load(const QString& gitDir, RevFileMap& rfm, StrVect& dirs, StrVect&
     stream >> magic;
     stream >> version;
     if (magic != C_MAGIC || version != C_VERSION) {
-        log_error << "Unable to load file-cache. File version failed";
+        log_error << "Unable to load cache-file: " << path
+                  << ". File version failed";
         //f.close();
         return false;
     }

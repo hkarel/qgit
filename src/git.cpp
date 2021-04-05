@@ -6,11 +6,11 @@
     Copyright: See COPYING file that comes with this distribution
 
 */
+#include "git.h"
 #include "FileHistory.h"
 #include "annotate.h"
 #include "cache.h"
 #include "dataloader.h"
-#include "git.h"
 #include "lanes.h"
 #include "myprocess.h"
 #include "rangeselectimpl.h"
@@ -32,6 +32,7 @@
 #include <QTextCodec>
 #include <QTextDocument>
 #include <QTextStream>
+#include <unistd.h>
 
 #define SHOW_MSG(x) {QApplication::postEvent(parent(), new MessageEvent(x)); EM_PROCESS_EVENTS_NO_INPUT;}
 
@@ -2145,69 +2146,98 @@ void Git::parseDiffFormat(RevFile& rf, const QString& buf, FileNamesLoader& fl) 
 
 bool Git::startParseProc(const QStringList& initCmd, FileHistory* fh, const QString& buf) {
 
-    DataLoader* dl = new DataLoader(this, fh); // auto-deleted when done
+    static bool connectDataLoader {false};
 
-    chk_connect_a(this, SIGNAL(cancelLoading(const FileHistory*)),
-                  dl, SLOT(on_cancel(const FileHistory*)));
+    if (!connectDataLoader) {
+        connectDataLoader = true;
 
-    chk_connect_a(dl, SIGNAL(newDataReady(const FileHistory*)),
-                  this, SLOT(on_newDataReady(const FileHistory*)));
+        chk_connect_a(this, SIGNAL(cancelAllProcesses()),
+                      &dataLoader(), SLOT(cancel()));
 
-    chk_connect_a(dl, SIGNAL(loaded(FileHistory*, ulong, int, bool, QString, QString)),
-                  this, SLOT(on_loaded(FileHistory*, ulong, int, bool, QString, QString)));
+        chk_connect_a(this, SIGNAL(cancelLoading(const FileHistory*)),
+                      &dataLoader(), SLOT(cancel(const FileHistory*)));
 
-    return dl->start(initCmd, workDir, buf);
+        chk_connect_q(&dataLoader(), SIGNAL(addChunk(FileHistory*, QString)),
+                      this, SLOT(addChunk(FileHistory*, QString)));
+
+        chk_connect_q(&dataLoader(), SIGNAL(newDataReady(FileHistory*)),
+                      this, SLOT(on_newDataReady(FileHistory*)));
+
+        chk_connect_q(&dataLoader(), SIGNAL(allDataLoaded(FileHistory*, ulong, int, bool, QString, QString)),
+                      this, SLOT(on_loaded(FileHistory*, ulong, int, bool, QString, QString)));
+    }
+
+    if (dataLoader().isRunning()) {
+        log_error << "DataLoader is running";
+        return false;
+    }
+
+    dataLoader().init(fh, initCmd, workDir, buf);
+    dataLoader().start();
+    while (dataLoader().runInit() == -1)
+        usleep(10);
+
+    return dataLoader().runInit();
 }
 
 bool Git::startRevList(const QStringList& args, FileHistory* fh) {
 
-    QString baseCmd("git log --topo-order --no-color "
-
+    QString baseCmd {"git log --no-color "
+                     "--topo-order "
 #ifndef Q_OS_WIN32
-                    "--log-size " // FIXME broken on Windows
+                     "--log-size " // FIXME broken on Windows
 #endif
-                    "--parents --boundary -z "
-                    "--pretty=format:" GIT_LOG_FORMAT);
+                     "--parents --boundary -z "
+                     "--pretty=format:" GIT_LOG_FORMAT};
 
     // we don't need log message body for file history
     if (isMainHistory(fh))
         baseCmd.append("%b");
 
-    QStringList initCmd(baseCmd.split(' '));
+    QStringList initCmd {baseCmd.split(' ')};
     if (!isMainHistory(fh)) {
-    /*
-       NOTE: we don't use '--remove-empty' option because
-       in case a file is deleted and then a new file with
-       the same name is created again in the same directory
-       then, with this option, file history is truncated to
-       the file deletion revision.
-    */
+        /*
+          NOTE: we don't use '--remove-empty' option because
+          in case a file is deleted and then a new file with
+          the same name is created again in the same directory
+          then, with this option, file history is truncated to
+          the file deletion revision.
+        */
         initCmd << QString("-r -m -p --full-index").split(' ');
     }
     else
     {} // initCmd << QString("--early-output"); currently disabled
 
-    return startParseProc(initCmd + args, fh, QString());
+    if (!startParseProc(initCmd + args, fh, QString())) {
+        log_error << "Failed call startParseProc()";
+        return false;
+    }
+    return true;
 }
 
 bool Git::startUnappliedList() {
 
-    QStringList unAppliedShaList(getAllRefSha(UN_APPLIED));
+    QStringList unAppliedShaList {getAllRefSha(UN_APPLIED)};
     if (unAppliedShaList.isEmpty())
         return false;
 
     // WARNING: with this command 'git log' could send spurious
     // revs so we need some filter out logic during loading
-    QString cmd("git log --no-color --parents -z "
+    QString baseCmd {"git log --no-color --parents -z "
 
 #ifndef Q_OS_WIN32
-                "--log-size " // FIXME broken on Windows
+                     "--log-size " // FIXME broken on Windows
 #endif
-                "--pretty=format:" GIT_LOG_FORMAT "%b ^HEAD");
+                     "--pretty=format:" GIT_LOG_FORMAT "%b ^HEAD"};
 
-    QStringList sl(cmd.split(' '));
-    sl << unAppliedShaList;
-    return startParseProc(sl, revData, QString());
+    QStringList initCmd {baseCmd.split(' ')};
+    initCmd << unAppliedShaList;
+
+    if (!startParseProc(initCmd, revData, QString())) {
+        log_error << "Failed call startParseProc()";
+        return false;
+    }
+    return true;
 }
 
 void Git::stop(bool saveCache) {
@@ -2400,7 +2430,7 @@ void Git::init2() {
     }
 }
 
-void Git::on_newDataReady(const FileHistory* fh) {
+void Git::on_newDataReady(FileHistory* fh) {
 
     emit newRevsAdded(fh , fh->revOrder);
 }
@@ -2594,7 +2624,7 @@ bool Git::filterEarlyOutputRev(FileHistory* fh, Rev* rev) {
     return false;
 }
 
-int Git::addChunk(FileHistory* fh, const QString& str) {
+void Git::addChunk(FileHistory* fh, const QString& str) {
 
     RevMap& r = fh->revs;
     Rev* rev;
@@ -2619,14 +2649,16 @@ int Git::addChunk(FileHistory* fh, const QString& str) {
         // if got here - it is necessary to clarify and remove the cause
         break_point
         delete rev;
-        return -1;
+        //return -1;
+        return;
     }
 
     const ShaString& sha = rev->sha();
 
     if (fh->earlyOutputCnt != -1 && filterEarlyOutputRev(fh, rev)) {
         delete rev;
-        return nextStart;
+        //return nextStart;
+        return;
     }
 
     if (isStGIT) {
@@ -2635,7 +2667,8 @@ int Git::addChunk(FileHistory* fh, const QString& str) {
             Reference* rf = lookupReference(sha);
             if (!(rf && (rf->type & UN_APPLIED))) {
                 delete rev;
-                return nextStart;
+                //return nextStart;
+                return;
             }
         }
         // remove StGIT spurious revs filter
@@ -2651,7 +2684,8 @@ int Git::addChunk(FileHistory* fh, const QString& str) {
             Reference* rf = lookupReference(sha);
             if (!(rf && (rf->type & APPLIED))) {
                 delete rev;
-                return nextStart;
+                //return nextStart;
+                return;
             }
         }
         if (r.contains(sha)) {
@@ -2659,7 +2693,8 @@ int Git::addChunk(FileHistory* fh, const QString& str) {
             // 'git log' as example if called with --all option.
             if (r[sha]->isUnApplied) {
                 delete rev;
-                return nextStart;
+                //return nextStart;
+                return;
             }
             // could be a side effect of 'git log -m', see below
             if (isMainHistory(fh) || rev->parentsCount() < 2)
@@ -2688,7 +2723,8 @@ int Git::addChunk(FileHistory* fh, const QString& str) {
 
         r.insert(sha, c); // overwrite old content
         fh->renamedPatches.remove(sha);
-        return nextStart;
+        //return nextStart;
+        return;
     }
     if (!isMainHistory(fh) && rev->parentsCount() > 1 && r.contains(sha)) {
         /* In this case git log is called with -m option and merges are splitted
@@ -2739,7 +2775,7 @@ int Git::addChunk(FileHistory* fh, const QString& str) {
             }
         }
     }
-    return nextStart;
+    //return nextStart;
 }
 
 bool Git::copyDiffIndex(FileHistory* fh, const QString& parent) {

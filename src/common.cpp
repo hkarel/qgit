@@ -408,13 +408,15 @@ bool readFromFile(const QString& fileName, QString& data) {
 
 bool startProcess(QProcess* proc, const QStringList& args, const QString& buf, bool* winShell) {
 
-    if (!proc || args.isEmpty())
+    if (!proc || args.isEmpty()) {
+        log_error << "Failed run process. Incorrect arguments";
         return false;
+    }
 
-    QStringList arguments(args);
+    QStringList arguments {args};
     adjustPath(arguments, winShell);
 
-    QString prog(arguments.first());
+    QString program {arguments.first()};
     arguments.removeFirst();
     if (!buf.isEmpty()) {
     /*
@@ -436,8 +438,16 @@ bool startProcess(QProcess* proc, const QStringList& args, const QString& buf, b
     env << "GIT_FLUSH=0"; // skip the fflush() in 'git log'
     proc->setEnvironment(env);
 
-    proc->start(prog, arguments); // TODO test QIODevice::Unbuffered
-    return proc->waitForStarted();
+    proc->start(program, arguments); // TODO test QIODevice::Unbuffered
+    if (!proc->waitForStarted(5*1000)) {
+        proc->kill();
+        log_error << "Failed start of process: " << program
+                  << ". Run timeout are expired";
+        return false;
+    }
+
+    log_debug << log_format("Process started: %? %?", program, arguments.join(' '));
+    return true;
 }
 
 } // namespace qgit

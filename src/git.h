@@ -156,8 +156,10 @@ private slots:
     void loadFileNames();
     void on_runAsScript_eof();
     void on_getHighlightedFile_eof();
-    void on_newDataReady(const FileHistory*);
-    void on_loaded(FileHistory*, ulong,int,bool,const QString&,const QString&);
+    void on_newDataReady(FileHistory*);
+    void on_loaded(FileHistory*, ulong, int, bool, const QString&, const QString&);
+
+    void addChunk(FileHistory* fh, const QString& str);
 
 private:
     friend class MainImpl;
@@ -219,7 +221,6 @@ private:
     bool populateRenamedPatches(const QString& sha, const QStringList& nn,
                                 FileHistory* fh, QStringList* on, bool bt);
     bool filterEarlyOutputRev(FileHistory* fh, Rev* rev);
-    int addChunk(FileHistory* fh, const QString& str);
     void parseDiffFormat(RevFile& rf, const QString& buf, FileNamesLoader& fl);
     void parseDiffFormatLine(RevFile& rf, const QString& line, int parNum, FileNamesLoader& fl);
     void getDiffIndex();

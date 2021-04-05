@@ -1,14 +1,12 @@
 /*
-    Description: async stream reader, used to load repository data on startup
-
-    Author: Marco Costalba (C) 2005-2007
+    Author: Pavel Karelin 2021 (hkarel), <hkarel@yandex.ru>
 
     Copyright: See COPYING file that comes with this distribution
 
 */
-#include "FileHistory.h"
-#include "git.h"
 #include "dataloader.h"
+#include "FileHistory.h"
+//#include "git.h"
 
 #include "shared/defmac.h"
 #include "shared/break_point.h"
@@ -17,255 +15,214 @@
 #include "shared/qt/logger_operators.h"
 
 #include <QDir>
+#include <QProcess>
 #include <QTemporaryFile>
 
-#define GUI_UPDATE_INTERVAL 500
+#define log_error_m   alog::logger().error   (alog_line_location, "DataLoader")
+#define log_warn_m    alog::logger().warn    (alog_line_location, "DataLoader")
+#define log_info_m    alog::logger().info    (alog_line_location, "DataLoader")
+#define log_verbose_m alog::logger().verbose (alog_line_location, "DataLoader")
+#define log_debug_m   alog::logger().debug   (alog_line_location, "DataLoader")
+#define log_debug2_m  alog::logger().debug2  (alog_line_location, "DataLoader")
+
+#define GUI_UPDATE_INTERVAL 250
 #define READ_BLOCK_SIZE     65535
 
-class UnbufferedTemporaryFile : public QTemporaryFile {
+class UnbufferedTemporaryFile : public QTemporaryFile
+{
 public:
-    explicit UnbufferedTemporaryFile(QObject* p) : QTemporaryFile(p) {}
-    bool unbufOpen() { return open(QIODevice::ReadOnly | QIODevice::Unbuffered); }
+    explicit UnbufferedTemporaryFile(const QString &templateName)
+        : QTemporaryFile(templateName)
+    {}
+    bool unbufOpen() {
+        return open(QIODevice::ReadOnly | QIODevice::Unbuffered);
+    }
 };
 
-DataLoader::DataLoader(Git* g, FileHistory* f) : QProcess(g), git(g), fh(f) {
+DataLoader::DataLoader()
+{}
 
-    parsing = false;
-    canceling = false;
-    procFinished = true;
-    dataFile = NULL;
-    loadedBytes = 0;
-    guiUpdateTimer.setSingleShot(true);
-
-    chk_connect_a(git, SIGNAL(cancelAllProcesses()), this, SLOT(on_cancel()));
-    chk_connect_a(&guiUpdateTimer, SIGNAL(timeout()), this, SLOT(on_timeout()));
+DataLoader::~DataLoader()
+{
+    stop();
 }
 
-DataLoader::~DataLoader() {
+bool DataLoader::init(FileHistory* fileHist, const QStringList& args,
+                       const QString& workDir, const QString& buff)
+{
+    _runInit = -1;
+    _fileHist = fileHist;
+    _args = args;
+    _workDir = workDir;
+    _buff = buff;
 
-    if (!procFinished) {
-        // avoid a Qt warning in case we are
-        // destroyed while still running
-        waitForFinished(1000);
-    }
-}
-
-void DataLoader::on_cancel(const FileHistory* f) {
-
-    if (f == fh)
-        on_cancel();
-}
-
-void DataLoader::on_cancel() {
-
-    if (!canceling) { // just once
-        canceling = true;
-        kill(); // SIGKILL (Unix and Mac), TerminateProcess (Windows)
-    }
-}
-
-bool DataLoader::start(const QStringList& args, const QString& wd, const QString& buf) {
-
-    if (!procFinished) {
-        log_error << "Failed start git process, it already running";
-        return false;
-    }
-    procFinished = false;
-    setWorkingDirectory(wd);
-
-    chk_connect_a(this, SIGNAL(finished(int, QProcess::ExitStatus)),
-                  this, SLOT(on_finished(int, QProcess::ExitStatus)));
-
-    if (!createTemporaryFile() || !qgit::startProcess(this, args, buf)) {
-        deleteLater();
-
-        log_error << "Failed start git process";
-        return false;
-    }
-    loadTime.start();
-    timerCallCounter = 0;
-    guiUpdateTimer.start(GUI_UPDATE_INTERVAL);
-
-    log_debug << "Git process started";
     return true;
 }
 
-void DataLoader::on_finished(int, QProcess::ExitStatus) {
-
-    procFinished = true;
-
-    if (parsing && guiUpdateTimer.isActive())
-        log_error << "Timer active while parsing";
-
-    if (parsing == guiUpdateTimer.isActive() && !canceling)
-        log_error << "Inconsistent timer";
-
-    if (guiUpdateTimer.isActive()) // no need to wait anymore
-        guiUpdateTimer.start(0);
-
-    log_debug << "Git process finished";
+void DataLoader::cancel(const FileHistory* fh)
+{
+    if (fh == _fileHist)
+        cancel();
 }
 
-void DataLoader::on_timeout() {
+void DataLoader::cancel()
+{
+    stop();
+}
 
-    ++timerCallCounter;
+void DataLoader::runSetError()
+{
+    _runInit = 0;
+    _fileHist = nullptr;
+}
 
-    if (canceling) {
-        deleteLater();
-        return; // we leave with guiUpdateTimer not active
-    }
-    parsing = true;
+void DataLoader::run()
+{
+    log_info_m << "Started";
 
-    log_debug << "Read new git data";
-
-    qint64 len = readNewData();
-    if (len == -1) {
-        emit loaded(fh, loadedBytes, loadTime.elapsed(), true, "", "");
-        deleteLater();
-
-        log_debug << "All git data readed";
+    if (!_fileHist)
+    {
+        runSetError();
+        log_error_m << "Not initialized 'fileHist' field";
+        log_info_m  << "Stopped";
         return;
     }
-    else if (len > 0) {
-        loadedBytes += len;
-        if (timerCallCounter <= 3)
-            emit newDataReady(fh);
+
+    QString tmpDirPath = QDir::tempPath() + "/qgit";
+    UnbufferedTemporaryFile dataFile {tmpDirPath};
+
+    if (!dataFile.open())
+    {
+        runSetError();
+        log_error_m << "Failed open temporary file";
+        log_info_m  << "Stopped";
+        return;
     }
 
-    if (procFinished)
-        guiUpdateTimer.start(0);
-    else
-        guiUpdateTimer.start(GUI_UPDATE_INTERVAL / 2);
+    QString tmpFilePath = dataFile.fileName();
+    dataFile.close();
 
-    parsing = false;
-}
+    QProcess proc;
+    proc.setWorkingDirectory(_workDir);
+    proc.setStandardOutputFile(tmpFilePath);
 
-// *************** git interface facility dependant code *****************************
+    bool procFinished = false;
+    bool procFinishLog = false;
 
-//#ifdef USE_QPROCESS
+    auto procFinishFunc = [&procFinished](int /*exitCode*/) {
+        procFinished = true;
+    };
+    connect(&proc, QOverload<int>::of(&QProcess::finished), procFinishFunc);
 
-//ulong DataLoader::readNewData(bool lastBuffer) {
+    if (!qgit::startProcess(&proc, _args, _buff))
+    {
+        runSetError();
+        log_info_m  << "Stopped";
+        return;
+    }
+    while (proc.state() == QProcess::Starting)
+        usleep(10);
 
-//    /*
-//       QByteArray copy c'tor uses shallow copy, but there is a deep copy in
-//       QProcess::readStdout(), from an internal buffers list to return value.
+    _runInit = 1;
+    msleep(GUI_UPDATE_INTERVAL);
 
-//       Qt uses a select() to detect new data is ready, copies immediately the
-//       data to the heap with a read() and stores the pointer to new data in a
-//       pointer list, from qprocess_unix.cpp:
+    if (!dataFile.unbufOpen())
+    {
+        log_error_m << "Failed open temporary file: " << tmpFilePath;
+        log_info_m  << "Stopped";
+        return;
+    }
 
-//        const int basize = 4096;
-//        QByteArray *ba = new QByteArray(basize);
-//        n = ::read(fd, ba->data(), basize);
-//        buffer->append(ba); // added to a QPtrList<QByteArray> pointer list
+    int loopCounter = 0;
+    qint64 loadedBytes = 0;
 
-//       When we call QProcess::readStdout() data from buffers pointed by the
-//       pointer list is memcpy() to the function return value, from qprocess.cpp:
-
-//        ....
-//        return buf->readAll(); // memcpy() here
-//    */
-//    QByteArray* ba = new QByteArray(readAllStandardOutput());
-//    if (lastBuffer)
-//        ba->append('\0'); // be sure stream is null terminated
-
-//    if (ba->size() == 0) {
-//        delete ba;
-//        return 0;
-//    }
-//    fh->rowData.append(ba);
-//    parseSingleBuffer(*ba);
-//    return ba->size();
-//}
-
-//bool DataLoader::createTemporaryFile() { return true; }
-
-//#else // temporary file as data exchange facility
-
-qint64 DataLoader::readNewData() {
-
-    bool ok = dataFile &&
-             (dataFile->isOpen() || (dataFile->exists() && dataFile->unbufOpen()));
-
-    if (!ok)
-        return 0;
-
-    QByteArray ba;
-    ba.resize(READ_BLOCK_SIZE);
-    qint64 len = dataFile->read((char*) ba.constData(), READ_BLOCK_SIZE);
-
+    QByteArray rawBuff;
     QTextCodec* tc = QTextCodec::codecForLocale();
 
-    if (len == 0) {
-        bool atEnd = dataFile->atEnd();
-        if (procFinished && atEnd) {
-            if (!rawBuff.isEmpty()) {
-                rawBuff.append('\0');
-                QString s = tc->toUnicode(rawBuff);
-                git->addChunk(fh, s);
-            }
-            return -1;
+    QTime loadTime;
+    loadTime.start();
+
+    while (true)
+    {
+        CHECK_QTHREADEX_STOP
+
+        if (!procFinishLog && procFinished)
+        {
+            procFinishLog = true;
+            log_debug_m << "Process finished: " << proc.program();
         }
-        return 0;
-    }
-    if (len < ba.size())
-        ba.resize(int(len));
 
-    rawBuff.append(ba);
+        QByteArray ba;
+        ba.resize(READ_BLOCK_SIZE);
+        qint64 size = dataFile.read((char*) ba.constData(), READ_BLOCK_SIZE);
 
-    int pos = -1;
-    while ((pos = rawBuff.indexOf('\0')) != -1) {
-        QByteArray b = QByteArray::fromRawData(rawBuff.constData(), pos + 1);
-        QString s = tc->toUnicode(b);
-        git->addChunk(fh, s);
-        rawBuff.remove(0, pos + 1);
+        log_debug_m << "Read git data. Size: " << size;
+
+        if (size != 0)
+        {
+            if (size < ba.size())
+                ba.resize(int(size));
+
+            rawBuff.append(ba);
+
+            int pos = -1;
+            while ((pos = rawBuff.indexOf('\0')) != -1)
+            {
+                QByteArray b = QByteArray::fromRawData(rawBuff.constData(), pos + 1);
+                QString s = tc->toUnicode(b);
+                emit addChunk(_fileHist, s);
+                rawBuff.remove(0, pos + 1);
+            }
+        }
+        else
+        {
+            bool atEnd = dataFile.atEnd();
+            if (procFinished && atEnd)
+            {
+                if (!rawBuff.isEmpty())
+                {
+                    rawBuff.append('\0');
+                    QString s = tc->toUnicode(rawBuff);
+                    emit addChunk(_fileHist, s);
+                }
+                size = -1;
+            }
+        }
+
+        if (size == -1)
+        {
+            emit allDataLoaded(_fileHist, loadedBytes, loadTime.elapsed(), true, "", "");
+            log_debug_m << "All git data readed";
+            break;
+        }
+        loadedBytes += size;
+
+        if ((loopCounter <= 3) || (loopCounter % 10 == 0))
+            emit newDataReady(_fileHist);
+        ++loopCounter;
+
+        if (!procFinished)
+            proc.waitForFinished(GUI_UPDATE_INTERVAL);
     }
-    return len;
+
+    if (!procFinished)
+    {
+        proc.terminate();
+        log_debug_m << "Wait a completion process: " << proc.program();
+        if (!proc.waitForFinished(5*1000))
+        {
+            proc.kill();
+            log_debug_m << "Process killed: " << proc.program();
+        }
+    }
+
+    _runInit = -1;
+    _fileHist = nullptr;
+
+    log_info_m << "Stopped";
 }
 
-bool DataLoader::createTemporaryFile() {
-
-    // redirect 'git log' output to a temporary file
-    dataFile = new UnbufferedTemporaryFile(this);
-
-#ifndef Q_OS_WIN32
-    /*
-       For performance reasons we would like to use a tmpfs filesystem
-       if available, this is normally mounted under '/tmp' in Linux.
-
-       According to Qt docs, a temporary file is placed in QDir::tempPath(),
-       that should be system's temporary directory. On Unix/Linux systems this
-       is usually /tmp; on Windows this is usually the path in the TEMP or TMP
-       environment variable.
-
-       But due to a bug in Qt 4.2 QDir::tempPath() is instead set to $HOME/tmp
-       under Unix/Linux, that is not a tmpfs filesystem.
-
-       So try to manually set the best directory for our temporary file.
-    */
-        QDir dir {"/tmp"};
-        bool foundTmpDir = (dir.exists() && dir.isReadable());
-        if (foundTmpDir && dir.absolutePath() != QDir::tempPath()) {
-
-            dataFile->setFileTemplate(dir.absolutePath() + "/qt_temp");
-            if (!dataFile->open()) { // test for write access
-
-                delete dataFile;
-                dataFile = new UnbufferedTemporaryFile(this);
-                log_warn << "Directory '/tmp' is not writable,"
-                            " fallback on Qt default one, there could"
-                            " be a performance penalty";
-            }
-            else
-                dataFile->close();
-        }
-#endif
-    if (!dataFile->open()) // to read the file name
-        return false;
-
-    setStandardOutputFile(dataFile->fileName());
-    dataFile->close();
-    return true;
+DataLoader& dataLoader()
+{
+    return ::safe_singleton<DataLoader>();
 }
-
-//#endif // USE_QPROCESS

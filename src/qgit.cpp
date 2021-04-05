@@ -6,6 +6,7 @@
 */
 #include "common.h"
 #include "mainimpl.h"
+#include "dataloader.h"
 #include "spellcheck/spellcheck.h"
 
 #include "shared/defmac.h"
@@ -48,7 +49,7 @@ int main(int argc, char* argv[])
     if (!QDir(configDir).exists())
         if (!QDir().mkpath(configDir))
         {
-            log_error << "Failed create log directory: " << configDir;
+            log_error << "Failed create config directory: " << configDir;
             stopLog();
             return 1;
         }
@@ -132,6 +133,8 @@ int main(int argc, char* argv[])
 
     if (config::base().changed())
         config::base().save();
+
+    dataLoader().stop();
 
     log_info << log_format("%? is stopped", APPLICATION_NAME);
     stopLog();

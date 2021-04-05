@@ -1,60 +1,56 @@
 /*
-    Author: Marco Costalba (C) 2005-2007
+    Author: Pavel Karelin 2021 (hkarel), <hkarel@yandex.ru>
 
     Copyright: See COPYING file that comes with this distribution
 
 */
-#ifndef DATALOADER_H
-#define DATALOADER_H
+#pragma once
 
-#include <QProcess>
-#include <QTime>
-#include <QTimer>
+#include "shared/defmac.h"
+#include "shared/safe_singleton.h"
+#include "shared/qt/qthreadex.h"
 
-class Git;
+#include <QtCore>
+
 class FileHistory;
-class QString;
-class UnbufferedTemporaryFile;
 
-// data exchange facility with 'git log' could be based on QProcess or on
-// a temporary file (default). Uncomment following line to use QProcess
-// #define USE_QPROCESS
-
-class DataLoader : public QProcess {
-Q_OBJECT
+class DataLoader : public QThreadEx
+{
 public:
-    DataLoader(Git* g, FileHistory* f);
     ~DataLoader();
-    bool start(const QStringList& args, const QString& wd, const QString& buf);
+
+    bool init(FileHistory*, const QStringList& args, const QString& workDir,
+              const QString& buff);
+
+     int runInit() const {return _runInit;}
 
 signals:
-    void newDataReady(const FileHistory*);
-    void loaded(FileHistory*, ulong, int, bool, const QString&, const QString&);
+    void addChunk(FileHistory*, const QString&);
+    void newDataReady(FileHistory*);
+    void allDataLoaded(FileHistory*, ulong byteSize, int loadTime, bool normalExit,
+                       const QString& cmd, const QString& errorDesc);
 
 private slots:
-    void on_finished(int, QProcess::ExitStatus);
-    void on_cancel();
-    void on_cancel(const FileHistory*);
-    void on_timeout();
+    void cancel();
+    void cancel(const FileHistory*);
 
 private:
-    //void parseSingleBuffer(const QByteArray& ba);
-    //void baAppend(QByteArray** src, const char* ascii, int len);
-    //void addSplittedChunks(const QByteArray* halfChunk);
-    bool createTemporaryFile();
-    qint64 readNewData();
+    Q_OBJECT
+    DISABLE_DEFAULT_COPY(DataLoader)
+    DataLoader();
 
-    Git* git;
-    FileHistory* fh;
-    UnbufferedTemporaryFile* dataFile;
-    QTime loadTime;
-    QTimer guiUpdateTimer;
-    int timerCallCounter;
-    qint64 loadedBytes;
-    bool parsing;
-    bool canceling;
-    bool procFinished;
-    QByteArray rawBuff;
+    void runSetError();
+    void run() override;
+
+private:
+    volatile int _runInit = {-1};
+    FileHistory* _fileHist = {nullptr};
+
+    QStringList _args;
+    QString _workDir;
+    QString _buff;
+
+    template<typename T, int> friend T& ::safe_singleton();
 };
 
-#endif
+DataLoader& dataLoader();
