@@ -176,15 +176,15 @@ void ListView::scrollToNextHighlighted(int direction) {
 }
 
 void ListView::scrollToNext(int direction) {
-	// Depending on the value of direction, scroll to:
-	// -1 = the next child in history
-	//  1 = the previous parent in history
+    // Depending on the value of direction, scroll to:
+    // -1 = the next child in history
+    //  1 = the previous parent in history
     QString s = sha(currentIndex().row());
-	const Rev* r = git->revLookup(s);
-	if (!r) return;
-	const QStringList& next = direction < 0 ? git->getChildren(s) : r->parents();
-	if (next.size() >= 1)
-		setCurrentIndex(model()->index(row(next.first()), 0));
+    const Rev* r = git->revLookup(s);
+    if (!r) return;
+    const QStringList& next = direction < 0 ? git->getChildren(s) : r->parents();
+    if (next.size() >= 1)
+        setCurrentIndex(model()->index(row(next.first()), 0));
 }
 
 void ListView::scrollToCurrent(ScrollHint hint) {
@@ -365,85 +365,85 @@ void ListView::mouseReleaseEvent(QMouseEvent* e) {
 
 
 QPixmap ListView::pixmapFromSelection(const QStringList &revs, const QString &ref) const {
-	const int maxRows = 10;
-	const int dotdotRow = 5;
-	QStyleOptionViewItem opt; opt.initFrom(this);
-//	ListViewDelegate *lvd = dynamic_cast<ListViewDelegate*>(itemDelegate());
+    const int maxRows = 10;
+    const int dotdotRow = 5;
+    QStyleOptionViewItem opt; opt.initFrom(this);
+//    ListViewDelegate *lvd = dynamic_cast<ListViewDelegate*>(itemDelegate());
 
-	QFontMetrics fm(opt.font);
-	int height = fm.height()+2;
-	int row = 0, rows = std::min(revs.count() + (ref.isEmpty() ? 0 : 1), maxRows);
-	int spacing = 4;
-	QPixmap pixmap (columnWidth(LOG_COL), rows*height);
-	pixmap.fill(Qt::transparent);
+    QFontMetrics fm(opt.font);
+    int height = fm.height()+2;
+    int row = 0, rows = std::min(revs.count() + (ref.isEmpty() ? 0 : 1), maxRows);
+    int spacing = 4;
+    QPixmap pixmap (columnWidth(LOG_COL), rows*height);
+    pixmap.fill(Qt::transparent);
 
-	QPainter painter(&pixmap);
-	// render selected ref name
-	if (!ref.isEmpty()) {
-		QStyleOptionViewItem o(opt);
-		QString dummy;
-		getTagMarkParams(dummy, o, refTypeFromName(ref), false);
-		painter.fillRect(0, 0, fm.width(ref)+2*spacing, height, o.palette.window());
-		painter.drawText(spacing, fm.ascent()+1, ref);
-		row = 1;
-	}
+    QPainter painter(&pixmap);
+    // render selected ref name
+    if (!ref.isEmpty()) {
+        QStyleOptionViewItem o(opt);
+        QString dummy;
+        getTagMarkParams(dummy, o, refTypeFromName(ref), false);
+        painter.fillRect(0, 0, fm.width(ref)+2*spacing, height, o.palette.window());
+        painter.drawText(spacing, fm.ascent()+1, ref);
+        row = 1;
+    }
 
-	painter.fillRect(0, row*height, pixmap.width(), (rows-row)*height, opt.palette.window());
-	for (QStringList::const_iterator it = revs.begin(), end = revs.end(); it != end; ++it) {
-		const Rev* r = git->revLookup(it->section(" ", 0, 0));
-		if (!r) continue; // should not happen
-		painter.drawText(spacing, row*height + fm.ascent()+1, r->shortLog()); ++row;
-		// jump to last dotdotRows-1 items if necessary
-		if (rows-row == dotdotRow && end-it > dotdotRow+1) {
-			++row; // leave one line empty
-			it += end-it - dotdotRow;
-		}
-	}
-	painter.end();
-	return pixmap;
+    painter.fillRect(0, row*height, pixmap.width(), (rows-row)*height, opt.palette.window());
+    for (QStringList::const_iterator it = revs.begin(), end = revs.end(); it != end; ++it) {
+        const Rev* r = git->revLookup(it->section(" ", 0, 0));
+        if (!r) continue; // should not happen
+        painter.drawText(spacing, row*height + fm.ascent()+1, r->shortLog()); ++row;
+        // jump to last dotdotRows-1 items if necessary
+        if (rows-row == dotdotRow && end-it > dotdotRow+1) {
+            ++row; // leave one line empty
+            it += end-it - dotdotRow;
+        }
+    }
+    painter.end();
+    return pixmap;
 }
 
 void ListView::startDragging(QMouseEvent* /*e*/) {
 
-	QStringList selRevs;
-	getSelectedItems(selRevs);
-	selRevs.removeAll(ZERO_SHA);
+    QStringList selRevs;
+    getSelectedItems(selRevs);
+    selRevs.removeAll(ZERO_SHA);
 
-	QDrag* drag = new QDrag(this);
-	QMimeData* mimeData = new QMimeData;
-	if (!selRevs.empty()) {
-		Qt::DropActions actions = Qt::CopyAction; // patch
-		Qt::DropAction default_action = Qt::CopyAction;
+    QDrag* drag = new QDrag(this);
+    QMimeData* mimeData = new QMimeData;
+    if (!selRevs.empty()) {
+        Qt::DropActions actions = Qt::CopyAction; // patch
+        Qt::DropAction default_action = Qt::CopyAction;
 
-		// compose mime data
-		bool contiguous = git->isContiguous(selRevs);
+        // compose mime data
+        bool contiguous = git->isContiguous(selRevs);
 
-		// standard text for range description
-		if (contiguous) {
-			QString text;
-			if (selRevs.size() > 1) text += selRevs.back() + "..";
-			text += lastRefName.isEmpty() ? selRevs.front() : lastRefName;
-			mimeData->setText(text);
-		}
+        // standard text for range description
+        if (contiguous) {
+            QString text;
+            if (selRevs.size() > 1) text += selRevs.back() + "..";
+            text += lastRefName.isEmpty() ? selRevs.front() : lastRefName;
+            mimeData->setText(text);
+        }
 
-		// revision range for patch/merge/rebase operations
-		QString mime = QString("%1@%2\n").arg(contiguous ? "RANGE" : "LIST").arg(d->m()->currentDir());
-		if (contiguous && !lastRefName.isEmpty())
-			selRevs.front() += " " + lastRefName; // append ref name
-		mime.append(selRevs.join("\n"));
-		mimeData->setData("application/x-qgit-revs", mime.toUtf8());
+        // revision range for patch/merge/rebase operations
+        QString mime = QString("%1@%2\n").arg(contiguous ? "RANGE" : "LIST").arg(d->m()->currentDir());
+        if (contiguous && !lastRefName.isEmpty())
+            selRevs.front() += " " + lastRefName; // append ref name
+        mime.append(selRevs.join("\n"));
+        mimeData->setData("application/x-qgit-revs", mime.toUtf8());
 
-		drag->setMimeData(mimeData);
-		drag->setPixmap(pixmapFromSelection(selRevs, lastRefName));
+        drag->setMimeData(mimeData);
+        drag->setPixmap(pixmapFromSelection(selRevs, lastRefName));
 
-		if (contiguous) { // rebase enabled
-			actions |= Qt::MoveAction; // rebase (local branch) or push (remote branch)
-		}
-		// merging (of several shas) is also enabled
-		actions |= Qt::LinkAction;
+        if (contiguous) { // rebase enabled
+            actions |= Qt::MoveAction; // rebase (local branch) or push (remote branch)
+        }
+        // merging (of several shas) is also enabled
+        actions |= Qt::LinkAction;
 
-		drag->exec(actions, default_action);
-	}
+        drag->exec(actions, default_action);
+    }
 }
 
 void ListView::mouseMoveEvent(QMouseEvent* e) {
@@ -457,228 +457,228 @@ void ListView::mouseMoveEvent(QMouseEvent* e) {
 }
 
 struct ListView::DropInfo {
-	DropInfo (uint f) : flags(f) {}
+    DropInfo (uint f) : flags(f) {}
 
-	enum Flags {
-		PATCHES  = 1 << 0,
-		REV_LIST = 1 << 1,
-		REV_RANGE = 1 << 2,
-		SAME_REPO     = 1 << 3,
-	};
-	enum Action {
-		PatchAction = Qt::CopyAction,
-		RebaseAction = Qt::MoveAction,
-		MoveRefAction = (Qt::LinkAction << 1) | Qt::MoveAction,
-		MergeAction = Qt::LinkAction,
-	};
+    enum Flags {
+        PATCHES  = 1 << 0,
+        REV_LIST = 1 << 1,
+        REV_RANGE = 1 << 2,
+        SAME_REPO     = 1 << 3,
+    };
+    enum Action {
+        PatchAction = Qt::CopyAction,
+        RebaseAction = Qt::MoveAction,
+        MoveRefAction = (Qt::LinkAction << 1) | Qt::MoveAction,
+        MergeAction = Qt::LinkAction,
+    };
 
-	QString sourceRepo;
-	QString sourceRef;
-	uint    sourceRefType;
-	Action  action;
-	uint flags;
-	QStringList shas;
+    QString sourceRepo;
+    QString sourceRef;
+    uint    sourceRefType;
+    Action  action;
+    uint flags;
+    QStringList shas;
 
-	static QString actionName (ListView::DropInfo::Action a) {
-		switch (a) {
-		case PatchAction: return "patching";
-		case RebaseAction: return "rebasing";
-		case MoveRefAction: return "moving";
-		case MergeAction: return "merging";
-		default: return "This should not happen.";
-		}
-	}
+    static QString actionName (ListView::DropInfo::Action a) {
+        switch (a) {
+        case PatchAction: return "patching";
+        case RebaseAction: return "rebasing";
+        case MoveRefAction: return "moving";
+        case MergeAction: return "merging";
+        default: return "This should not happen.";
+        }
+    }
 };
 
 uint refTypeFromName(const QString& name) {
-	if (name.startsWith("tags/")) return Git::TAG;
-	if (name.startsWith("remotes/")) return Git::RMT_BRANCH;
-	if (!name.isEmpty()) return Git::BRANCH;
-	return 0;
+    if (name.startsWith("tags/")) return Git::TAG;
+    if (name.startsWith("remotes/")) return Git::RMT_BRANCH;
+    if (!name.isEmpty()) return Git::BRANCH;
+    return 0;
 }
 
 void ListView::dragEnterEvent(QDragEnterEvent* e) {
 
-	if (dropInfo) delete dropInfo;
-	dropInfo = NULL;
-	bool bCleanWorkDir = git->isNothingToCommit();
+    if (dropInfo) delete dropInfo;
+    dropInfo = NULL;
+    bool bCleanWorkDir = git->isNothingToCommit();
 
-	// accept local file urls for patching
-	bool valid=true;
-	const QList<QUrl>& urls = e->mimeData()->urls();
-	for(QList<QUrl>::const_iterator it=urls.begin(), end=urls.end();
-	    valid && it!=end; ++it)
-		valid &= it->isLocalFile();
-	if (urls.size() > 0 && valid && bCleanWorkDir) {
-		dropInfo = new DropInfo(DropInfo::PATCHES);
+    // accept local file urls for patching
+    bool valid=true;
+    const QList<QUrl>& urls = e->mimeData()->urls();
+    for(QList<QUrl>::const_iterator it=urls.begin(), end=urls.end();
+        valid && it!=end; ++it)
+        valid &= it->isLocalFile();
+    if (urls.size() > 0 && valid && bCleanWorkDir) {
+        dropInfo = new DropInfo(DropInfo::PATCHES);
         e->accept();
-	}
+    }
 
-	// parse internal mime format
-	if (!e->mimeData()->hasFormat("application/x-qgit-revs"))
-		return;
+    // parse internal mime format
+    if (!e->mimeData()->hasFormat("application/x-qgit-revs"))
+        return;
 
-	dropInfo = new DropInfo(DropInfo::REV_LIST);
+    dropInfo = new DropInfo(DropInfo::REV_LIST);
 
     QString revsText(e->mimeData()->data("application/x-qgit-revs"));
-	QString header = revsText.section("\n", 0, 0);
-	dropInfo->shas = revsText.section("\n", 1).split('\n', QString::SkipEmptyParts);
-	// extract refname and sha from first entry again
-	dropInfo->sourceRef = dropInfo->shas.front().section(" ", 1);
-	dropInfo->shas.front() = dropInfo->shas.front().section(" ", 0, 0);
-	dropInfo->sourceRefType = refTypeFromName(dropInfo->sourceRef);
+    QString header = revsText.section("\n", 0, 0);
+    dropInfo->shas = revsText.section("\n", 1).split('\n', QString::SkipEmptyParts);
+    // extract refname and sha from first entry again
+    dropInfo->sourceRef = dropInfo->shas.front().section(" ", 1);
+    dropInfo->shas.front() = dropInfo->shas.front().section(" ", 0, 0);
+    dropInfo->sourceRefType = refTypeFromName(dropInfo->sourceRef);
 
-	// check source repo
-	dropInfo->sourceRepo = header.section("@", 1);
-	if (dropInfo->sourceRepo != d->m()->currentDir()) {
-		if (!QDir().exists(dropInfo->sourceRepo)) {
-			emit showStatusMessage("Remote repository missing: " + dropInfo->sourceRepo, 10000);
-			e->ignore();
-			return;
-		}
-	} else
-		dropInfo->flags |= DropInfo::SAME_REPO;
+    // check source repo
+    dropInfo->sourceRepo = header.section("@", 1);
+    if (dropInfo->sourceRepo != d->m()->currentDir()) {
+        if (!QDir().exists(dropInfo->sourceRepo)) {
+            emit showStatusMessage("Remote repository missing: " + dropInfo->sourceRepo, 10000);
+            e->ignore();
+            return;
+        }
+    } else
+        dropInfo->flags |= DropInfo::SAME_REPO;
 
 
-	if (!bCleanWorkDir && // dirty work dir doesn't allow merging/rebasing
-	    // only exception is moving ref names within same repo
-	    !(dropInfo->sourceRefType != 0 && dropInfo->shas.count() == 1 && (dropInfo->flags & DropInfo::SAME_REPO))) {
-		emit showStatusMessage("Drag-n-drop rejected: First clean your working dir!", 10000);
-		e->ignore();
-		return;
-	}
-	e->accept();
+    if (!bCleanWorkDir && // dirty work dir doesn't allow merging/rebasing
+        // only exception is moving ref names within same repo
+        !(dropInfo->sourceRefType != 0 && dropInfo->shas.count() == 1 && (dropInfo->flags & DropInfo::SAME_REPO))) {
+        emit showStatusMessage("Drag-n-drop rejected: First clean your working dir!", 10000);
+        e->ignore();
+        return;
+    }
+    e->accept();
 
-	if (header.startsWith("RANGE")) dropInfo->flags |= DropInfo::REV_RANGE;
+    if (header.startsWith("RANGE")) dropInfo->flags |= DropInfo::REV_RANGE;
 }
 
 void ListView::dragMoveEvent(QDragMoveEvent* e) {
-	// When getting here, dragEnterEvent already accepted the drag in general
+    // When getting here, dragEnterEvent already accepted the drag in general
 
     QString targetRef = refNameAt(e->pos());
-	uint targetRefType = refTypeFromName(targetRef);
-	QModelIndex idx = indexAt(e->pos());
+    uint targetRefType = refTypeFromName(targetRef);
+    QModelIndex idx = indexAt(e->pos());
     QString targetSHA = sha(idx.row());
-	uint   accepted_actions = DropInfo::PatchAction; // applying patches is always allowed
-	DropInfo::Action  action, default_action = DropInfo::PatchAction;
+    uint   accepted_actions = DropInfo::PatchAction; // applying patches is always allowed
+    DropInfo::Action  action, default_action = DropInfo::PatchAction;
 
-	// extended drop actions (merging, rebasing, pushing) are only allowed
-	if (dropInfo->flags & DropInfo::SAME_REPO && // on same repo
-	    dropInfo->flags & DropInfo::REV_LIST && // qgit drags
-	    idx.column() == LOG_COL) { // and when dropping onto LOG_COL
-		// only accept drop when target has different sha than source shas
-		if (dropInfo->shas.contains(targetSHA)) {
-			e->ignore();
-			emit showStatusMessage("Cannot drop onto current selection.");
-			return;
-		}
-		// decide the preferred drop action based on context and
+    // extended drop actions (merging, rebasing, pushing) are only allowed
+    if (dropInfo->flags & DropInfo::SAME_REPO && // on same repo
+        dropInfo->flags & DropInfo::REV_LIST && // qgit drags
+        idx.column() == LOG_COL) { // and when dropping onto LOG_COL
+        // only accept drop when target has different sha than source shas
+        if (dropInfo->shas.contains(targetSHA)) {
+            e->ignore();
+            emit showStatusMessage("Cannot drop onto current selection.");
+            return;
+        }
+        // decide the preferred drop action based on context and
 
-		// rebasing is allowed onto any sha (and workdir),
-		// but only if source sha list is contiguous range
-		if (dropInfo->flags & DropInfo::REV_RANGE) {
-			accepted_actions |= DropInfo::RebaseAction;
-			default_action = DropInfo::RebaseAction;
-		}
+        // rebasing is allowed onto any sha (and workdir),
+        // but only if source sha list is contiguous range
+        if (dropInfo->flags & DropInfo::REV_RANGE) {
+            accepted_actions |= DropInfo::RebaseAction;
+            default_action = DropInfo::RebaseAction;
+        }
 
-		// merging is allowed onto any local branch
-		if (targetRefType == Git::BRANCH) {
-			accepted_actions |= DropInfo::MergeAction;
-			default_action = DropInfo::MergeAction;
-		}
+        // merging is allowed onto any local branch
+        if (targetRefType == Git::BRANCH) {
+            accepted_actions |= DropInfo::MergeAction;
+            default_action = DropInfo::MergeAction;
+        }
 
-		// pushing is allowed when sha list has 1 item and sourceRef is remote branch
-		if (dropInfo->shas.count() == 1 &&
-		    dropInfo->sourceRefType != 0 && targetSHA != ZERO_SHA) {
-			accepted_actions |= DropInfo::MoveRefAction;
-			default_action = DropInfo::MoveRefAction;
-		}
-	} else if (e->source() == this && idx.row() == currentIndex().row()) {
-		// move at least by one line before enabling drag
-		e->ignore();
-		showStatusMessage("");
-		return;
-	}
+        // pushing is allowed when sha list has 1 item and sourceRef is remote branch
+        if (dropInfo->shas.count() == 1 &&
+            dropInfo->sourceRefType != 0 && targetSHA != ZERO_SHA) {
+            accepted_actions |= DropInfo::MoveRefAction;
+            default_action = DropInfo::MoveRefAction;
+        }
+    } else if (e->source() == this && idx.row() == currentIndex().row()) {
+        // move at least by one line before enabling drag
+        e->ignore();
+        showStatusMessage("");
+        return;
+    }
 
     e->accept();
-	// check whether modifier keys enforce an action
-	switch (e->keyboardModifiers()) {
-	case Qt::ControlModifier: action = DropInfo::PatchAction; break;
-	case Qt::ShiftModifier: action = DropInfo::RebaseAction; break;
-	case Qt::AltModifier: action = DropInfo::MergeAction; break;
-	default: action = default_action; break;
-	}
-	QString statusMsg;
-	if ((action & accepted_actions) == 0) {
-		statusMsg = DropInfo::actionName(action) + " not allowed. ";
-		statusMsg[0] = statusMsg[0].toUpper();
-		action = default_action;
-	}
+    // check whether modifier keys enforce an action
+    switch (e->keyboardModifiers()) {
+    case Qt::ControlModifier: action = DropInfo::PatchAction; break;
+    case Qt::ShiftModifier: action = DropInfo::RebaseAction; break;
+    case Qt::AltModifier: action = DropInfo::MergeAction; break;
+    default: action = default_action; break;
+    }
+    QString statusMsg;
+    if ((action & accepted_actions) == 0) {
+        statusMsg = DropInfo::actionName(action) + " not allowed. ";
+        statusMsg[0] = statusMsg[0].toUpper();
+        action = default_action;
+    }
 
-	// inform user about the to-be-performed action in statusBar
-	switch (action) {
-	case DropInfo::PatchAction:
-		statusMsg += "Applying patches";
-		break;
-	case DropInfo::RebaseAction:
-		statusMsg += QString("Rebasing %1 onto %2")
-		        .arg((dropInfo->sourceRefType == Git::BRANCH &&
-		              dropInfo->shas.count() == 1) ? dropInfo->sourceRef : "selection")
-		        .arg(targetRefType == Git::BRANCH ? targetRef : targetSHA);
-		break;
-	case DropInfo::MoveRefAction:
-		statusMsg += "Moving " + dropInfo->sourceRef;
-		break;
-	case DropInfo::MergeAction:
-		statusMsg += "Merging selected branches into " + targetRef;
-		break;
-	}
-	emit showStatusMessage(statusMsg);
-	dropInfo->action = action;
-	e->setDropAction(static_cast<Qt::DropAction>(action & 0x7));
+    // inform user about the to-be-performed action in statusBar
+    switch (action) {
+    case DropInfo::PatchAction:
+        statusMsg += "Applying patches";
+        break;
+    case DropInfo::RebaseAction:
+        statusMsg += QString("Rebasing %1 onto %2")
+                .arg((dropInfo->sourceRefType == Git::BRANCH &&
+                      dropInfo->shas.count() == 1) ? dropInfo->sourceRef : "selection")
+                .arg(targetRefType == Git::BRANCH ? targetRef : targetSHA);
+        break;
+    case DropInfo::MoveRefAction:
+        statusMsg += "Moving " + dropInfo->sourceRef;
+        break;
+    case DropInfo::MergeAction:
+        statusMsg += "Merging selected branches into " + targetRef;
+        break;
+    }
+    emit showStatusMessage(statusMsg);
+    dropInfo->action = action;
+    e->setDropAction(static_cast<Qt::DropAction>(action & 0x7));
 }
 
 void ListView::dragLeaveEvent(QDragLeaveEvent* /*e*/)
 {
     if (dropInfo) delete dropInfo;
     dropInfo = NULL;
-	showStatusMessage("");
+    showStatusMessage("");
 }
 
 void ListView::dropEvent(QDropEvent *e) {
 
-	if (dropInfo->flags & DropInfo::PATCHES) {
-		QStringList files;
-		QList<QUrl> urls = e->mimeData()->urls();
+    if (dropInfo->flags & DropInfo::PATCHES) {
+        QStringList files;
+        QList<QUrl> urls = e->mimeData()->urls();
         FOREACH(url, urls)
             files << url->toLocalFile();
 
-		emit applyPatches(files);
-		return;
-	}
+        emit applyPatches(files);
+        return;
+    }
 
     QString targetRef = refNameAt(e->pos());
-//	uint  targetRefType = refTypeFromName(targetRef);
+//    uint  targetRefType = refTypeFromName(targetRef);
     QString targetSHA = sha(indexAt(e->pos()).row());
-	switch(dropInfo->action) {
-	case DropInfo::PatchAction:
-		emit applyRevisions(dropInfo->shas, dropInfo->sourceRepo);
-		break;
-	case DropInfo::RebaseAction:
-		if (dropInfo->sourceRefType == Git::BRANCH && dropInfo->shas.count() == 1)
-			emit rebase("", dropInfo->sourceRef, targetSHA);
-		else
-			emit rebase(dropInfo->shas.last(),
-		                dropInfo->sourceRef.isEmpty() ? dropInfo->shas.first()
-		                                              : dropInfo->sourceRef,
-		                targetSHA);
-		break;
-	case DropInfo::MergeAction:
-		emit merge(dropInfo->shas, targetRef);
-		break;
-	case DropInfo::MoveRefAction:
-		emit moveRef(dropInfo->sourceRef, targetSHA);
-		break;
+    switch(dropInfo->action) {
+    case DropInfo::PatchAction:
+        emit applyRevisions(dropInfo->shas, dropInfo->sourceRepo);
+        break;
+    case DropInfo::RebaseAction:
+        if (dropInfo->sourceRefType == Git::BRANCH && dropInfo->shas.count() == 1)
+            emit rebase("", dropInfo->sourceRef, targetSHA);
+        else
+            emit rebase(dropInfo->shas.last(),
+                        dropInfo->sourceRef.isEmpty() ? dropInfo->shas.first()
+                                                      : dropInfo->sourceRef,
+                        targetSHA);
+        break;
+    case DropInfo::MergeAction:
+        emit merge(dropInfo->shas, targetRef);
+        break;
+    case DropInfo::MoveRefAction:
+        emit moveRef(dropInfo->sourceRef, targetSHA);
+        break;
     }
 }
 
@@ -782,7 +782,7 @@ void RefNameIterator::next()
         case Git::TAG: cur_state = Git::REF; break;
         default: cur_state = -1; // indicate end
         }
-		ref_names = git->getRefNames(sha, (Git::RefType)cur_state);
+        ref_names = git->getRefNames(sha, (Git::RefType)cur_state);
         cur_name = ref_names.begin();
     }
 }
@@ -1100,7 +1100,7 @@ void ListViewDelegate::paintLog(QPainter* p, const QStyleOptionViewItem& opt,
     QStyleOptionViewItem newOpt(opt); // we need a copy
     if (pm) {
         p->drawPixmap(newOpt.rect.x(), newOpt.rect.y() + 1, *pm); // +1 means leave a pixel spacing above the pixmap
-		newOpt.rect.adjust(static_cast<int>(pm->width() / dpr()), 0, 0, 0);
+        newOpt.rect.adjust(static_cast<int>(pm->width() / dpr()), 0, 0, 0);
         delete pm;
     }
     if (isHighlighted)
@@ -1214,7 +1214,7 @@ void ListViewDelegate::addTextPixmap(QPixmap** pp, const QString& txt, const QSt
     QPixmap* pm = *pp;
 
     const unsigned int mark_spacing = 2; // Space between markers in pixels
-	unsigned int offset = pm->isNull() ? 0 : static_cast<unsigned int>(pm->width() / dpr()) + mark_spacing; // Marker's offset in the base pixmap
+    unsigned int offset = pm->isNull() ? 0 : static_cast<unsigned int>(pm->width() / dpr()) + mark_spacing; // Marker's offset in the base pixmap
 
     QFontMetrics fm(opt.font);
     const unsigned int text_spacing = 4;
@@ -1222,8 +1222,8 @@ void ListViewDelegate::addTextPixmap(QPixmap** pp, const QString& txt, const QSt
     unsigned int text_height = fm.height();
 
     // Define size of the new Pixmap
-	QSize pixmapSize(static_cast<int>((offset + text_width) * dpr()),
-			 static_cast<int>(text_height * dpr()));
+    QSize pixmapSize {static_cast<int>((offset + text_width) * dpr()),
+                      static_cast<int>(text_height * dpr())};
 
     QPixmap* newPm = new QPixmap(pixmapSize);
 #if QT_VERSION >= QT_VERSION_CHECK(5,6,0)
@@ -1332,6 +1332,6 @@ int ListViewProxy::setFilter(bool isOn, bool h, const QString& fl, int cn, ShaSe
         setSourceModel(fh); // trigger a rows scanning
         lv->setModel(this);
     }
-	lv->setCurrentIndex(lv->model()->index(lv->row(cur), 0));
+    lv->setCurrentIndex(lv->model()->index(lv->row(cur), 0));
     return (sourceModel() ? rowCount() : 0);
 }

@@ -106,7 +106,7 @@ Domain::Domain(MainImpl* m, Git* g, bool isMain) : QObject(m), git(g) {
         git->setDefaultModel(fileHistory);
 
     st.clear();
-	busy = linked = false;
+    busy = linked = false;
     popupType = 0;
     container = new QWidget(NULL); // will be reparented to m()->tabWidget
 }
@@ -251,7 +251,7 @@ void Domain::update(bool fromMaster, bool force) {
         EM_RAISE(exCancelRequest);
         emit cancelDomainProcesses();
     }
-	if (busy)
+    if (busy)
         return;
 
     if (linked && !fromMaster) {

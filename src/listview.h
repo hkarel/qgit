@@ -20,16 +20,16 @@ class ListViewProxy;
 
 class ListView: public QTreeView {
 Q_OBJECT
-	struct DropInfo;
+    struct DropInfo;
 public:
     ListView(QWidget* parent);
     ~ListView();
     void setup(Domain* d, Git* g);
-	const QString shaFromAnnId(int id);
+    const QString shaFromAnnId(int id);
     void showIdValues();
     void scrollToCurrent(ScrollHint hint = EnsureVisible);
     void scrollToNextHighlighted(int direction);
-	void scrollToNext(int direction);
+    void scrollToNext(int direction);
     void getSelectedItems(QStringList& selectedItems);
     bool update();
     void addNewRevs(const QVector<QString>& shaVec);
@@ -46,14 +46,14 @@ public:
 
 signals:
     void lanesContextMenuRequested(const QStringList&, const QStringList&);
-	void applyRevisions(const QStringList& shas, const QString& remoteRepo);
-	void applyPatches(const QStringList &files);
-	void rebase(const QString& from, const QString& to, const QString& onto);
-	void merge(const QStringList& shas, const QString& into);
-	void moveRef(const QString& refName, const QString& toSHA);
+    void applyRevisions(const QStringList& shas, const QString& remoteRepo);
+    void applyPatches(const QStringList &files);
+    void rebase(const QString& from, const QString& to, const QString& onto);
+    void merge(const QStringList& shas, const QString& into);
+    void moveRef(const QString& refName, const QString& toSHA);
     void contextMenu(const QString&, int);
     void diffTargetChanged(int); // used by new model_view integration
-	void showStatusMessage(const QString&, int timeout=0);
+    void showStatusMessage(const QString&, int timeout=0);
 
 public slots:
     void on_changeFont(const QFont& f);
@@ -66,10 +66,10 @@ protected:
     virtual void mouseReleaseEvent(QMouseEvent* e);
     virtual void dragEnterEvent(QDragEnterEvent* e);
     virtual void dragMoveEvent(QDragMoveEvent* e);
-	virtual void dragLeaveEvent(QDragLeaveEvent* event);
+    virtual void dragLeaveEvent(QDragLeaveEvent* event);
     virtual void dropEvent(QDropEvent* e);
-	void startDragging(QMouseEvent *e);
-	QPixmap pixmapFromSelection(const QStringList &revs, const QString &ref) const;
+    void startDragging(QMouseEvent *e);
+    QPixmap pixmapFromSelection(const QStringList &revs, const QString &ref) const;
 
 private slots:
     void on_customContextMenuRequested(const QPoint&);
@@ -89,11 +89,11 @@ private:
     unsigned long secs;
     bool filterNextContextMenuRequest;
     QString lastRefName; // last ref name clicked on
-	DropInfo *dropInfo; // struct describing to-be-dropped content
+    DropInfo *dropInfo; // struct describing to-be-dropped content
 };
 
 class ListViewDelegate : public QItemDelegate {
-	friend class ListView;
+    friend class ListView;
 Q_OBJECT
 public:
     ListViewDelegate(Git* git, ListViewProxy* lp, QObject* parent);
@@ -117,7 +117,7 @@ private:
     QPixmap* getTagMarks(const QString& sha, const QStyleOptionViewItem& opt) const;
     void addTextPixmap(QPixmap** pp, const QString& txt, const QStyleOptionViewItem& opt) const;
     bool changedFiles(const QString& sha) const;
-	qreal dpr(void) const;
+    qreal dpr(void) const;
 
     Git* git;
     ListViewProxy* lp;

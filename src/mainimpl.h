@@ -39,7 +39,7 @@ public:
     MainImpl(const QString& curDir = "", QWidget* parent = 0);
     void updateContextActions(const QString& newRevSha, const QString& newFileName, bool isDir, bool found);
     const QString getRevisionDesc(const QString& sha);
-	const QString currentDir() const {return curDir;}
+    const QString currentDir() const {return curDir;}
 
     // not buildable with Qt designer, will be created manually
     QLineEdit* lineSHA;
@@ -72,11 +72,11 @@ signals:
 private slots:
     void newRevsAdded(const FileHistory*, const QVector<ShaString>&);
     void fileNamesLoad(int, int);
-	void applyRevisions(const QStringList& shas, const QString& remoteRepo);
-	bool applyPatches(const QStringList &files);
-	void rebase(const QString& from, const QString& to, const QString& onto);
-	void merge(const QStringList& shas, const QString& into);
-	void moveRef(const QString& refName, const QString& toSHA);
+    void applyRevisions(const QStringList& shas, const QString& remoteRepo);
+    bool applyPatches(const QStringList &files);
+    void rebase(const QString& from, const QString& to, const QString& onto);
+    void merge(const QStringList& shas, const QString& into);
+    void moveRef(const QString& refName, const QString& toSHA);
     void shortCutActivated();
     void consoleDestroyed(QObject*);
 
@@ -150,13 +150,13 @@ private:
     void updateRevVariables(const QString& sha);
     void setupShortcuts();
     int currentTabType(Domain** t);
-	int tabType(Domain** t, int index);
+    int tabType(Domain** t, int index);
     void filterList(bool isOn, bool onlyHighlight);
     bool isMatch(const QString& sha, const QString& f, int cn, const QMap<QString,bool>& sm);
     void highlightAbbrevSha(const QString& abbrevSha);
     void setRepository(const QString& wd, bool = false, bool = false, const QStringList* = NULL, bool = false);
     void getExternalDiffArgs(QStringList* args, QStringList* filenames);
-	QString copyFileToDiffIfNeeded(QStringList* filenames, QString sha);
+    QString copyFileToDiffIfNeeded(QStringList* filenames, QString sha);
     QStringList getExternalEditorArgs();
     void lineEditSHASetText(const QString& text);
     void updateCommitMenu(bool isStGITStack);
@@ -190,11 +190,11 @@ private:
     // we are sure is correct.
     QString curDir;
     QString startUpDir;
-	QString startUpFile;
+    QString startUpFile;
     QString textToFind;
     QRegExp shortLogRE;
     QRegExp longLogRE;
-	static const QRegExp emptySha;
+    static const QRegExp emptySha;
     QMap<QString, QVariant> revision_variables; // variables used in generic input dialogs
     bool setRepositoryBusy;
 };
@@ -223,10 +223,10 @@ private:
 
         if (!filenames.empty()) {
             QDir d; // remove temporary files to diff on
-			for (int i = 0; i < filenames.size(); i++)
-			{
-				d.remove(filenames[i]);
-			}
+            for (int i = 0; i < filenames.size(); i++)
+            {
+                d.remove(filenames[i]);
+            }
         }
     }
 };

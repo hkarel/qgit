@@ -416,7 +416,7 @@ void SettingsImpl::on_chkMsgOnNewSHA_toggled(bool b) {
 
 void SettingsImpl::on_chkEnableDragnDrop_toggled(bool b) {
 
-	changeFlag(ENABLE_DRAGNDROP_F, b);
+    changeFlag(ENABLE_DRAGNDROP_F, b);
 }
 
 void SettingsImpl::on_chkCommitSign_toggled(bool b) {

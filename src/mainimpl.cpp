@@ -101,7 +101,7 @@ MainImpl::MainImpl(const QString& cd, QWidget* p) : QMainWindow(p) {
 #else
         fontDescr = QApplication::font().toString();
 #endif
-	}
+    }
     qgit::STD_FONT.fromString(fontDescr);
 
     int iconSizeIndex = 0;
@@ -131,7 +131,7 @@ MainImpl::MainImpl(const QString& cd, QWidget* p) : QMainWindow(p) {
 
     if (fontDescr.isEmpty()) { // choose a sensible default
 #if (QT_VERSION >= QT_VERSION_CHECK(5,2,0))
-		QFont fnt = QFontDatabase::systemFont(QFontDatabase::FixedFont);
+        QFont fnt = QFontDatabase::systemFont(QFontDatabase::FixedFont);
 #else
         QFont fnt = QApplication::font();
         fnt.setStyleHint(QFont::TypeWriter, QFont::PreferDefault);
@@ -147,7 +147,7 @@ MainImpl::MainImpl(const QString& cd, QWidget* p) : QMainWindow(p) {
     rv = new RevsView(this, git, true); // set has main domain
     tabWidget->addTab(rv->tabPage(), "&Rev list");
 
-	// hide close button for rev list tab
+    // hide close button for rev list tab
     QTabBar* const tabBar = tabWidget->tabBar();
     tabBar->setTabButton(0, QTabBar::RightSide, NULL);
     tabBar->setTabButton(0, QTabBar::LeftSide, NULL);
@@ -191,7 +191,7 @@ MainImpl::MainImpl(const QString& cd, QWidget* p) : QMainWindow(p) {
     // connect cross-domain update signals
     chk_connect_a(rv->tab()->listViewLog, SIGNAL(doubleClicked(const QModelIndex&)),
                   this, SLOT(listViewLog_doubleClicked(const QModelIndex&)));
-	chk_connect_a(rv->tab()->listViewLog, SIGNAL(showStatusMessage(const QString&,int)),
+    chk_connect_a(rv->tab()->listViewLog, SIGNAL(showStatusMessage(const QString&,int)),
                   statusBar(), SLOT(showMessage(QString,int)));
 
     chk_connect_a(rv->tab()->fileList, SIGNAL(itemDoubleClicked(QListWidgetItem*)),
@@ -215,20 +215,20 @@ MainImpl::MainImpl(const QString& cd, QWidget* p) : QMainWindow(p) {
         startUpDir = (cd.isEmpty() ? QDir::current().absolutePath() : cd);
     }
 
-	// handle --view-file=* or --view-file * argument
-	QStringList arglist = qApp->arguments();
-	// Remove first argument which is the path of the current executable
-	arglist.removeFirst();
-	bool retainNext = false;
-	foreach (QString arg, arglist) {
-		if (retainNext) {
-			retainNext = false;
-			startUpFile = arg;
-		} else if (arg == "--view-file")
-			retainNext = true;
-		else if (arg.startsWith("--view-file="))
-			startUpFile = arg.mid(12);
-	}
+    // handle --view-file=* or --view-file * argument
+    QStringList arglist = qApp->arguments();
+    // Remove first argument which is the path of the current executable
+    arglist.removeFirst();
+    bool retainNext = false;
+    foreach (QString arg, arglist) {
+        if (retainNext) {
+            retainNext = false;
+            startUpFile = arg;
+        } else if (arg == "--view-file")
+            retainNext = true;
+        else if (arg.startsWith("--view-file="))
+            startUpFile = arg.mid(12);
+    }
 
     // MainImpl c'tor is called before to enter event loop,
     // but some stuff requires event loop to init properly
@@ -269,13 +269,13 @@ void MainImpl::initWithEventLoopActive() {
     setRepository(startUpDir);
     startUpDir = ""; // one shot
 
-	// handle --view-file=* or --view-file * argument
-	if (!startUpFile.isEmpty()) {
-		rv->st.setSha("HEAD");
-		rv->st.setFileName(startUpFile);
-		openFileTab();
-		startUpFile = QString(); // one shot
-	}
+    // handle --view-file=* or --view-file * argument
+    if (!startUpFile.isEmpty()) {
+        rv->st.setSha("HEAD");
+        rv->st.setFileName(startUpFile);
+        openFileTab();
+        startUpFile = QString(); // one shot
+    }
 }
 
 void MainImpl::highlightAbbrevSha(const QString& abbrevSha) {
@@ -377,15 +377,15 @@ QString MainImpl::copyFileToDiffIfNeeded(QStringList* filenames, QString sha) {
 
 void MainImpl::getExternalDiffArgs(QStringList* args, QStringList* filenames) {
 
-	QString prevRevSha(rv->st.diffToSha());
-	if (prevRevSha.isEmpty()) { // default to first parent
-		const Rev* r = git->revLookup(rv->st.sha());
-		prevRevSha = (r && r->parentsCount() > 0 ? r->parent(0) : rv->st.sha());
-	}
-	// save files to diff in working directory,
-	// will be removed by ExternalDiffProc on exit
-	QString fName1 = copyFileToDiffIfNeeded(filenames, rv->st.sha());
-	QString fName2 = copyFileToDiffIfNeeded(filenames, prevRevSha);
+    QString prevRevSha(rv->st.diffToSha());
+    if (prevRevSha.isEmpty()) { // default to first parent
+        const Rev* r = git->revLookup(rv->st.sha());
+        prevRevSha = (r && r->parentsCount() > 0 ? r->parent(0) : rv->st.sha());
+    }
+    // save files to diff in working directory,
+    // will be removed by ExternalDiffProc on exit
+    QString fName1 = copyFileToDiffIfNeeded(filenames, rv->st.sha());
+    QString fName2 = copyFileToDiffIfNeeded(filenames, prevRevSha);
 
     // get external diff viewer command
     QString extDiff;
@@ -507,16 +507,16 @@ void MainImpl::setRepository(const QString& newDir, bool refresh, bool keepSelec
         QString n(curDir);
         treeView->setTreeName(n.prepend('/').section('/', -1, -1));
 
-		QString curBranch;
+        QString curBranch;
 
         bool quit;
         bool ok = git->init(curDir, !refresh, passedArgs, overwriteArgs, &quit); // blocking call
         if (quit)
             goto exit;
 
-		curBranch = git->getCurrentBranchName();
-		if (curBranch.length()) curBranch = " [" + curBranch + "]";
-		setWindowTitle(curDir + curBranch + " - QGit");
+        curBranch = git->getCurrentBranchName();
+        if (curBranch.length()) curBranch = " [" + curBranch + "]";
+        setWindowTitle(curDir + curBranch + " - QGit");
 
         if (actFilterTree->isChecked() && passedArgs) {
             QString msg = " - FILTER ON < %1 >";
@@ -580,12 +580,12 @@ void MainImpl::updateRevVariables(const QString& sha) {
     QMap<QString, QVariant> &v = revision_variables;
     v.clear();
 
-	const QStringList &remote_branches = git->getRefNames(sha, Git::RMT_BRANCH);
+    const QStringList &remote_branches = git->getRefNames(sha, Git::RMT_BRANCH);
     QString curBranch;
-	v.insert(REV_LOCAL_BRANCHES, git->getRefNames(sha, Git::BRANCH));
+    v.insert(REV_LOCAL_BRANCHES, git->getRefNames(sha, Git::BRANCH));
     v.insert(CURRENT_BRANCH, git->getCurrentBranchName());
     v.insert(REV_REMOTE_BRANCHES, remote_branches);
-	v.insert(REV_TAGS, git->getRefNames(sha, Git::TAG));
+    v.insert(REV_TAGS, git->getRefNames(sha, Git::TAG));
     v.insert("SHA", sha);
 
     // determine which name the user clicked on
@@ -675,7 +675,7 @@ void MainImpl::on_treeView_itemDoubleClicked(QTreeWidgetItem* item, int) {
 void MainImpl::on_tabWidget_tabCloseRequested(int index) {
 
     Domain* t;
-	switch (tabType(&t, index)) {
+    switch (tabType(&t, index)) {
     case TAB_REV:
         break;
     case TAB_PATCH:
@@ -782,16 +782,16 @@ bool MainImpl::eventFilter(QObject* obj, QEvent* ev) {
 }
 
 void MainImpl::applyRevisions(const QStringList& remoteRevs, const QString& remoteRepo) {
-	// remoteRevs is already sanity checked to contain some possible valid data
+    // remoteRevs is already sanity checked to contain some possible valid data
 
     QDir dr(curDir + qgit::PATCHES_DIR);
-	dr.setFilter(QDir::Files);
-	if (!dr.exists(remoteRepo)) {
-		statusBar()->showMessage("Remote repository missing: " + remoteRepo);
-		return;
-	}
-	if (dr.exists() && dr.count()) {
-		statusBar()->showMessage(QString("Please remove stale import directory " + dr.absolutePath()));
+    dr.setFilter(QDir::Files);
+    if (!dr.exists(remoteRepo)) {
+        statusBar()->showMessage("Remote repository missing: " + remoteRepo);
+        return;
+    }
+    if (dr.exists() && dr.count()) {
+        statusBar()->showMessage(QString("Please remove stale import directory " + dr.absolutePath()));
         return;
     }
     bool workDirOnly, fold;
@@ -818,17 +818,17 @@ void MainImpl::applyRevisions(const QStringList& remoteRevs, const QString& remo
         dr.refresh();
         if (dr.count() != 1) {
             qDebug("ASSERT in on_droppedRevisions: found %i files "
-			       "in %s", dr.count(), qPrintable(dr.absolutePath()));
+                   "in %s", dr.count(), qPrintable(dr.absolutePath()));
             break;
         }
         const QString& fn(dr.absoluteFilePath(dr[0]));
         bool is_applied = git->applyPatchFile(fn, fold, Git::optDragDrop);
         dr.remove(fn);
-		if (!is_applied) {
-			statusBar()->showMessage(QString("Failed to import revision %1 of %2: %3")
-			                         .arg(revNum).arg(remoteRevs.count()).arg(sha));
+        if (!is_applied) {
+            statusBar()->showMessage(QString("Failed to import revision %1 of %2: %3")
+                                     .arg(revNum).arg(remoteRevs.count()).arg(sha));
             break;
-		}
+        }
 
     } while (it != remoteRevs.constBegin());
 
@@ -844,89 +844,89 @@ void MainImpl::applyRevisions(const QStringList& remoteRevs, const QString& remo
 }
 
 bool MainImpl::applyPatches(const QStringList &files) {
-	bool workDirOnly, fold;
-	if (!askApplyPatchParameters(&workDirOnly, &fold))
-		return false;
+    bool workDirOnly, fold;
+    if (!askApplyPatchParameters(&workDirOnly, &fold))
+        return false;
 
-	QApplication::setOverrideCursor(QCursor(Qt::WaitCursor));
-	QStringList::const_iterator it=files.begin(), end=files.end();
-	for(; it!=end; ++it) {
-		statusBar()->showMessage("Applying " + *it);
-		if (!git->applyPatchFile(*it, fold, Git::optDragDrop))
-			statusBar()->showMessage("Failed to apply " + *it);
-	}
-	if (it == end) statusBar()->clearMessage();
+    QApplication::setOverrideCursor(QCursor(Qt::WaitCursor));
+    QStringList::const_iterator it=files.begin(), end=files.end();
+    for(; it!=end; ++it) {
+        statusBar()->showMessage("Applying " + *it);
+        if (!git->applyPatchFile(*it, fold, Git::optDragDrop))
+            statusBar()->showMessage("Failed to apply " + *it);
+    }
+    if (it == end) statusBar()->clearMessage();
 
-	if (workDirOnly && (files.count() > 0))
-		git->resetCommits(files.count());
+    if (workDirOnly && (files.count() > 0))
+        git->resetCommits(files.count());
 
-	QApplication::restoreOverrideCursor();
-	refreshRepo();
-	return true;
+    QApplication::restoreOverrideCursor();
+    refreshRepo();
+    return true;
 }
 
 void MainImpl::rebase(const QString &from, const QString &to, const QString &onto)
 {
-	bool success = false;
-	QApplication::setOverrideCursor(QCursor(Qt::WaitCursor));
-	if (from.isEmpty()) {
-		success = git->run(QString("git checkout -q %1").arg(to)) &&
-		          git->run(QString("git rebase %1").arg(onto));
-	} else {
-		success = git->run(QString("git rebase --onto %3 %1^ %2").arg(from, to, onto));
-	}
+    bool success = false;
+    QApplication::setOverrideCursor(QCursor(Qt::WaitCursor));
+    if (from.isEmpty()) {
+        success = git->run(QString("git checkout -q %1").arg(to)) &&
+                  git->run(QString("git rebase %1").arg(onto));
+    } else {
+        success = git->run(QString("git rebase --onto %3 %1^ %2").arg(from, to, onto));
+    }
     if (!success) {
         // TODO say something about rebase failure
     }
-	refreshRepo(true);
-	QApplication::restoreOverrideCursor();
+    refreshRepo(true);
+    QApplication::restoreOverrideCursor();
 }
 
 void MainImpl::merge(const QStringList &shas, const QString &into)
 {
-	QApplication::setOverrideCursor(QCursor(Qt::WaitCursor));
-	QString output;
-	if (git->merge(into, shas, &output)) {
-		refreshRepo(true);
-		statusBar()->showMessage(QString("Successfully merged into %1").arg(into));
+    QApplication::setOverrideCursor(QCursor(Qt::WaitCursor));
+    QString output;
+    if (git->merge(into, shas, &output)) {
+        refreshRepo(true);
+        statusBar()->showMessage(QString("Successfully merged into %1").arg(into));
         on_actCommit_triggered(false);
-	} else if (!output.isEmpty()) {
-		QMessageBox::warning(this, "git merge failed",
-		                     QString("\n\nGit says: \n\n" + output));
-	}
-	refreshRepo(true);
-	QApplication::restoreOverrideCursor();
+    } else if (!output.isEmpty()) {
+        QMessageBox::warning(this, "git merge failed",
+                             QString("\n\nGit says: \n\n" + output));
+    }
+    refreshRepo(true);
+    QApplication::restoreOverrideCursor();
 }
 
 void MainImpl::moveRef(const QString &target, const QString &toSHA)
 {
-	QString cmd;
-	if (target.startsWith("remotes/")) {
-		QString remote = target.section("/", 1, 1);
-		QString name = target.section("/", 2);
-		cmd = QString("git push -q %1 %2:%3").arg(remote, toSHA, name);
-	} else if (target.startsWith("tags/")) {
-		cmd = QString("git tag -f %1 %2").arg(target.section("/",1), toSHA);
-	} else if (!target.isEmpty()) {
-		const QString &sha = git->getRefSha(target, Git::BRANCH, false);
-		if (sha.isEmpty()) return;
-		const QStringList &children = git->getChildren(sha);
-		if ((children.count() == 0 || (children.count() == 1 && children.front() == ZERO_SHA)) && // no children
-		    git->getRefNames(sha, Git::ANY_REF).count() == 1 && // last ref name
-		    QMessageBox::question(this, "move branch",
-		                          QString("This is the last reference to this branch.\n"
-		                                  "Do you really want to move '%1'?").arg(target))
-		    == QMessageBox::No)
-			return;
+    QString cmd;
+    if (target.startsWith("remotes/")) {
+        QString remote = target.section("/", 1, 1);
+        QString name = target.section("/", 2);
+        cmd = QString("git push -q %1 %2:%3").arg(remote, toSHA, name);
+    } else if (target.startsWith("tags/")) {
+        cmd = QString("git tag -f %1 %2").arg(target.section("/",1), toSHA);
+    } else if (!target.isEmpty()) {
+        const QString &sha = git->getRefSha(target, Git::BRANCH, false);
+        if (sha.isEmpty()) return;
+        const QStringList &children = git->getChildren(sha);
+        if ((children.count() == 0 || (children.count() == 1 && children.front() == ZERO_SHA)) && // no children
+            git->getRefNames(sha, Git::ANY_REF).count() == 1 && // last ref name
+            QMessageBox::question(this, "move branch",
+                                  QString("This is the last reference to this branch.\n"
+                                          "Do you really want to move '%1'?").arg(target))
+            == QMessageBox::No)
+            return;
 
-		if (target == git->getCurrentBranchName()) // move current branch
-			cmd = QString("git checkout -q -B %1 %2").arg(target, toSHA);
-		else // move any other local branch
-			cmd = QString("git branch -f %1 %2").arg(target, toSHA);
-	}
-	QApplication::setOverrideCursor(QCursor(Qt::WaitCursor));
-	if (git->run(cmd)) refreshRepo(true);
-	QApplication::restoreOverrideCursor();
+        if (target == git->getCurrentBranchName()) // move current branch
+            cmd = QString("git checkout -q -B %1 %2").arg(target, toSHA);
+        else // move any other local branch
+            cmd = QString("git branch -f %1 %2").arg(target, toSHA);
+    }
+    QApplication::setOverrideCursor(QCursor(Qt::WaitCursor));
+    if (git->run(cmd)) refreshRepo(true);
+    QApplication::restoreOverrideCursor();
 }
 
 // ******************************* Filter ******************************
@@ -1057,7 +1057,7 @@ bool MainImpl::event(QEvent* e) {
         EM_PROCESS_EVENTS;
         MainExecErrorEvent* me = (MainExecErrorEvent*)e;
         QString text("An error occurred while executing command:\n\n");
-		text.append(me->command() + "\n\n" + me->report());
+        text.append(me->command() + "\n\n" + me->report());
 
         // Display message only if console window is not shown
         if (console == 0)
@@ -1231,8 +1231,8 @@ void MainImpl::goMatch(int delta) {
 
     if (actSearchAndHighlight->isChecked())
         rv->tab()->listViewLog->scrollToNextHighlighted(delta);
-	else
-		rv->tab()->listViewLog->scrollToNext(delta);
+    else
+        rv->tab()->listViewLog->scrollToNext(delta);
 }
 
 QTextEdit* MainImpl::getCurrentTextEdit() {
@@ -1363,7 +1363,7 @@ static void prepareRefSubmenu(QMenu* menu, const QStringList& refs, const QChar 
 
     for (const QString& ref : refs) {
         QStringList parts = ref.split(sep, QString::SkipEmptyParts);
-		QMenu* add_here = menu;
+        QMenu* add_here = menu;
         for (const QString& pit : parts) {
             if (pit == parts.last())
                 break;
@@ -1373,23 +1373,23 @@ static void prepareRefSubmenu(QMenu* menu, const QStringList& refs, const QChar 
 #else
             QMenu* found = add_here->findChild<QMenu*>(pit);
 #endif
-			if(!found) {
+            if(!found) {
                 found = add_here->addMenu(pit);
                 found->setObjectName(pit);
-			}
-			add_here = found;
-		}
+            }
+            add_here = found;
+        }
         QAction* act = add_here->addAction(ref);
-		act->setData("Ref");
+        act->setData("Ref");
     }
 }
 
 void MainImpl::doContexPopup(const QString& sha) {
 
     QMenu contextMenu(this);
-	QMenu contextBrnMenu("Branches...", this);
+    QMenu contextBrnMenu("Branches...", this);
     QMenu contextRmtMenu("Remote branches...", this);
-	QMenu contextTagMenu("Tags...", this);
+    QMenu contextTagMenu("Tags...", this);
 
     chk_connect_a(&contextMenu, SIGNAL(triggered(QAction*)), this, SLOT(goRef_triggered(QAction*)));
 
@@ -1434,26 +1434,26 @@ void MainImpl::doContexPopup(const QString& sha) {
         if (actPop->isEnabled())
             contextMenu.addAction(actPop);
 
-		contextMenu.addSeparator();
+        contextMenu.addSeparator();
 
-		QStringList bn(git->getAllRefNames(Git::BRANCH, Git::optOnlyLoaded));
-		bn.sort();
-		prepareRefSubmenu(&contextBrnMenu, bn);
-		contextMenu.addMenu(&contextBrnMenu);
-		contextBrnMenu.setEnabled(bn.size() > 0);
+        QStringList bn(git->getAllRefNames(Git::BRANCH, Git::optOnlyLoaded));
+        bn.sort();
+        prepareRefSubmenu(&contextBrnMenu, bn);
+        contextMenu.addMenu(&contextBrnMenu);
+        contextBrnMenu.setEnabled(bn.size() > 0);
 
-		QStringList rbn(git->getAllRefNames(Git::RMT_BRANCH, Git::optOnlyLoaded));
-		rbn.sort();
-		prepareRefSubmenu(&contextRmtMenu, rbn);
-		contextMenu.addMenu(&contextRmtMenu);
-		contextRmtMenu.setEnabled(rbn.size() > 0);
+        QStringList rbn(git->getAllRefNames(Git::RMT_BRANCH, Git::optOnlyLoaded));
+        rbn.sort();
+        prepareRefSubmenu(&contextRmtMenu, rbn);
+        contextMenu.addMenu(&contextRmtMenu);
+        contextRmtMenu.setEnabled(rbn.size() > 0);
 
-		QStringList tn(git->getAllRefNames(Git::TAG, Git::optOnlyLoaded));
-		tn.sort();
-		prepareRefSubmenu(&contextTagMenu, tn);
-		contextMenu.addSeparator();
-		contextMenu.addMenu(&contextTagMenu);
-		contextTagMenu.setEnabled(tn.size() > 0);
+        QStringList tn(git->getAllRefNames(Git::TAG, Git::optOnlyLoaded));
+        tn.sort();
+        prepareRefSubmenu(&contextTagMenu, tn);
+        contextMenu.addSeparator();
+        contextMenu.addMenu(&contextTagMenu);
+        contextTagMenu.setEnabled(tn.size() > 0);
 
     }
 
@@ -2025,16 +2025,16 @@ void MainImpl::on_actDelete_triggered(bool) {
     for (QStringList::const_iterator it=tags.begin(), end=tags.end(); it!=end; ++it)
         all_names << "tags/" + *it;
 
-	// group selected names by origin and determine which ref names will remain
+    // group selected names by origin and determine which ref names will remain
     QMap <QString, QStringList> groups;
-	QStringList remaining = all_names;
+    QStringList remaining = all_names;
     if (!selected_name.isEmpty()) {
         groupRef(selected_name, groups);
-		remaining.removeOne(selected_name);
+        remaining.removeOne(selected_name);
     } else if (all_names.size() == 1) {
-		const QString &name = all_names.first();
-		groupRef(name, groups);
-		remaining.removeOne(name);
+        const QString &name = all_names.first();
+        groupRef(name, groups);
+        remaining.removeOne(name);
     } else {
         revision_variables.insert("ALL_NAMES", all_names);
         InputDialog dlg("%listbox:_refs=$ALL_NAMES%", revision_variables,
@@ -2044,24 +2044,24 @@ void MainImpl::on_actDelete_triggered(bool) {
         if (dlg.exec() != QDialog::Accepted) return;
 
         QModelIndexList selected = w->selectionModel()->selectedIndexes();
-		for (QModelIndexList::const_iterator it=selected.begin(), end=selected.end(); it!=end; ++it) {
-			const QString &name = it->data().toString();
-			groupRef(name, groups);
-			remaining.removeOne(name);
-		}
+        for (QModelIndexList::const_iterator it=selected.begin(), end=selected.end(); it!=end; ++it) {
+            const QString &name = it->data().toString();
+            groupRef(name, groups);
+            remaining.removeOne(name);
+        }
     }
     if (groups.empty()) return;
 
-	// check whether all refs will be removed
-	const QString sha = revision_variables.value("SHA").toString();
-	const QStringList &children = git->getChildren(sha);
-	if ((children.count() == 0 || (children.count() == 1 && children.front() == ZERO_SHA)) && // no children
-	    remaining.count() == 0 && // all refs will be removed
-	    QMessageBox::warning(this, "remove references",
-	                         "Do you really want to remove all\nremaining references to this branch?",
-	                         QMessageBox::Yes | QMessageBox::No, QMessageBox::No)
-	    == QMessageBox::No)
-		return;
+    // check whether all refs will be removed
+    const QString sha = revision_variables.value("SHA").toString();
+    const QStringList &children = git->getChildren(sha);
+    if ((children.count() == 0 || (children.count() == 1 && children.front() == ZERO_SHA)) && // no children
+        remaining.count() == 0 && // all refs will be removed
+        QMessageBox::warning(this, "remove references",
+                             "Do you really want to remove all\nremaining references to this branch?",
+                             QMessageBox::Yes | QMessageBox::No, QMessageBox::No)
+        == QMessageBox::No)
+        return;
 
     // group selected names by origin
     QApplication::setOverrideCursor(QCursor(Qt::WaitCursor));
@@ -2069,7 +2069,7 @@ void MainImpl::on_actDelete_triggered(bool) {
     for (RefGroupMap::const_iterator g = groups.begin(), gend = groups.end(); g != gend; ++g) {
         QString cmd;
         if (g.key() == "") // local branches
-			cmd = "git branch -D " + g.value().join(" ");
+            cmd = "git branch -D " + g.value().join(" ");
         else if (g.key() == "tags/") // tags
             cmd = "git tag -d " + g.value().join(" ");
         else // remote branches
@@ -2217,49 +2217,49 @@ void MainImpl::on_actAbout_triggered(bool) {
 
     static const char* aboutMsg =
     "<p><b>QGit version " VERSION_PROJECT " (Gitrev:&nbsp;" GIT_REVISION ") </b></p>"
-	"<p>Copyright (c) 2005, 2007, 2008 Marco Costalba<br>"
-	"Copyright (c) 2011-2020 <a href='mailto:tibirna@kde.org'>Cristian Tibirna</a></p>"
+    "<p>Copyright (c) 2005, 2007, 2008 Marco Costalba<br>"
+    "Copyright (c) 2011-2020 <a href='mailto:tibirna@kde.org'>Cristian Tibirna</a></p>"
     "<p>Use and redistribute under the terms of the<br>"
     "<a href=\"http://www.gnu.org/licenses/old-licenses/gpl-2.0.html\">GNU General Public License Version 2</a></p>"
     "<p>Contributors:<br>"
-	"Copyright (c) "
-	"<nobr>2007 Andy Parkins,</nobr> "
-	"<nobr>2007 Pavel Roskin,</nobr> "
-	"<nobr>2007 Peter Oberndorfer,</nobr> "
-	"<nobr>2007 Yaacov Akiba,</nobr> "
-	"<nobr>2007 James McKaskill,</nobr> "
-	"<nobr>2008 Jan Hudec,</nobr> "
-	"<nobr>2008 Paul Gideon Dann,</nobr> "
-	"<nobr>2008 Oliver Bock,</nobr> "
-	"<nobr>2010 <a href='mailto:cyp561@gmail.com'>Cyp</a>,</nobr> "
-	"<nobr>2011 <a href='dagenaisj@sonatest.com'>Jean-Fran&ccedil;ois Dagenais</a>,</nobr> "
-	"<nobr>2011 <a href='mailto:pavtih@gmail.com'>Pavel Tikhomirov</a>,</nobr> "
-	"<nobr>2011 <a href='mailto:tim@klingt.org'>Tim Blechmann</a>,</nobr> "
-	"<nobr>2014 <a href='mailto:codestruct@posteo.org'>Gregor Mi</a>,</nobr> "
-	"<nobr>2014 <a href='mailto:sbytnn@gmail.com'>Sbytov N.N</a>,</nobr> "
-	"<nobr>2015 <a href='mailto:dendy.ua@gmail.com'>Daniel Levin</a>,</nobr> "
-	"<nobr>2017 <a href='mailto:luigi.toscano@tiscali.it'>Luigi Toscano</a>,</nobr> "
-	"<nobr>2016 <a href='mailto:hkarel@yandex.ru'>Pavel Karelin</a>,</nobr> "
-	"<nobr>2016 <a href='mailto:zbitter@redhat.com'>Zane Bitter</a>,</nobr> "
-	"<nobr>2017 <a href='mailto:wrar@wrar.name'>Andrey Rahmatullin</a>,</nobr> "
-	"<nobr>2017 <a href='mailto:alex-github@wenlex.nl'>Alex Hermann</a>,</nobr> "
-	"<nobr>2017 <a href='mailto:shalokshalom@protonmail.ch'>Matthias Schuster</a>,</nobr> "
-	"<nobr>2017 <a href='mailto:u.joss@calltrade.ch'>Urs Joss</a>,</nobr> "
-	"<nobr>2017 <a href='mailto:patrick.m.lacasse@gmail.com'>Patrick Lacasse</a>,</nobr> "
-	"<nobr>2018 <a href='mailto:deveee@gmail.com'>Deve</a>,</nobr> "
-	"<nobr>2018 <a href='mailto:asturm@gentoo.org'>Andreas Sturmlechner</a>,</nobr> "
-	"<nobr>2018 <a href='mailto:kde@davidedmundson.co.uk'>David Edmundson</a>,</nobr> "
-	"<nobr>2016-2018 <a href='mailto:rhaschke@techfak.uni-bielefeld.de'>Robert Haschke</a>,</nobr> "
-	"<nobr>2018 <a href='mailto:filipe.rinaldi@gmail.com'>Filipe Rinaldi</a>,</nobr> "
-	"<nobr>2018 <a href='mailto:balbusm@gmail.com'>Mateusz Balbus</a>,</nobr> "
-	"<nobr>2019 <a href='mailto:sebastian@pipping.org'>Sebastian Pipping</a>,</nobr> "
-	"<nobr>2019-2020 <a href='mailto:mvf@gmx.eu'>Matthias von Faber</a>,</nobr> "
+    "Copyright (c) "
+    "<nobr>2007 Andy Parkins,</nobr> "
+    "<nobr>2007 Pavel Roskin,</nobr> "
+    "<nobr>2007 Peter Oberndorfer,</nobr> "
+    "<nobr>2007 Yaacov Akiba,</nobr> "
+    "<nobr>2007 James McKaskill,</nobr> "
+    "<nobr>2008 Jan Hudec,</nobr> "
+    "<nobr>2008 Paul Gideon Dann,</nobr> "
+    "<nobr>2008 Oliver Bock,</nobr> "
+    "<nobr>2010 <a href='mailto:cyp561@gmail.com'>Cyp</a>,</nobr> "
+    "<nobr>2011 <a href='dagenaisj@sonatest.com'>Jean-Fran&ccedil;ois Dagenais</a>,</nobr> "
+    "<nobr>2011 <a href='mailto:pavtih@gmail.com'>Pavel Tikhomirov</a>,</nobr> "
+    "<nobr>2011 <a href='mailto:tim@klingt.org'>Tim Blechmann</a>,</nobr> "
+    "<nobr>2014 <a href='mailto:codestruct@posteo.org'>Gregor Mi</a>,</nobr> "
+    "<nobr>2014 <a href='mailto:sbytnn@gmail.com'>Sbytov N.N</a>,</nobr> "
+    "<nobr>2015 <a href='mailto:dendy.ua@gmail.com'>Daniel Levin</a>,</nobr> "
+    "<nobr>2017 <a href='mailto:luigi.toscano@tiscali.it'>Luigi Toscano</a>,</nobr> "
+    "<nobr>2016 <a href='mailto:hkarel@yandex.ru'>Pavel Karelin</a>,</nobr> "
+    "<nobr>2016 <a href='mailto:zbitter@redhat.com'>Zane Bitter</a>,</nobr> "
+    "<nobr>2017 <a href='mailto:wrar@wrar.name'>Andrey Rahmatullin</a>,</nobr> "
+    "<nobr>2017 <a href='mailto:alex-github@wenlex.nl'>Alex Hermann</a>,</nobr> "
+    "<nobr>2017 <a href='mailto:shalokshalom@protonmail.ch'>Matthias Schuster</a>,</nobr> "
+    "<nobr>2017 <a href='mailto:u.joss@calltrade.ch'>Urs Joss</a>,</nobr> "
+    "<nobr>2017 <a href='mailto:patrick.m.lacasse@gmail.com'>Patrick Lacasse</a>,</nobr> "
+    "<nobr>2018 <a href='mailto:deveee@gmail.com'>Deve</a>,</nobr> "
+    "<nobr>2018 <a href='mailto:asturm@gentoo.org'>Andreas Sturmlechner</a>,</nobr> "
+    "<nobr>2018 <a href='mailto:kde@davidedmundson.co.uk'>David Edmundson</a>,</nobr> "
+    "<nobr>2016-2018 <a href='mailto:rhaschke@techfak.uni-bielefeld.de'>Robert Haschke</a>,</nobr> "
+    "<nobr>2018 <a href='mailto:filipe.rinaldi@gmail.com'>Filipe Rinaldi</a>,</nobr> "
+    "<nobr>2018 <a href='mailto:balbusm@gmail.com'>Mateusz Balbus</a>,</nobr> "
+    "<nobr>2019 <a href='mailto:sebastian@pipping.org'>Sebastian Pipping</a>,</nobr> "
+    "<nobr>2019-2020 <a href='mailto:mvf@gmx.eu'>Matthias von Faber</a>,</nobr> "
     "<nobr>2019 <a href='mailto:Kevin@tigcc.ticalc.org'>Kevin Kofler</a>,</nobr> "
     "<nobr>2020 <a href='mailto:cortexspam-github@yahoo.fr'>Matthieu Muffato</a>,</nobr> "
     "<nobr>2020 <a href='mailto:brent@mbari.org'>Brent Roman</a>,</nobr> "
     "<nobr>2020 <a href='mailto:jjm@keelhaul.demon.co.uk'>Jonathan Marten</a>,</nobr> "
     "<nobr>2020 <a href='mailto:yyc1992@gmail.com'>Yichao Yu</a></nobr> "
-	"</p>"
+    "</p>"
     "<p>This version was compiled against Qt " QT_VERSION_STR "</p>";
 
     QMessageBox::about(this, "About QGit", QString::fromLatin1(aboutMsg));

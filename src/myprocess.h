@@ -21,7 +21,7 @@ public:
     bool runSync(const QString& runCmd, QByteArray* runOutput, QObject* rcv, const QString& buf);
     bool runAsync(const QString& rc, QObject* rcv, const QString& buf);
     static const QStringList splitArgList(const QString& cmd);
-	const QString& getErrorOutput() const { return accError; }
+    const QString& getErrorOutput() const { return accError; }
 
 signals:
     void procDataReady(const QByteArray&);
@@ -38,7 +38,7 @@ private slots:
 private:
     void setupSignals();
     bool launchMe(const QString& runCmd, const QString& buf);
-	void sendErrorMsg(bool notStarted = false);
+    void sendErrorMsg(bool notStarted = false);
     static void restoreSpaces(QString& newCmd, const QChar& sepChar);
 
     QObject* guiObject;
@@ -48,7 +48,7 @@ private:
     QString workDir;
     QObject* receiver;
     QStringList arguments;
-	QString accError;
+    QString accError;
     bool errorReportingEnabled;
     bool canceling;
     bool busy;

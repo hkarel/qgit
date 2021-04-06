@@ -70,7 +70,7 @@ to direct calls.
     A()
     |---> try
     |---> emit mySignal  --> slotMySignal() 
-    |          			|-----> throw X
+    |                   |-----> throw X
     |---> catch(x)
     |      |---> we will NOT catch X
 
@@ -154,12 +154,12 @@ If we rewrite the above code to use ExceptionManager helper macros we have:
 
             EM_REMOVE(databaseIsEmpty);
 
-	    if (i == databaseIsEmpty) {
+        if (i == databaseIsEmpty) {
 
                    .....handle the exception....
 
                    EM_CHECK_PENDING; // re-check any other pending exception
-            }	
+            }    
       }
       .....
 }
@@ -239,15 +239,15 @@ is done 'just before' the qApp->processEvents() call. Where 'just before' it mea
 that no others ExceptionManager method must be called between saveThrowableSet() and
 processEvents().
 
-	int currentRegionId = saveThrowableSet();
+    int currentRegionId = saveThrowableSet();
 
-	.....(no more ExceptionManager calls).....
+    .....(no more ExceptionManager calls).....
 
-	qApp->processEvents();
+    qApp->processEvents();
 
-	.....(no ExceptionManager calls).....
+    .....(no ExceptionManager calls).....
 
-	restoreThrowableSet(currentRegionId);
+    restoreThrowableSet(currentRegionId);
 
 The region throwable sets are saved in a list: throwableSetList
 
@@ -263,7 +263,7 @@ times as are the occurrences of excp in the corresponding throwable set
 Upon restoring the throwable set with restoreThrowableSet() it is safe to
 throw any pending exception with:
 
-	throwPending();
+    throwPending();
 
 
 Method throwPending() walks _in order_ the regionThrowableSet ONLY to find all the
@@ -279,7 +279,7 @@ thrown in the correct order.
 Note that the catch clause is always in the same region of the throw command.
 
 
-		The exception thrown is the last that has been added
+        The exception thrown is the last that has been added
 
 
 -Removing exceptions from throwables list
@@ -294,34 +294,34 @@ If there are two exceptions raised, the first will throw and the catch clause wi
 remove both. So the second exception will never be thrown. This is to take in account 
 when adding exceptions in the try clause:
 
-			NO!!!						YES
-	try {						try {
-		EM_REGISTER(very_bad_one);			EM_REGISTER(small_one);
-		EM_REGISTER(small_one);				EM_REGISTER(very_bad_one);
+            NO!!!                        YES
+    try {                        try {
+        EM_REGISTER(very_bad_one);            EM_REGISTER(small_one);
+        EM_REGISTER(small_one);                EM_REGISTER(very_bad_one);
 
 
 When a remove(excp) occurs regionThrowableSet and  totalThrowableSet are walked
 in order from newest entry to oldest and the first occurrence of excp is removed.
 So to take in account the case where the same exception is added twice:
 
-	fa() {
-		......
-		try {
-			EM_REGISTER(myExcp);
-			.......(no processEvents() here, same region)
-			fb();
-			.......(no processEvents() here, same region)
-			EM_REMOVE(myExcp);
-		} catch ()
+    fa() {
+        ......
+        try {
+            EM_REGISTER(myExcp);
+            .......(no processEvents() here, same region)
+            fb();
+            .......(no processEvents() here, same region)
+            EM_REMOVE(myExcp);
+        } catch ()
 
 Where
-	fb() {
-		......
-		try {
-			EM_REGISTER(myExcp);
-			.......
-			EM_REMOVE(myExcp);
-		} catch ()
+    fb() {
+        ......
+        try {
+            EM_REGISTER(myExcp);
+            .......
+            EM_REMOVE(myExcp);
+        } catch ()
 
 
 In this case myExcp will be added twice and must be removed twice. And after the

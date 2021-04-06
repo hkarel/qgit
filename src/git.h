@@ -84,7 +84,7 @@ public:
     bool isTextHighlighter() const { return isTextHighlighterFound; }
     const QString textHighlighterVersion() const { return textHighlighterVersionFound; }
     bool isMainHistory(const FileHistory* fh) { return (fh == revData); }
-	bool isContiguous(const QStringList &revs);
+    bool isContiguous(const QStringList &revs);
     MyProcess* getDiff(const QString& sha, QObject* receiver, const QString& diffToSha, bool combined);
     const QString getWorkDirDiff(const QString& fileName = "");
     MyProcess* getFile(const QString& fileSha, QObject* receiver, QByteArray* result, const QString& fileName);

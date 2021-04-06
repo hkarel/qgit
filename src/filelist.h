@@ -31,7 +31,7 @@ public slots:
 protected:
     //virtual void focusInEvent(QFocusEvent*);
     virtual void mouseMoveEvent(QMouseEvent*);
-	bool startDragging(QMouseEvent *e);
+    bool startDragging(QMouseEvent *e);
 
 private slots:
     //void on_currentItemChanged(QListWidgetItem*, QListWidgetItem*);

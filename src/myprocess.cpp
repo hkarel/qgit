@@ -100,11 +100,11 @@ void MyProcess::sendErrorMsg(bool notStarted) {
 
     if (!errorReportingEnabled)
         return;
-		
+        
     QByteArray err = readAllStandardError();
     QTextCodec* tc = QTextCodec::codecForLocale();
     accError += tc->toUnicode(err);
-	QString errorDesc = accError;
+    QString errorDesc = accError;
 
     if (notStarted)
         errorDesc = QString::fromLatin1("Unable to start the process!");
@@ -169,17 +169,17 @@ void MyProcess::on_finished(int exitCode, QProcess::ExitStatus exitStatus) {
     //
     // So to detect a failing command we check also if stderr is not empty.
     QByteArray err = readAllStandardError();
-	QTextCodec* tc = QTextCodec::codecForLocale();
+    QTextCodec* tc = QTextCodec::codecForLocale();
     accError += tc->toUnicode(err);
 
-    isErrorExit =   (exitStatus != QProcess::NormalExit)
+    isErrorExit = (exitStatus != QProcess::NormalExit)
 #ifdef Q_OS_WIN32
-	             || (exitCode && isWinShell)
-                 || !accError.isEmpty()
+                  || (exitCode && isWinShell)
+                  || !accError.isEmpty()
 #else
-	             || (exitCode && !accError.isEmpty())
+                  || (exitCode && !accError.isEmpty())
 #endif
-                 ||  canceling;
+                  ||  canceling;
 
     if (!canceling) { // no more noise after cancel
 
@@ -187,7 +187,7 @@ void MyProcess::on_finished(int exitCode, QProcess::ExitStatus exitStatus) {
             emit eof();
 
         if (isErrorExit)
-			sendErrorMsg(false);
+            sendErrorMsg(false);
     }
     busy = false;
     if (async)

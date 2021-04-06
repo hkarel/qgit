@@ -165,33 +165,33 @@ void FileList::on_customContextMenuRequested(const QPoint&) {
 }
 
 bool FileList::startDragging(QMouseEvent* /*e*/) {
-	const QString& dragFileName = currentText();
-	if (dragFileName.isEmpty()) return false;
+    const QString& dragFileName = currentText();
+    if (dragFileName.isEmpty()) return false;
 
-	QMimeData* mimeData = new QMimeData;
-	mimeData->setText(dragFileName);
+    QMimeData* mimeData = new QMimeData;
+    mimeData->setText(dragFileName);
 
-	QDrag *drag = new QDrag(this);
-	drag->setMimeData(mimeData);
+    QDrag *drag = new QDrag(this);
+    drag->setMimeData(mimeData);
 
-	// attach some nice pixmap to the drag (to know what is dragged)
-	int spacing = 4;
-	QFont f;
-	QFontMetrics fm(f);
-	QSize size = fm.boundingRect(dragFileName).size() + QSize(2*spacing, 2);
+    // attach some nice pixmap to the drag (to know what is dragged)
+    int spacing = 4;
+    QFont f;
+    QFontMetrics fm(f);
+    QSize size = fm.boundingRect(dragFileName).size() + QSize(2*spacing, 2);
 
-	QPixmap pixmap(size);
-	QPainter painter;
-	painter.begin(&pixmap);
-	painter.setBrush(QPalette().color(QPalette::Window));
-	painter.drawRect(0,0, size.width()-1, size.height()-1);
-	painter.drawText(spacing, fm.ascent()+1, dragFileName);
-	painter.end();
-	drag->setPixmap(pixmap);
+    QPixmap pixmap(size);
+    QPainter painter;
+    painter.begin(&pixmap);
+    painter.setBrush(QPalette().color(QPalette::Window));
+    painter.drawRect(0,0, size.width()-1, size.height()-1);
+    painter.drawText(spacing, fm.ascent()+1, dragFileName);
+    painter.end();
+    drag->setPixmap(pixmap);
 
-	// exec blocks until dragging is finished
-	drag->exec(Qt::CopyAction, Qt::CopyAction);
-	return true;
+    // exec blocks until dragging is finished
+    drag->exec(Qt::CopyAction, Qt::CopyAction);
+    return true;
 }
 
 void FileList::mouseMoveEvent(QMouseEvent* e) {

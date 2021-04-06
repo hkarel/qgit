@@ -268,13 +268,13 @@ void RevsView::on_updateRevDesc() {
 
 void RevsView::on_flagChanged(uint flag) {
 
-	if (flag == qgit::ENABLE_DRAGNDROP_F) {
+    if (flag == qgit::ENABLE_DRAGNDROP_F) {
         if (qgit::flags().test(qgit::ENABLE_DRAGNDROP_F)) {
-			tab()->listViewLog->setSelectionMode(QAbstractItemView::ExtendedSelection);
-		} else {
-			tab()->listViewLog->setSelectionMode(QAbstractItemView::SingleSelection);
-		}
-	}
+            tab()->listViewLog->setSelectionMode(QAbstractItemView::ExtendedSelection);
+        } else {
+            tab()->listViewLog->setSelectionMode(QAbstractItemView::SingleSelection);
+        }
+    }
 }
 
 bool RevsView::doUpdate(bool force) {
