@@ -143,6 +143,7 @@ Product {
     }
 
     Group {
+        name: "trigrams"
         fileTags: "trigrams"
         files: FileInfo.joinPaths(product.sourceDirectory, "spellcheck/sonnet/trigrams/*")
     }
