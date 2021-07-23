@@ -60,6 +60,7 @@ SettingsImpl::SettingsImpl(QWidget* p, Git* g, int defTab) : QDialog(p), git(g) 
     chkReopenLastRepo->setChecked(f & REOPEN_REPO_F);
     chkOpenInEditor->setChecked(f & OPEN_IN_EDITOR_F);
     chkCommitConfirm->setChecked(f & COMMIT_CONFIRM_F);
+    chkShowCloseButton->setChecked(f & SHOW_CLOSE_BTN_F);
     chkRelativeDate->setChecked(f & REL_DATE_F);
     chkLogDiffTab->setChecked(f & LOG_DIFF_TAB_F);
     chkSmartLabels->setChecked(f & SMART_LBL_F);
@@ -389,9 +390,14 @@ void SettingsImpl::on_chkOpenInEditor_toggled(bool b) {
     changeFlag(OPEN_IN_EDITOR_F, b);
 }
 
-void SettingsImpl::on_chkCommitConfirm_toggled(bool b)
-{
+void SettingsImpl::on_chkCommitConfirm_toggled(bool b) {
+
     changeFlag(COMMIT_CONFIRM_F, b);
+}
+
+void SettingsImpl::on_chkShowCloseButton_toggled(bool b) {
+
+    changeFlag(SHOW_CLOSE_BTN_F, b);
 }
 
 void SettingsImpl::on_chkRelativeDate_toggled(bool b) {

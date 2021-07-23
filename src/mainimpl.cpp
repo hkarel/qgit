@@ -63,6 +63,15 @@ MainImpl::MainImpl(const QString& cd, QWidget* p) : QMainWindow(p) {
     actAmendShort << QKeySequence("@") << QKeySequence("\"");
     actAmend->setShortcuts(actAmendShort);
 
+    if (qgit::flags().test(SHOW_CLOSE_BTN_F))
+    {
+        toolBar->insertAction(actSearchAndFilter, actExit);
+        toolBar->insertSeparator(actSearchAndFilter);
+        QToolButton* btnExit = dynamic_cast<QToolButton*>(toolBar->widgetForAction(actExit));
+        btnExit->setToolButtonStyle(Qt::ToolButtonTextBesideIcon);
+        btnExit->setToolTip("");
+    }
+
     // manual setup widgets not buildable with Qt designer
     lineSHA = new QLineEdit(NULL);
     lineFilter = new QLineEdit(NULL);
@@ -1739,8 +1748,8 @@ void MainImpl::on_actSettings_triggered(bool) {
 void MainImpl::on_actCustomActionSetup_triggered(bool) {
 
     CustomActionImpl ca {this};
-     if (ca.exec() == QDialog::Accepted)
-         doUpdateCustomActionMenu();
+    if (ca.exec() == QDialog::Accepted)
+        doUpdateCustomActionMenu();
 }
 
 void MainImpl::doUpdateCustomActionMenu() {

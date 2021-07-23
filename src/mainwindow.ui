@@ -6,7 +6,7 @@
    <rect>
     <x>0</x>
     <y>0</y>
-    <width>905</width>
+    <width>1000</width>
     <height>477</height>
    </rect>
   </property>
@@ -91,11 +91,11 @@
    <addaction name="actOpenRepo"/>
    <addaction name="actBack"/>
    <addaction name="actForward"/>
-   <addaction name="actRefresh"/>
    <addaction name="actShowTree"/>
    <addaction name="actFilterTree"/>
    <addaction name="actMailFormatPatch"/>
    <addaction name="actMailApplyPatch"/>
+   <addaction name="actRefresh"/>
    <addaction name="separator"/>
    <addaction name="actSearchAndFilter"/>
    <addaction name="actSearchAndHighlight"/>
@@ -106,7 +106,7 @@
     <rect>
      <x>0</x>
      <y>0</y>
-     <width>905</width>
+     <width>1000</width>
      <height>23</height>
     </rect>
    </property>
@@ -208,7 +208,7 @@
   </action>
   <action name="actExit">
    <property name="icon">
-    <iconset theme="application-exit">
+    <iconset theme="system-log-out">
      <normaloff>.</normaloff>.</iconset>
    </property>
    <property name="text">

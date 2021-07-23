@@ -108,6 +108,13 @@
             </property>
            </widget>
           </item>
+          <item>
+           <widget class="QCheckBox" name="chkShowCloseButton">
+            <property name="text">
+             <string>Show close button on ToolBar</string>
+            </property>
+           </widget>
+          </item>
          </layout>
         </widget>
        </item>

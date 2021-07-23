@@ -209,6 +209,7 @@ enum FlagType
     ENABLE_DRAGNDROP_F = 1 << 17,
     COMMIT_CONFIRM_F   = 1 << 18,
     SPELL_CHECK_F      = 1 << 19,
+    SHOW_CLOSE_BTN_F   = 1 << 20,
 };
 const int FLAGS_DEF = USE_CMT_MSG_F | RANGE_SELECT_F | SMART_LBL_F
                       | VERIFY_CMT_F | SIGN_PATCH_F | LOG_DIFF_TAB_F
