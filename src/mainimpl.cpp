@@ -1341,8 +1341,6 @@ void MainImpl::doUpdateRecentRepoMenu(const QString& newEntry) {
     QStringList recents;
     config::base().getValue("general.recent_open_repos", (QList<QString>&)recents);
 
-    QStringList recents2 = recents;
-
     int idx = recents.indexOf(newEntry);
     if (idx != -1)
         recents.removeAt(idx);
@@ -1359,13 +1357,8 @@ void MainImpl::doUpdateRecentRepoMenu(const QString& newEntry) {
         if (idx > MAX_RECENT_REPOS)
             break;
     }
-
-    if (recents != recents2)
-    {
-        config::base().setValue("general.recent_open_repos",
-                                (QList<QString>&)recents, YAML::EmitterStyle::Block);
-        config::base().save();
-    }
+    config::base().setValue("general.recent_open_repos",
+                            (QList<QString>&)newRecents, YAML::EmitterStyle::Block);
 }
 
 static void prepareRefSubmenu(QMenu* menu, const QStringList& refs, const QChar sep = '/') {
