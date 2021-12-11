@@ -109,9 +109,9 @@ enum ColumnType
     GRAPH_COL   = 0,
     ANN_ID_COL  = 1,
     LOG_COL     = 2,
-		HASH_COL    = 3,
-    AUTH_COL    = 3,
-    TIME_COL    = 4,
+    HASH_COL    = 3,
+    AUTH_COL    = 4,
+    TIME_COL    = 5,
     COMMIT_COL  = 97, // dummy col used for sha searching
     LOG_MSG_COL = 98, // dummy col used for log messages searching
     SHA_MAP_COL = 99  // dummy col used when filter output is a set of matching sha
@@ -294,7 +294,7 @@ public:
     const QStringList parents() const;
     bool  isBoundary() const {return _isBoundary;}
     uint  parentsCount() const {return _parents.count();}
-    const QString shortHash(int len) const {return midSha(shaStart, len);}
+    const QString shortHash(int len) const {return midSha(0/*shaStart*/, len);}
     const ShaString& sha() const {return _sha;}
     const ShaString& parent(int idx) const {return _parents.at(idx);}
     const QString&   committer() const {return _committer;}

@@ -468,6 +468,11 @@ QString Rev::mid(const QString& s, int start, int len) const {
     return QString(data + start, len);
 }
 
+QString Rev::midSha(int start, int len) const {
+
+    return mid(_sha, start, len);
+}
+
 const QStringList Rev::parents() const {
 
     QStringList p;

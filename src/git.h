@@ -113,12 +113,12 @@ public:
     uint checkRef(const QString& sha, uint mask = ANY_REF) const;
     const QString getRevInfo(const QString& sha);
     const QString getRefSha(const QString& refName, RefType type = ANY_REF, bool askGit = true);
-    int getShortHashLength();
     const QStringList getRefNames(const QString& sha, uint mask = ANY_REF) const;
     const QStringList getAllRefNames(uint mask, bool onlyLoaded);
     const QStringList getAllRefSha(uint mask);
     const QStringList sortShaListByIndex(const QStringList& shaList);
     //const QString refAsShortHash(const QString& sha);
+    int getShortHashLength();
     void getWorkDirFiles(QStringList& files, QStringList& dirs, RevFile::StatusFlag status);
     QTextCodec* getTextCodec(bool* isGitArchive);
     bool formatPatch(const QStringList& shaList, const QString& dirPath, const QString& remoteDir = "");
@@ -281,7 +281,7 @@ private:
     bool loadingUnAppliedPatches;
     bool fileCacheAccessed;
     int patchesStillToFind;
-	int shortHashLen;
+    int shortHashLen;
     QString firstNonStGitPatch;
     RevFileMap revsFiles;
     RefMap refsShaMap;

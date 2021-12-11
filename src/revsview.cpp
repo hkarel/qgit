@@ -369,7 +369,7 @@ void RevsView::updateLineEditSHA(bool clear) {
     }
     else if (l->text() != sha) {
         QString hash = (qgit::flags().test(qgit::ENABLE_SHORTREF_F))
-                       ? git->refAsShortHash(sha)
+                       ? sha.left(git->shortHashLength())
                        : sha;
 
         if (l->text().isEmpty())

@@ -241,8 +241,8 @@ QVariant FileHistory::data(const QModelIndex& index, int role) const {
   static const QVariant no_value;
 
   if (!index.isValid() || role != Qt::DisplayRole) {
-    if (role == Qt::FontRole && index.column() == QGit::HASH_COL)
-        return QGit::TYPE_WRITER_FONT;
+    if (role == Qt::FontRole && index.column() == qgit::HASH_COL)
+        return qgit::TYPE_WRITER_FONT;
     return no_value; // fast path, 90% of calls ends here!
   }
 
@@ -262,7 +262,7 @@ QVariant FileHistory::data(const QModelIndex& index, int role) const {
   if (col == qgit::LOG_COL)
     return r->shortLog();
 
-  if (col == QGit::HASH_COL)
+  if (col == qgit::HASH_COL)
     return r->shortHash(git->shortHashLength());
 
   if (col == qgit::AUTH_COL)

@@ -1349,7 +1349,7 @@ void MainImpl::doUpdateRecentRepoMenu(const QString& newEntry) {
 static void prepareRefSubmenu(QMenu* menu, const QStringList& refs, const QChar sep = '/') {
 
     for (const QString& ref : refs) {
-		const QStringList& parts(it->split(sep, QGIT_SPLITBEHAVIOR(SkipEmptyParts)));
+        QStringList parts = ref.split(sep, QGIT_SPLITBEHAVIOR(SkipEmptyParts));
         QMenu* add_here = menu;
         for (const QString& pit : parts) {
             if (pit == parts.last())
