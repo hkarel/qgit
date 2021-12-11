@@ -95,7 +95,7 @@ int main(int argc, char* argv[])
          config::base().setValue("commit.template_file_path", commitTmpl);
 
     if (config::base().changed())
-        config::base().save();
+        config::base().saveFile();
     //---
 
     // Init logger
@@ -156,7 +156,7 @@ int main(int argc, char* argv[])
     spellCheck().deinit();
 
     if (config::base().changed())
-        config::base().save();
+        config::base().saveFile();
 
     log_info << log_format("%? is stopped", APPLICATION_NAME);
     stopLog();

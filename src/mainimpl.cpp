@@ -1342,8 +1342,8 @@ void MainImpl::doUpdateRecentRepoMenu(const QString& newEntry) {
         if (idx > MAX_RECENT_REPOS)
             break;
     }
-    config::base().setValue("general.recent_open_repos",
-                            (QList<QString>&)newRecents, YAML::EmitterStyle::Block);
+    config::base().setValue("general.recent_open_repos", (QList<QString>&)newRecents);
+    config::base().setNodeStyle("general.recent_open_repos", YAML::EmitterStyle::Block);
 }
 
 static void prepareRefSubmenu(QMenu* menu, const QStringList& refs, const QChar sep = '/') {
@@ -1643,7 +1643,7 @@ void MainImpl::on_actMailFormatPatch_triggered(bool) {
 
     QDir d(dirPath);
     config::base().setValue("patch.last_dir", d.absolutePath());
-    config::base().save();
+    config::base().saveFile();
 
     QApplication::setOverrideCursor(QCursor(Qt::WaitCursor));
     git->formatPatch(selectedItems, d.absolutePath());
@@ -1681,7 +1681,7 @@ void MainImpl::on_actMailApplyPatch_triggered(bool) {
 
     QFileInfo f(patchName);
     config::base().setValue("patch.last_dir", f.absolutePath());
-    config::base().save();
+    config::base().saveFile();
 
     bool workDirOnly, fold;
     if (!askApplyPatchParameters(&workDirOnly, &fold))

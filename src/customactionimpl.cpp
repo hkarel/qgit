@@ -58,7 +58,7 @@ void CustomActionImpl::done(int r)
 
     if (r == QDialog::Accepted) {
         saveActions();
-        config::base().save();
+        config::base().saveFile();
     }
     else
         config::base().rereadFile();

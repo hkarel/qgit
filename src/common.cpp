@@ -200,7 +200,7 @@ void Flags::load()
 void Flags::save() const
 {
     config::base().setValue("general.flags", uint(value));
-    config::base().save();
+    config::base().saveFile();
 }
 
 bool Flags::test(uint flag) const
