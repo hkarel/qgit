@@ -23,6 +23,7 @@
 #include "shared/qt/logger_operators.h"
 
 #include <QApplication>
+#include <QDateTime>
 #include <QDir>
 #include <QFile>
 #include <QImageReader>

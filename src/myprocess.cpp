@@ -55,7 +55,7 @@ bool MyProcess::runSync(const QString& rc, QByteArray* ro, QObject* rcv, const Q
     if (!launchMe(runCmd, buf))
         return false;
 
-    QTime t;
+	QElapsedTimer t;
     t.start();
 
     busy = true; // we have to wait here until we exit
