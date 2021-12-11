@@ -282,6 +282,13 @@ const QStringList Git::getAllRefSha(uint mask) {
 }
 
 const QString Git::getRefSha(const QString& refName, RefType type, bool askGit) {
+{
+	QString shortHash;
+	const bool success = run("git rev-parse --short " + sha, &shortHash);
+	// Fall back to input hash `sha` if rev-parse fails
+	return success ? shortHash : sha;
+}
+
 
     bool any = (type == ANY_REF);
 

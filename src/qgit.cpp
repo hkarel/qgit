@@ -107,9 +107,7 @@ int main(int argc, char* argv[])
     qgit::flags().load();
 
     QApplication app(argc, argv);
-#if QT_VERSION >= QT_VERSION_CHECK(5,6,0)
-    app.setAttribute(Qt::AA_UseHighDpiPixmaps, true);
-#endif
+	app.setAttribute(Qt::AA_UseHighDpiPixmaps, true);
     QCoreApplication::setOrganizationName("qgit");
     QCoreApplication::setApplicationName("qgit");
 

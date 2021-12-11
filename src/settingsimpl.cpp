@@ -68,6 +68,7 @@ SettingsImpl::SettingsImpl(QWidget* p, Git* g, int defTab) : QDialog(p), git(g) 
     chkEnableDragnDrop->setChecked(f & ENABLE_DRAGNDROP_F);
     chkEnableDragnDrop->setChecked(f & ENABLE_DRAGNDROP_F);
     chkSpellCheck->setChecked(f & SPELL_CHECK_F);
+    checkBoxShowShortRef->setChecked(f & ENABLE_SHORTREF_F);
 
     QString FPOpt;
     config::base().getValue("patch.args", FPOpt);
@@ -423,6 +424,11 @@ void SettingsImpl::on_chkMsgOnNewSHA_toggled(bool b) {
 void SettingsImpl::on_chkEnableDragnDrop_toggled(bool b) {
 
     changeFlag(ENABLE_DRAGNDROP_F, b);
+}
+
+void SettingsImpl::checkBoxShowShortRef_toggled(bool b) {
+
+	changeFlag(ENABLE_SHORTREF_F, b);
 }
 
 void SettingsImpl::on_chkCommitSign_toggled(bool b) {

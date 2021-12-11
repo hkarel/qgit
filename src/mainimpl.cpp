@@ -105,11 +105,7 @@ MainImpl::MainImpl(const QString& cd, QWidget* p) : QMainWindow(p) {
     // set-up standard revisions and files list font
     QString fontDescr; // (settings.value(STD_FNT_KEY).toString());
     if (fontDescr.isEmpty()) {
-#if (QT_VERSION >= QT_VERSION_CHECK(5,2,0))
         fontDescr = QFontDatabase::systemFont(QFontDatabase::GeneralFont).toString();
-#else
-        fontDescr = QApplication::font().toString();
-#endif
     }
     qgit::STD_FONT.fromString(fontDescr);
 
@@ -139,14 +135,7 @@ MainImpl::MainImpl(const QString& cd, QWidget* p) : QMainWindow(p) {
     config::base().getValue("general.typewriter_font", fontDescr);
 
     if (fontDescr.isEmpty()) { // choose a sensible default
-#if (QT_VERSION >= QT_VERSION_CHECK(5,2,0))
         QFont fnt = QFontDatabase::systemFont(QFontDatabase::FixedFont);
-#else
-        QFont fnt = QApplication::font();
-        fnt.setStyleHint(QFont::TypeWriter, QFont::PreferDefault);
-        fnt.setFixedPitch(true);
-        fnt.setFamily(fnt.defaultFamily()); // the family corresponding
-#endif
         fontDescr = fnt.toString();              // to current style hint
     }
     qgit::TYPE_WRITER_FONT.fromString(fontDescr);
@@ -1176,11 +1165,7 @@ void MainImpl::shortCutActivated() {
     QShortcut* se = dynamic_cast<QShortcut*>(sender());
 
     if (se) {
-#if QT_VERSION >= 0x050000
         const QKeySequence& key = se->key();
-#else
-        const int key = se->key();
-#endif
 
         if (key == Qt::Key_I) {
             rv->tab()->listViewLog->on_keyUp();

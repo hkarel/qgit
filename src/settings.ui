@@ -487,6 +487,16 @@
           </item>
           <item>
            <widget class="QCheckBox" name="chkSign">
+              <item>
+               <widget class="QCheckBox" name="checkBoxShowShortRef">
+                <property name="toolTip">
+                 <string>Check to display short commit hash instead of full-length hash</string>
+                </property>
+                <property name="text">
+                 <string>Display short commit hash</string>
+                </property>
+               </widget>
+              </item>
             <property name="toolTip">
              <string>Check to add a 'Signed-off-by:' line if not already existent</string>
             </property>
@@ -1064,6 +1074,12 @@
      <y>246</y>
     </hint>
    </hints>
+  </connection>
+  <connection>
+   <sender>checkBoxShowShortRef</sender>
+   <signal>toggled(bool)</signal>
+   <receiver>settingsBase</receiver>
+   <slot>checkBoxShowShortRef_toggled(bool)</slot>
   </connection>
  </connections>
 </ui>
