@@ -120,7 +120,7 @@ void DataLoader::on_timeout() {
 
     qint64 len = readNewData();
     if (len == -1) {
-        emit loaded(fh, loadedBytes, loadTime.elapsed(), true, "", "");
+        emit loaded(fh, loadedBytes, int(loadTime.elapsed()), true, "", "");
         deleteLater();
 
         log_debug << "All git data readed";
