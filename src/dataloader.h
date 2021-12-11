@@ -29,7 +29,7 @@ public:
 
 signals:
     void newDataReady(const FileHistory*);
-    void loaded(FileHistory*, ulong, int, bool, const QString&, const QString&);
+    void loaded(FileHistory*, qint64, qint64, bool, const QString&, const QString&);
 
 private slots:
     void on_finished(int, QProcess::ExitStatus);
