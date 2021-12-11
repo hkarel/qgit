@@ -262,8 +262,12 @@ QVariant FileHistory::data(const QModelIndex& index, int role) const {
   if (col == qgit::LOG_COL)
     return r->shortLog();
 
-  if (col == qgit::HASH_COL)
-    return r->shortHash(git->shortHashLength());
+  if (col == qgit::HASH_COL) {
+    if (r->sha() == qgit::ZERO_SHA)
+      return QString("-");
+    else
+      return r->shortHash(git->shortHashLength());
+  }
 
   if (col == qgit::AUTH_COL)
     return r->author();

@@ -292,17 +292,17 @@ public:
     int parse(const QString& str, int start, int orderIdx, bool withDiff);
 
     const QStringList parents() const;
-    bool  isBoundary() const {return _isBoundary;}
-    uint  parentsCount() const {return _parents.count();}
-    const QString shortHash(int len) const {return midSha(0/*shaStart*/, len);}
-    const ShaString& sha() const {return _sha;}
-    const ShaString& parent(int idx) const {return _parents.at(idx);}
-    const QString&   committer() const {return _committer;}
-    const QString&   author() const {return _author;}
-    const QString&   authorDate() const {return _authorDate;}
-    const QString&   diff() const {return _diff;}
-    const QString&   shortLog() const {return _shortLog;}
-    const QString&   longLog() const {return _longLog;}
+    bool isBoundary() const {return _isBoundary;}
+    uint parentsCount() const {return _parents.count();}
+    ShaString sha() const {return _sha;}
+    ShaString parent(int idx) const {return _parents.at(idx);}
+    QString shortHash(int len) const {return midSha(0, len);}
+    QString committer() const {return _committer;}
+    QString author() const {return _author;}
+    QString authorDate() const {return _authorDate;}
+    QString diff() const {return _diff;}
+    QString shortLog() const {return _shortLog;}
+    QString longLog() const {return _longLog;}
 
     QVector<int> lanes;
     QVector<int> children;
