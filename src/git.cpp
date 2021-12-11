@@ -824,7 +824,7 @@ bool Git::getTree(const QString& treeSha, TreeInfo& ti, bool isWorkingDir, const
             ti.append(te);
         }
     }
-    qSort(ti); // list directories before files
+	std::sort(ti.begin(), ti.end()); // list directories before files
     return true;
 }
 
@@ -1679,7 +1679,7 @@ const QString Git::getLocalDate(const QString& gitDate) {
     if (localDate.isEmpty()) {
         static QDateTime d;
         d.setTime_t(gitDate.toUInt());
-        localDate = d.toString(Qt::SystemLocaleShortDate);
+                localDate = QLocale::system().toString(d, QLocale::ShortFormat);
 
         // save to cache
         localDates[gitDate] = localDate;
@@ -2432,9 +2432,9 @@ void Git::on_loaded(FileHistory* fh, ulong byteSize, int loadTime,
             ulong kb = byteSize / 1024;
             double mbs = (double)byteSize / fh->loadTime / 1000;
             QString tmp;
-            tmp.sprintf("Loaded %i revisions  (%li KB),   "
-                        "time elapsed: %i ms  (%.2f MB/s)",
-                        fh->revs.count(), kb, fh->loadTime, mbs);
+                        tmp.asprintf("Loaded %i revisions  (%li KB),   "
+                                     "time elapsed: %i ms  (%.2f MB/s)",
+                                     fh->revs.count(), kb, fh->loadTime, mbs);
 
             if (!tryFollowRenames(fh))
                 emit loadCompleted(fh, tmp);
@@ -2994,7 +2994,7 @@ void Git::mergeBranches(Rev* p, const Rev* r) {
     const QVector<int>& src2 = revLookup(revData->revOrder[r_descBrnMaster])->descBranches;
     QVector<int> dst(src1);
     for (int i = 0; i < src2.count(); i++)
-        if (qFind(src1.constBegin(), src1.constEnd(), src2[i]) == src1.constEnd())
+                if (std::find(src1.constBegin(), src1.constEnd(), src2[i]) == src1.constEnd())
             dst.append(src2[i]);
 
     p->descBranches = dst;
