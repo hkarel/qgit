@@ -15,6 +15,12 @@
 #include <QSplitter>
 #include <atomic>
 #include <memory>
+// QString::SplitBehavior becomes Qt::SplitBehavior in Qt 5.14
+#if (QT_VERSION >= QT_VERSION_CHECK(5, 14, 0))
+# define QGIT_SPLITBEHAVIOR(x) Qt::x
+#else
+# define QGIT_SPLITBEHAVIOR(x) QString::x
+#endif
 
 // some syntactic sugar
 #define FOREACH(i, c) \
@@ -103,6 +109,7 @@ enum ColumnType
     GRAPH_COL   = 0,
     ANN_ID_COL  = 1,
     LOG_COL     = 2,
+		HASH_COL    = 3,
     AUTH_COL    = 3,
     TIME_COL    = 4,
     COMMIT_COL  = 97, // dummy col used for sha searching
@@ -116,6 +123,7 @@ inline bool isInfoCol(int x) {return (x == TIME_COL || x == LOG_COL
 // default list view widths
 const int DEF_GRAPH_COL_WIDTH = 80;
 const int DEF_LOG_COL_WIDTH   = 500;
+	const int DEF_HASH_COL_WIDTH  = 90;
 const int DEF_AUTH_COL_WIDTH  = 230;
 const int DEF_TIME_COL_WIDTH  = 160;
 
@@ -286,6 +294,7 @@ public:
     const QStringList parents() const;
     bool  isBoundary() const {return _isBoundary;}
     uint  parentsCount() const {return _parents.count();}
+    const QString shortHash(int len) const {return midSha(shaStart, len);}
     const ShaString& sha() const {return _sha;}
     const ShaString& parent(int idx) const {return _parents.at(idx);}
     const QString&   committer() const {return _committer;}
@@ -314,6 +323,7 @@ private:
     Rev& operator== (const Rev&) = delete;
 
     QString mid(const QString& s, int start, int len) const;
+    QString midSha(int start, int len) const;
 
     bool       _isBoundary = {false};
     ShaString  _sha;

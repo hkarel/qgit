@@ -35,6 +35,8 @@ public:
     static const bool optAmend       = true; //CT TODO enum
     static const bool optOnlyInIndex = true; //CT TODO private, enum
 
+	static const int shortHashLenDefault = 7;
+
     enum RefType {
         TAG           = 1,
         BRANCH        = 2,
@@ -111,11 +113,12 @@ public:
     uint checkRef(const QString& sha, uint mask = ANY_REF) const;
     const QString getRevInfo(const QString& sha);
     const QString getRefSha(const QString& refName, RefType type = ANY_REF, bool askGit = true);
+    int getShortHashLength();
     const QStringList getRefNames(const QString& sha, uint mask = ANY_REF) const;
     const QStringList getAllRefNames(uint mask, bool onlyLoaded);
     const QStringList getAllRefSha(uint mask);
     const QStringList sortShaListByIndex(const QStringList& shaList);
-    const QString refAsShortHash(const QString& sha);
+    //const QString refAsShortHash(const QString& sha);
     void getWorkDirFiles(QStringList& files, QStringList& dirs, RevFile::StatusFlag status);
     QTextCodec* getTextCodec(bool* isGitArchive);
     bool formatPatch(const QStringList& shaList, const QString& dirPath, const QString& remoteDir = "");
@@ -136,6 +139,7 @@ public:
 
         return dirNamesVec[rf.dirAt(i)] + fileNamesVec[rf.nameAt(i)];
     }
+	int shortHashLength() const { return shortHashLen; }
     void setCurContext(Domain* d) { curDomain = d; }
     Domain* curContext() const { return curDomain; }
 
@@ -277,6 +281,7 @@ private:
     bool loadingUnAppliedPatches;
     bool fileCacheAccessed;
     int patchesStillToFind;
+	int shortHashLen;
     QString firstNonStGitPatch;
     RevFileMap revsFiles;
     RefMap refsShaMap;

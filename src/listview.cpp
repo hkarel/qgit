@@ -112,6 +112,7 @@ void ListView::setupGeometry() {
     hv->setSectionResizeMode(ANN_ID_COL, QHeaderView::ResizeToContents);
     hv->resizeSection(GRAPH_COL, DEF_GRAPH_COL_WIDTH);
     hv->resizeSection(LOG_COL, DEF_LOG_COL_WIDTH);
+	hv->resizeSection(HASH_COL, DEF_HASH_COL_WIDTH);
     hv->resizeSection(AUTH_COL, DEF_AUTH_COL_WIDTH);
     hv->resizeSection(TIME_COL, DEF_TIME_COL_WIDTH);
 }
@@ -516,7 +517,7 @@ void ListView::dragEnterEvent(QDragEnterEvent* e) {
 
     QString revsText(e->mimeData()->data("application/x-qgit-revs"));
     QString header = revsText.section("\n", 0, 0);
-    dropInfo->shas = revsText.section("\n", 1).split('\n', QString::SkipEmptyParts);
+	dropInfo->shas = revsText.section("\n", 1).split('\n', QGIT_SPLITBEHAVIOR(SkipEmptyParts));
     // extract refname and sha from first entry again
     dropInfo->sourceRef = dropInfo->shas.front().section(" ", 1);
     dropInfo->shas.front() = dropInfo->shas.front().section(" ", 0, 0);

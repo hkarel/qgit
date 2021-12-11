@@ -71,6 +71,7 @@ Git::Git(QObject* p) : QObject(p) {
     isStGIT = isGIT = loadingUnAppliedPatches = isTextHighlighterFound = false;
     errorReportingEnabled = true; // report errors if run() fails
     curDomain = NULL;
+	shortHashLen = shortHashLenDefault;
     revData = NULL;
     revsFiles.reserve(MAX_DICT_SIZE);
 }
@@ -150,7 +151,7 @@ const QStringList Git::getGitConfigList(bool global) {
 
     errorReportingEnabled = true;
 
-    return runOutput.split('\n', QString::SkipEmptyParts);
+    return runOutput.split('\n', QGIT_SPLITBEHAVIOR(SkipEmptyParts));
 }
 
 bool Git::isImageFile(const QString& file) {
@@ -288,6 +289,16 @@ const QString Git::refAsShortHash(const QString& sha) {
     const bool success = run("git rev-parse --short " + sha, &shortHash);
     // Fall back to input hash `sha` if rev-parse fails
     return (success) ? shortHash : sha;
+}
+*/
+
+int Git::getShortHashLength()
+{
+	int len = 0;
+	QString shortHash;
+	if (run("git rev-parse --short HEAD", &shortHash))
+		len = shortHash.trimmed().size();   // Result contains a newline.
+	return (len > shortHashLenDefault) ? len : shortHashLenDefault;
 }
 
 const QString Git::getRefSha(const QString& refName, RefType type, bool askGit) {
@@ -1341,7 +1352,7 @@ bool Git::getPatchFilter(const QString& exp, bool isRegExp, ShaSet& shaSet) {
     if (!run(runCmd, &runOutput, NULL, buf))
         return false;
 
-    const QStringList sl = runOutput.split('\n', QString::SkipEmptyParts);
+	const QStringList sl(runOutput.split('\n', QGIT_SPLITBEHAVIOR(SkipEmptyParts)));
     for (const QString& s : sl)
         shaSet.insert(s);
 
@@ -1830,7 +1841,7 @@ bool Git::getRefs() {
 
     QString prevRefSha;
     QStringList patchNames, patchShas;
-    const QStringList rLst = runOutput.split('\n', QString::SkipEmptyParts);
+        const QStringList rLst(runOutput.split('\n', QGIT_SPLITBEHAVIOR(SkipEmptyParts)));
     for (const QString& s : rLst) {
 
         const QString& revSha = s.left(qgit::SHA_LENGTH);
@@ -1915,7 +1926,7 @@ void Git::parseStGitPatches(const QStringList& patchNames, const QStringList& pa
     if (!run("stg series", &runOutput))
         return;
 
-    const QStringList pl = runOutput.split('\n', QString::SkipEmptyParts);
+        const QStringList pl(runOutput.split('\n', QGIT_SPLITBEHAVIOR(SkipEmptyParts)));
     for (const QString& s : pl) {
 
         const QString& status = s.left(1);
@@ -1956,7 +1967,7 @@ const QStringList Git::getOthersFiles() {
 
     QString runOutput;
     run(runCmd, &runOutput);
-    return runOutput.split('\n', QString::SkipEmptyParts);
+        return runOutput.split('\n', QGIT_SPLITBEHAVIOR(SkipEmptyParts));
 }
 
 const Rev* Git::fakeWorkDirRev(const QString& parent, const QString& log,
@@ -2097,7 +2108,7 @@ void Git::setStatus(RevFile& rf, const QString& rowSt) {
 
 void Git::setExtStatus(RevFile& rf, const QString& rowSt, int parNum, FileNamesLoader& fl) {
 
-    const QStringList sl(rowSt.split('\t', QString::SkipEmptyParts));
+        const QStringList sl(rowSt.split('\t', QGIT_SPLITBEHAVIOR(SkipEmptyParts)));
     if (sl.count() != 3) {
         log_warn << log_format("Unexpected status string %?", rowSt);
         return;
@@ -2342,6 +2353,7 @@ bool Git::init(const QString& wd, bool askForRange, const QStringList* passedArg
             }
         }
         init2();
+                shortHashLen = getShortHashLength();
         setThrowOnStop(false);
         return true;
     }

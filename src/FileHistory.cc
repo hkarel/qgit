@@ -24,7 +24,7 @@ using namespace qgit;
 
 FileHistory::FileHistory(QObject* p, Git* g) : QAbstractItemModel(p), git(g) {
 
-  headerInfo << "Graph" << "Id" << "Short Log" << "Author" << "Author Date";
+  headerInfo << "Graph" << "Id" << "Short Log" << "Commit" << "Author" << "Author Date";
   lns = new Lanes();
   revs.reserve(qgit::MAX_DICT_SIZE);
   clear(); // after _headerInfo is set
@@ -122,15 +122,15 @@ void FileHistory::clear(bool complete) {
 
   if (qgit::flags().test(REL_DATE_F)) {
     secs = QDateTime::currentDateTime().toTime_t();
-    headerInfo[4] = "Last Change";
+    headerInfo[ColumnType::TIME_COL] = "Last Change";
   } else {
     secs = 0;
-    headerInfo[4] = "Author Date";
+    headerInfo[ColumnType::TIME_COL] = "Author Date";
   }
   rowCnt = revOrder.count();
   annIdValid = false;
   endResetModel();
-  emit headerDataChanged(Qt::Horizontal, 0, 4);
+  emit headerDataChanged(Qt::Horizontal, 0, ColumnType::TIME_COL);
 }
 
 void FileHistory::on_newRevsAdded(const FileHistory* fh, const QVector<ShaString>& shaVec) {
@@ -240,8 +240,11 @@ QVariant FileHistory::data(const QModelIndex& index, int role) const {
 
   static const QVariant no_value;
 
-  if (!index.isValid() || role != Qt::DisplayRole)
+  if (!index.isValid() || role != Qt::DisplayRole) {
+    if (role == Qt::FontRole && index.column() == QGit::HASH_COL)
+        return QGit::TYPE_WRITER_FONT;
     return no_value; // fast path, 90% of calls ends here!
+  }
 
   const Rev* r = git->revLookup(revOrder.at(index.row()), this);
   if (!r)
@@ -258,6 +261,9 @@ QVariant FileHistory::data(const QModelIndex& index, int role) const {
 
   if (col == qgit::LOG_COL)
     return r->shortLog();
+
+  if (col == QGit::HASH_COL)
+    return r->shortHash(git->shortHashLength());
 
   if (col == qgit::AUTH_COL)
     return r->author();
