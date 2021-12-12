@@ -94,7 +94,7 @@ public:
     const QString getFileSha(const QString& file, const QString& revSha);
     bool saveFile(const QString& fileSha, const QString& fileName, const QString& path);
     void getFileFilter(const QString& path, ShaSet& shaSet) const;
-    bool getPatchFilter(const QString& exp, bool isRegExp, ShaSet& shaSet);
+    bool getPatchFilter(const QString& exp, bool useGKey, bool isRegExp, ShaSet& shaSet);
     const RevFile* getFiles(const QString& sha, const QString& sha2 = "", bool all = false, const QString& path = "");
     bool getTree(const QString& ts, TreeInfo& ti, bool wd, const QString& treePath);
     static const QString getLocalDate(const QString& gitDate);

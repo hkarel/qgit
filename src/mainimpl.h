@@ -51,7 +51,8 @@ public:
         CS_AUTHOR,
         CS_SHA1,
         CS_FILE,
-        CS_PATCH,
+        CS_PATCH, // SKEY
+        CS_PATCH_GKEY,
         CS_PATCH_REGEXP
     };
 

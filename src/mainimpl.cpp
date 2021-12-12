@@ -76,7 +76,7 @@ MainImpl::MainImpl(const QString& cd, QWidget* p) : QMainWindow(p) {
     lineSHA = new QLineEdit(NULL);
     lineFilter = new QLineEdit(NULL);
     cboxSearch = new QComboBox(NULL);
-    QString list("Short log,Log msg,Author,SHA1,File,Patch,Patch (regExp)");
+    QString list {"Short log,Log msg,Author,SHA1,File,Patch (-S),Patch (-G),Patch (regExp)"};
     cboxSearch->addItems(list.split(","));
     toolBar->addWidget(lineSHA);
     QAction* act = toolBar->insertWidget(actSearchAndFilter, lineFilter);
@@ -999,6 +999,7 @@ void MainImpl::filterList(bool isOn, bool onlyHighlight) {
             break;
         case CS_FILE:
         case CS_PATCH:
+        case CS_PATCH_GKEY:
         case CS_PATCH_REGEXP:
             colNum = SHA_MAP_COL;
             QApplication::setOverrideCursor(QCursor(Qt::WaitCursor));
@@ -1007,9 +1008,12 @@ void MainImpl::filterList(bool isOn, bool onlyHighlight) {
                 git->getFileFilter(filter, shaSet);
             else {
                 isRegExp = (idx == CS_PATCH_REGEXP);
-                if (!git->getPatchFilter(filter, isRegExp, shaSet)) {
+                bool useGKey = (idx == CS_PATCH_GKEY);
+                if (!git->getPatchFilter(filter, useGKey, isRegExp, shaSet)) {
                     QApplication::restoreOverrideCursor();
                     actSearchAndFilter->toggle();
+                    cboxSearch->setEnabled(true);
+                    lineFilter->setEnabled(true);
                     return;
                 }
                 patchNeedsUpdate = (shaSet.count() > 0);

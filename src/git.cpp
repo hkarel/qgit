@@ -1332,7 +1332,7 @@ void Git::getFileFilter(const QString& path, ShaSet& shaSet) const {
     }
 }
 
-bool Git::getPatchFilter(const QString& exp, bool isRegExp, ShaSet& shaSet) {
+bool Git::getPatchFilter(const QString& exp, bool useGKey, bool isRegExp, ShaSet& shaSet) {
 
     shaSet.clear();
     QString buf;
@@ -1349,7 +1349,11 @@ bool Git::getPatchFilter(const QString& exp, bool isRegExp, ShaSet& shaSet) {
     if (isRegExp)
         runCmd.append("--pickaxe-regex ");
 
-    runCmd.append(quote("-S" + exp));
+    if (useGKey)
+        runCmd.append(quote("-G" + exp));
+    else
+        runCmd.append(quote("-S" + exp));
+
     if (!run(runCmd, &runOutput, NULL, buf))
         return false;
 
