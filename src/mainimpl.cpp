@@ -2203,7 +2203,7 @@ void MainImpl::on_actMarkDiffToSha_triggered(bool)
 void MainImpl::on_actAbout_triggered(bool) {
 
     static const char* aboutMsg =
-    "<p><b>QGit version " VERSION_PROJECT " (Gitrev:&nbsp;" GIT_REVISION ") </b></p>"
+    "<p><b>QGit version " VERSION_PROJECT " (gitrev:&nbsp;" GIT_REVISION ") </b></p>"
     "<p>Copyright (c) 2005, 2007, 2008 Marco Costalba<br>"
 	"Copyright (c) 2011-2021 <a href='mailto:tibirna@kde.org'>Cristian Tibirna</a></p>"
     "<p>Use and redistribute under the terms of the<br>"

@@ -429,9 +429,12 @@
            </widget>
           </item>
           <item>
-           <widget class="QCheckBox" name="chkBoxShowShortRef">
+           <widget class="QCheckBox" name="chkShortCommitHash">
+            <property name="toolTip">
+             <string>Display short commit hash instead of full-length hash</string>
+            </property>
             <property name="text">
-             <string>Check to display short commit hash instead of full-length hash</string>
+             <string>Display short commit hash</string>
             </property>
            </widget>
           </item>

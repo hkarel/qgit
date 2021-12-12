@@ -66,7 +66,7 @@ SettingsImpl::SettingsImpl(QWidget* p, Git* g, int defTab) : QDialog(p), git(g) 
     chkSmartLabels->setChecked(f & SMART_LBL_F);
     chkMsgOnNewSHA->setChecked(f & MSG_ON_NEW_F);
     chkEnableDragnDrop->setChecked(f & ENABLE_DRAGNDROP_F);
-    chkBoxShowShortRef->setChecked(f & ENABLE_SHORTREF_F);
+    chkShortCommitHash->setChecked(f & ENABLE_SHORTREF_F);
     chkEnableDragnDrop->setChecked(f & ENABLE_DRAGNDROP_F);
     chkSpellCheck->setChecked(f & SPELL_CHECK_F);
 
@@ -426,7 +426,7 @@ void SettingsImpl::on_chkEnableDragnDrop_toggled(bool b) {
     changeFlag(ENABLE_DRAGNDROP_F, b);
 }
 
-void SettingsImpl::on_chkBoxShowShortRef_toggled(bool b) {
+void SettingsImpl::on_chkShortCommitHash_toggled(bool b) {
 
     changeFlag(ENABLE_SHORTREF_F, b);
 }

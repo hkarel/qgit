@@ -37,7 +37,7 @@ protected slots:
     void on_chkSmartLabels_toggled(bool b);
     void on_chkMsgOnNewSHA_toggled(bool b);
     void on_chkEnableDragnDrop_toggled(bool b);
-    void on_chkBoxShowShortRef_toggled(bool b);
+    void on_chkShortCommitHash_toggled(bool b);
     void on_chkDiffCache_toggled(bool b);
     void on_chkCommitSign_toggled(bool b);
     void on_chkCommitVerify_toggled(bool b);
