@@ -78,7 +78,7 @@ private:
     ShaVect histRevOrder; // TODO use reference
     bool valid;
     bool canceled;
-	QElapsedTimer processingTime;
+    QElapsedTimer processingTime;
     Ranges ranges;
 };
 

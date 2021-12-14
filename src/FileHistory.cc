@@ -201,7 +201,7 @@ QModelIndex FileHistory::index(int row, int column, const QModelIndex&) const {
         index() is called much more then data(), also by a 100X factor on
         big archives, so we use just the row number as QModelIndex payload
         and defer the revision lookup later, inside data().
-        Because row and column info are	stored anyway in QModelIndex we
+        Because row and column info are stored anyway in QModelIndex we
         don't need to add any additional data.
 */
   if (row < 0 || row >= rowCnt)

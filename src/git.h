@@ -35,7 +35,7 @@ public:
     static const bool optAmend       = true; //CT TODO enum
     static const bool optOnlyInIndex = true; //CT TODO private, enum
 
-	static const int shortHashLenDefault = 7;
+    static const int shortHashLenDefault = 7;
 
     enum RefType {
         TAG           = 1,
@@ -139,7 +139,7 @@ public:
 
         return dirNamesVec[rf.dirAt(i)] + fileNamesVec[rf.nameAt(i)];
     }
-	int shortHashLength() const { return shortHashLen; }
+    int shortHashLength() const { return shortHashLen; }
     void setCurContext(Domain* d) { curDomain = d; }
     Domain* curContext() const { return curDomain; }
 

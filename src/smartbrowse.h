@@ -49,7 +49,7 @@ private:
     SmartLabel* logBottomLbl;
     SmartLabel* diffTopLbl;
     SmartLabel* diffBottomLbl;
-	QElapsedTimer scrollTimer, switchTimer, timeoutTimer;
+    QElapsedTimer scrollTimer, switchTimer, timeoutTimer;
     int wheelCnt;
     bool lablesEnabled;
 };

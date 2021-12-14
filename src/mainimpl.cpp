@@ -86,7 +86,7 @@ MainImpl::MainImpl(const QString& cd, QWidget* p) : QMainWindow(p) {
 
     // create light and dark colors for alternate background
     ODD_LINE_COL = palette().color(QPalette::Base);
-	EVEN_LINE_COL = ODD_LINE_COL.darker(103);
+    EVEN_LINE_COL = ODD_LINE_COL.darker(103);
 
     // our interface to git world
     git = new Git(this);
@@ -767,7 +767,7 @@ bool MainImpl::eventFilter(QObject* obj, QEvent* ev) {
         if (e->modifiers() == Qt::AltModifier) {
 
             int idx = tabWidget->currentIndex();
-			if (e->angleDelta().y() < 0)
+            if (e->angleDelta().y() < 0)
                 idx = (++idx == tabWidget->count() ? 0 : idx);
             else
                 idx = (--idx < 0 ? tabWidget->count() - 1 : idx);
@@ -2209,7 +2209,7 @@ void MainImpl::on_actAbout_triggered(bool) {
     static const char* aboutMsg =
     "<p><b>QGit version " VERSION_PROJECT " (gitrev:&nbsp;" GIT_REVISION ") </b></p>"
     "<p>Copyright (c) 2005, 2007, 2008 Marco Costalba<br>"
-	"Copyright (c) 2011-2021 <a href='mailto:tibirna@kde.org'>Cristian Tibirna</a></p>"
+    "Copyright (c) 2011-2021 <a href='mailto:tibirna@kde.org'>Cristian Tibirna</a></p>"
     "<p>Use and redistribute under the terms of the<br>"
     "<a href=\"http://www.gnu.org/licenses/old-licenses/gpl-2.0.html\">GNU General Public License Version 2</a></p>"
     "<p>Contributors:<br>"

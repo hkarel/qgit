@@ -123,7 +123,7 @@ inline bool isInfoCol(int x) {return (x == TIME_COL || x == LOG_COL
 // default list view widths
 const int DEF_GRAPH_COL_WIDTH = 80;
 const int DEF_LOG_COL_WIDTH   = 500;
-	const int DEF_HASH_COL_WIDTH  = 90;
+const int DEF_HASH_COL_WIDTH  = 90;
 const int DEF_AUTH_COL_WIDTH  = 230;
 const int DEF_TIME_COL_WIDTH  = 160;
 

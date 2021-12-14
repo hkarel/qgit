@@ -295,11 +295,11 @@ const QString Git::refAsShortHash(const QString& sha) {
 
 int Git::getShortHashLength()
 {
-	int len = 0;
-	QString shortHash;
-	if (run("git rev-parse --short HEAD", &shortHash))
-		len = shortHash.trimmed().size();   // Result contains a newline.
-	return (len > shortHashLenDefault) ? len : shortHashLenDefault;
+    int len = 0;
+    QString shortHash;
+    if (run("git rev-parse --short HEAD", &shortHash))
+        len = shortHash.trimmed().size();   // Result contains a newline.
+    return (len > shortHashLenDefault) ? len : shortHashLenDefault;
 }
 
 const QString Git::getRefSha(const QString& refName, RefType type, bool askGit) {
@@ -836,7 +836,7 @@ bool Git::getTree(const QString& treeSha, TreeInfo& ti, bool isWorkingDir, const
             ti.append(te);
         }
     }
-	std::sort(ti.begin(), ti.end()); // list directories before files
+    std::sort(ti.begin(), ti.end()); // list directories before files
     return true;
 }
 

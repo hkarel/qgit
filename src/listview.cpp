@@ -112,7 +112,7 @@ void ListView::setupGeometry() {
     hv->setSectionResizeMode(ANN_ID_COL, QHeaderView::ResizeToContents);
     hv->resizeSection(GRAPH_COL, DEF_GRAPH_COL_WIDTH);
     hv->resizeSection(LOG_COL, DEF_LOG_COL_WIDTH);
-	hv->resizeSection(HASH_COL, DEF_HASH_COL_WIDTH);
+    hv->resizeSection(HASH_COL, DEF_HASH_COL_WIDTH);
     hv->resizeSection(AUTH_COL, DEF_AUTH_COL_WIDTH);
     hv->resizeSection(TIME_COL, DEF_TIME_COL_WIDTH);
 }
@@ -378,7 +378,7 @@ QPixmap ListView::pixmapFromSelection(const QStringList &revs, const QString &re
         QStyleOptionViewItem o(opt);
         QString dummy;
         getTagMarkParams(dummy, o, refTypeFromName(ref), false);
-		painter.fillRect(0, 0, fm.horizontalAdvance(ref)+2*spacing, height, o.palette.window());
+        painter.fillRect(0, 0, fm.horizontalAdvance(ref)+2*spacing, height, o.palette.window());
         painter.drawText(spacing, fm.ascent()+1, ref);
         row = 1;
     }
@@ -1197,7 +1197,7 @@ QString ListView::refNameAt(const QPoint &pos)
  * Return the device pixel ratio
  */
 qreal ListViewDelegate::dpr(void) const {
-	return qApp->devicePixelRatio();
+    return qApp->devicePixelRatio();
 }
 
 void ListViewDelegate::addTextPixmap(QPixmap** pp, const QString& txt, const QStyleOptionViewItem& opt) const {
@@ -1217,7 +1217,7 @@ void ListViewDelegate::addTextPixmap(QPixmap** pp, const QString& txt, const QSt
                       static_cast<int>(text_height * dpr())};
 
     QPixmap* newPm = new QPixmap(pixmapSize);
-	newPm->setDevicePixelRatio(dpr());
+    newPm->setDevicePixelRatio(dpr());
 
     QPainter p;
     p.begin(newPm);

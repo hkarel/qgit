@@ -10,10 +10,10 @@ tmpfile1="$2.t1"
 tmpfile2="$2.t2"
 
 asciidoc --attribute 'newline=\n' --backend=html4 --no-header-footer \
-	--out-file="$tmpfile1" "$infile"
+         --out-file="$tmpfile1" "$infile"
 
 sed -n -e 's/"/\\"/g' -e '/Command line arguments/,$s/^.*$/"&\\n"/p' \
-	"$tmpfile1" >"$tmpfile2"
+    "$tmpfile1" >"$tmpfile2"
 
 cat >"$outfile" <<EOF
 /* Help content is generated automatically from README.adoc by helpgen script */

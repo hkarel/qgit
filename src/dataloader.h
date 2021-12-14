@@ -47,7 +47,7 @@ private:
     Git* git;
     FileHistory* fh;
     UnbufferedTemporaryFile* dataFile;
-	QElapsedTimer loadTime;
+    QElapsedTimer loadTime;
     QTimer guiUpdateTimer;
     int timerCallCounter;
     qint64 loadedBytes;

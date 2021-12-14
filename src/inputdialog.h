@@ -41,7 +41,7 @@ public:
     typedef QMap<QString, QVariant> VariableMap;
     explicit InputDialog(const QString &cmd, const VariableMap &variables,
                          const QString &title="",
-	                     QWidget *parent = 0, Qt::WindowFlags f = Qt::WindowFlags());
+                         QWidget *parent = 0, Qt::WindowFlags f = Qt::WindowFlags());
 
     /// any widgets defined?
     bool empty() const {return widgets.empty();}
