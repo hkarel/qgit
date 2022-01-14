@@ -2251,6 +2251,7 @@ void MainImpl::on_actAbout_triggered(bool) {
     "<nobr>2020 <a href='mailto:jjm@keelhaul.demon.co.uk'>Jonathan Marten</a>,</nobr> "
     "<nobr>2020 <a href='mailto:yyc1992@gmail.com'>Yichao Yu</a>,</nobr> "
     "<nobr>2021 <a href='mailto:wickedsmoke@users.sourceforge.net'>Karl Robillard</a></nobr> "
+    "<nobr>2021 <a href='mailto:vchesn@gmail.com'>Vitaly Chesnokov</a></nobr> "
     "</p>"
     "<p>This version was compiled against Qt " QT_VERSION_STR "</p>";
 

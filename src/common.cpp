@@ -237,64 +237,157 @@ void initMimePix() {
     QPixmap* pm = new QPixmap(u8":/icons/resources/misc.png");
     mimePixMap.insert("#default", pm);
 
-    pm = new QPixmap(u8":/icons/resources/folder.png");
+    pm = new QPixmap(u8":/icons/resources/file/folder.svg");
     mimePixMap.insert("#folder_closed", pm);
 
-    pm = new QPixmap(u8":/icons/resources/folder_open.png");
+    pm = new QPixmap(u8":/icons/resources/file/folder-open.svg");
     mimePixMap.insert("#folder_open", pm);
 
-    pm = new QPixmap(u8":/icons/resources/source_c.png");
+    pm = new QPixmap(u8":/icons/resources/file/text-x-cmake.svg");
+    mimePixMap.insert("CMakeLists.txt", pm);
+
+    pm = new QPixmap(u8":/icons/resources/file/text-dockerfile.svg");
+    mimePixMap.insert("Dockerfile", pm);
+
+    pm = new QPixmap(u8":/icons/resources/file/text-csv.svg");
+    mimePixMap.insert("csv", pm);
+
+    pm = new QPixmap(u8":/icons/resources/file/text-x-csrc.svg");
     mimePixMap.insert("c", pm);
 
-    pm = new QPixmap(u8":/icons/resources/source_cpp.png");
+    pm = new QPixmap(u8":/icons/resources/file/text-x-c++src.svg");
     mimePixMap.insert("cpp", pm);
 
-    pm = new QPixmap(u8":/icons/resources/source_h.png");
+    pm = new QPixmap(u8":/icons/resources/file/text-x-chdr.svg");
     mimePixMap.insert("h", pm);
+
+    pm = new QPixmap(u8":/icons/resources/file/text-x-c++hdr.svg");
     mimePixMap.insert("hpp", pm);
 
-    pm = new QPixmap(u8":/icons/resources/txt.png");
+    pm = new QPixmap(u8":/icons/resources/file/text-x-generic.svg");
     mimePixMap.insert("txt", pm);
 
-    pm = new QPixmap(u8":/icons/resources/shellscript.png");
+    pm = new QPixmap(u8":/icons/resources/file/file/text-rtf.svg");
+    mimePixMap.insert("rtf", pm);
+
+    pm = new QPixmap(u8":/icons/resources/file/text-x-script.svg");
     mimePixMap.insert("sh", pm);
 
-    pm = new QPixmap(u8":/icons/resources/source_pl.png");
+    pm = new QPixmap(u8":/icons/resources/file/application-x-perl.svg");
     mimePixMap.insert("perl", pm);
     mimePixMap.insert("pl",   pm);
 
-    pm = new QPixmap(u8":/icons/resources/source_py.png");
+    pm = new QPixmap(u8":/icons/resources/file/application-x-python-bytecode.svg");
     mimePixMap.insert("py", pm);
 
-    pm = new QPixmap(u8":/icons/resources/source_java.png");
+    pm = new QPixmap(u8":/icons/resources/file/application-x-java.svg");
     mimePixMap.insert("java", pm);
     mimePixMap.insert("jar",  pm);
 
-    pm = new QPixmap(u8":/icons/resources/tar.png");
+    pm = new QPixmap(u8":/icons/resources/file/application-x-tar.svg");
     mimePixMap.insert("tar", pm);
+
+    pm = new QPixmap(u8":/icons/resources/file/application-x-ace.svg");
     mimePixMap.insert("gz",  pm);
+
+    pm = new QPixmap(u8":/icons/resources/file/application-x-compressed-tar.svg");
     mimePixMap.insert("tgz", pm);
+
+    pm = new QPixmap(u8":/icons/resources/file/application-zip.svg");
     mimePixMap.insert("zip", pm);
+
+    pm = new QPixmap(u8":/icons/resources/file/application-x-bzip.svg");
     mimePixMap.insert("bz",  pm);
     mimePixMap.insert("bz2", pm);
 
-    pm = new QPixmap(u8":/icons/resources/html.png");
+    pm = new QPixmap(u8":/icons/resources/file/text-html.svg");
     mimePixMap.insert("html", pm);
-    mimePixMap.insert("xml",  pm);
 
-    pm = new QPixmap(u8":/icons/resources/image.png");
-    mimePixMap.insert("bmp",  pm);
-    mimePixMap.insert("gif",  pm);
-    mimePixMap.insert("jpg",  pm);
+    pm = new QPixmap(u8":/icons/resources/file/dialog-xml-editor.svg");
+    mimePixMap.insert("xml", pm);
+
+    pm = new QPixmap(u8":/icons/resources/file/image-bmp.svg");
+    mimePixMap.insert("bmp", pm);
+
+    pm = new QPixmap(u8":/icons/resources/file/image-gif.svg");
+    mimePixMap.insert("gif", pm);
+
+    pm = new QPixmap(u8":/icons/resources/file/image-jpeg.svg");
+    mimePixMap.insert("jpg", pm);
     mimePixMap.insert("jpeg", pm);
-    mimePixMap.insert("png",  pm);
-    mimePixMap.insert("pbm",  pm);
-    mimePixMap.insert("pgm",  pm);
-    mimePixMap.insert("ppm",  pm);
-    mimePixMap.insert("svg",  pm);
+
+    pm = new QPixmap(u8":/icons/resources/file/image-png.svg");
+    mimePixMap.insert("png", pm);
+
+    pm = new QPixmap(u8":/icons/resources/file/image-svg+xml-compressed.svg");
+    mimePixMap.insert("svg", pm);
+
+    pm = new QPixmap(u8":/icons/resources/file/image-tiff.svg");
     mimePixMap.insert("tiff", pm);
-    mimePixMap.insert("xbm",  pm);
-    mimePixMap.insert("xpm",  pm);
+
+    pm = new QPixmap(u8":/icons/resources/file/image-x-ico.svg");
+    mimePixMap.insert("ico", pm);
+
+    pm = new QPixmap(u8":/icons/resources/file/image-x-xcf.svg");
+    mimePixMap.insert("xcf", pm);
+
+    pm = new QPixmap(u8":/icons/resources/file/image-x-generic.svg");
+    mimePixMap.insert("pbm", pm);
+    mimePixMap.insert("pgm", pm);
+    mimePixMap.insert("ppm", pm);
+    mimePixMap.insert("xbm", pm);
+    mimePixMap.insert("xpm", pm);
+
+    pm = new QPixmap(u8":/icons/resources/file/application-json.svg");
+    mimePixMap.insert("json", pm);
+
+    pm = new QPixmap(u8":/icons/resources/file/application-pdf.svg");
+    mimePixMap.insert("pdf", pm);
+
+    pm = new QPixmap(u8":/icons/resources/file/application-x-javascript.svg");
+    mimePixMap.insert("js", pm);
+
+    pm = new QPixmap(u8":/icons/resources/file/text-x-go.svg");
+    mimePixMap.insert("go", pm);
+
+    pm = new QPixmap(u8":/icons/resources/file/text-x-markdown.svg");
+    mimePixMap.insert("md", pm);
+
+    pm = new QPixmap(u8":/icons/resources/file/text-x-patch.svg");
+    mimePixMap.insert("patch", pm);
+
+    pm = new QPixmap(u8":/icons/resources/file/text-x-qml.svg");
+    mimePixMap.insert("qml", pm);
+
+    pm = new QPixmap(u8":/icons/resources/file/text-x-tex.svg");
+    mimePixMap.insert("tex", pm);
+
+    pm = new QPixmap(u8":/icons/resources/file/application-x-ruby.svg");
+    mimePixMap.insert("rb", pm);
+
+    pm = new QPixmap(u8":/icons/resources/file/text-rust.svg");
+    mimePixMap.insert("rs", pm);
+
+    pm = new QPixmap(u8":/icons/resources/file/text-css.svg");
+    mimePixMap.insert("css", pm);
+
+    pm = new QPixmap(u8":/icons/resources/file/text-x-csharp.svg");
+    mimePixMap.insert("cs", pm);
+
+    pm = new QPixmap(u8":/icons/resources/file/text-x-r.svg");
+    mimePixMap.insert("r", pm);
+
+    pm = new QPixmap(u8":/icons/resources/file/application-x-designer.svg");
+    mimePixMap.insert("ui", pm);
+
+    pm = new QPixmap(u8":/icons/resources/file/project-development.svg");
+    mimePixMap.insert("pro", pm);
+    mimePixMap.insert("sln", pm);
+    mimePixMap.insert("vcproj", pm);
+    mimePixMap.insert("vcxproj", pm);
+
+    pm = new QPixmap(u8":/icons/resources/file/application-x-sharedlib.svg");
+    mimePixMap.insert("Makefile", pm);
 }
 
 void freeMimePix() {
@@ -306,6 +399,11 @@ void freeMimePix() {
 
 const QPixmap* mimePix(const QString& fileName) {
 
+    // Try to match full filename (e.g. CMakeLists.txt)
+    if (mimePixMap.contains(fileName))
+        return mimePixMap.value(fileName);
+
+    // Try to match extension
     const QString& ext = fileName.section('.', -1, -1).toLower();
     auto it = mimePixMap.find(ext);
     return (it != mimePixMap.end()) ? it.value() : mimePixMap["#default"];
