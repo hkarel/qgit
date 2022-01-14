@@ -257,6 +257,7 @@ void initMimePix() {
 
     pm = new QPixmap(u8":/icons/resources/file/text-x-c++src.svg");
     mimePixMap.insert("cpp", pm);
+    mimePixMap.insert("cc", pm);
 
     pm = new QPixmap(u8":/icons/resources/file/text-x-chdr.svg");
     mimePixMap.insert("h", pm);
