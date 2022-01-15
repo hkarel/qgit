@@ -286,7 +286,7 @@ void initMimePix() {
     pm = svgToPixmap(u8":/icons/resources/file/text-x-generic.svg");
     mimePixMap.insert("txt", pm);
 
-    pm = svgToPixmap(u8":/icons/resources/file/file/text-rtf.svg");
+    pm = svgToPixmap(u8":/icons/resources/file/text-rtf.svg");
     mimePixMap.insert("rtf", pm);
 
     pm = svgToPixmap(u8":/icons/resources/file/text-x-script.svg");
