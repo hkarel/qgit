@@ -79,5 +79,9 @@
         <file>resources/file/text-x-r.svg</file>
         <file>resources/file/text-x-script.svg</file>
         <file>resources/file/text-x-tex.svg</file>
+        <file>resources/folder-hd.svg</file>
+        <file>resources/folder-open-hd.svg</file>
+        <file>resources/misc-hd.svg</file>
+        <file>resources/misc.svg</file>
     </qresource>
 </RCC>
