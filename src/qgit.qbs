@@ -229,5 +229,10 @@ Product {
 //        console.info(Qt.core.version);
 //        console.info("=== VERSION_PROJECT ===");
 //        console.info(project.projectVersion[0]);
+//        for(var propertyName in cpp) {
+//            // propertyName is what you want
+//            // you can get the value like this: myObject[propertyName]
+//            console.info(propertyName + ": " + cpp[propertyName]);
+//        }
 //    }
 }
