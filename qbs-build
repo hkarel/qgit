@@ -153,14 +153,14 @@ build_dir=$script_dir/build/$build_subdir
 
 [ "$rebuild" = "yes"  ] && rm -rf $build_dir
 
-# Print QBS profile
-echo -e "\nQbs profile '$qbs_profile':"
-echo "$(qbs config --list profiles.$qbs_profile)"
-echo ""
-if [ -z "$(qbs config --list profiles.$qbs_profile)" ]; then
-    echo "Error: Qbs profile not found"
-    exit 1
-fi
+# # Print QBS profile
+# echo -e "\nQbs profile '$qbs_profile':"
+# echo "$(qbs config --list profiles.$qbs_profile)"
+# echo ""
+# if [ -z "$(qbs config --list profiles.$qbs_profile)" ]; then
+#     echo "Error: Qbs profile not found"
+#     exit 1
+# fi
 
 set -e
 qbs build \
@@ -171,8 +171,8 @@ qbs build \
     --no-install \
     qbs.buildVariant:$build_mode \
     project.standaloneBuild:$standalone_build \
-    config:$build_config \
-    profile:$qbs_profile
+    config:$build_config
+    #profile:$qbs_profile
 
 
 echo "Build is complete (configuration: ${build_config})"
