@@ -36,7 +36,6 @@ Project {
             "VERSION_PROJECT_MINOR=" + projectVersion[2],
             "VERSION_PROJECT_PATCH=" + projectVersion[3],
             "GIT_REVISION=\"" + projectGitRevision + "\"",
-            "LOGGER_LESS_SNPRINTF",
         ];
 
         if (qbs.buildVariant === "release")
