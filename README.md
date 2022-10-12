@@ -38,7 +38,7 @@ To compile, install and start qgit:
 - make install
 - (Windows only) run start_qgit.bat to start the application. You can also create a a desktop icon linked to 'start_qgit.bat' and double click on it.
 
-Installation directory is $HOME/bin under Linux and the directory of git exe files under Windows.  
+Installation directory is `~/bin` under MacOS, `QT_INSTALL_BINS` (location of Qt binaries) under Linux and the directory of git exe files under Windows.  
 You need to run 'qmake qgit.pro' only the first time to generate Makefile files, then you simply call 'make' and  'make install'. You may need to run 'qmake qgit.pro' again only after patches that modify 'qgit.pro' or 'src/src.pro' files or in case of 'strange' compile errors.  
 Remember to manually delete all Makefile *  files in 'src/' directory before to start 'qmake qgit.pro'.
 
