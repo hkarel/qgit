@@ -7,3 +7,6 @@
 [submodule "src/yaml"]
 	path = src/yaml
 	url = https://github.com/hkarel/yaml-cpp.git
+[submodule "setup/scripts"]
+	path = setup/scripts
+	url = https://github.com/hkarel/InstallScripts.git

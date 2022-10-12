@@ -2,11 +2,7 @@
 
 set -u
 
-jobs=$(nproc)
-mem_size=$(free -m | sed '2!d' | sed 's/  */ /g' | cut -d' ' -f2)
-[ "$mem_size" -lt 2100 ] && jobs=4
-echo "jobs: $jobs"
-
+SUDO=
 rebuild=
 print_help=
 build_mode=release
@@ -26,11 +22,29 @@ script_dir=$(dirname $(readlink -f $0))
 echo "script_dir: $script_dir"
 
 # Defining host parameters
-if [ ! -e $script_dir/setup/os_detect ]; then
+if [ ! -e $script_dir/setup/scripts/os_detect ]; then
     echo "Error: os_detect script not found"
     exit 1
 fi
-. $script_dir/setup/os_detect
+. $script_dir/setup/scripts/os_detect
+
+# Debug information removal function
+if [ ! -e $script_dir/setup/scripts/strip_debug_info ]; then
+    echo "Error: strip_debug_info script not found"
+    exit 1
+fi
+. $script_dir/setup/scripts/strip_debug_info
+# ---
+
+jobs=$(nproc)
+mem_size=$(free -m | sed '2!d' | sed 's/  */ /g' | cut -d' ' -f2)
+[ "$mem_size" -lt 2100 ] && jobs=4
+[ "$jobs" -gt 24 ] && jobs=$(($jobs - 6))
+echo "jobs: $jobs"
+
+if [ "$os_id" = "neon" ]; then
+    os_id="ubuntu"
+fi
 
 function display_help()
 {
@@ -196,9 +210,6 @@ echo "package_date ........ $package_date"
 echo "gitrev .............. $gitrev"
 echo "package_release ..... $package_release"
 echo "full_package_vers ... $full_package_vers"
-
-# Debug information removal function
-. $script_dir/setup/strip_debug_info
 
 if [ "$standalone" = "yes" ]; then
     . $script_dir/setup/deb-qgit-standalone
