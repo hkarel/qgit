@@ -39,7 +39,7 @@ echo "installed_size: $installed_size"
 
 packet_depends=$(cat <<-EOS
 	libc6, libstdc++6, libqt5core5a, libqt5gui5, libqt5widgets5, git, \
-	libhunspell-dev (>= 1.6.2)
+	libhunspell-dev (>= 1.6.2), hunspell-en-us, hunspell-ru
 EOS
 )
 

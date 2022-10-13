@@ -63,7 +63,7 @@ installed_size=$(du -s $package_dir | sed -r 's/([0-9]+).*/\1/')
 echo "installed_size: $installed_size"
 
 packet_depends=$(cat <<-EOS
-	libc6, git
+	libc6, git, libhunspell-dev (>= 1.6.2), hunspell-en-us, hunspell-ru
 EOS
 )
 #libhunspell-dev (>= 1.6.2)
