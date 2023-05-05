@@ -19,7 +19,8 @@ class SpellCheck : public QObject
 public:
     bool init();
     void deinit();
-    int  initialized() const;
+
+    int initialized() const;
 
     QStringList dictNames() const;
     QString langDetect(const QString& word) const;
@@ -71,8 +72,9 @@ private:
 
 private:
     int _initialized = {-1};
-    TrigramsMap _trigramsMap;
+
     HunsList _huns;
+    TrigramsMap _trigramsMap;
 
     //    language  words
     QHash<QString,  QSet<QString>> _externWords;

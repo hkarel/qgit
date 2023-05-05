@@ -444,6 +444,7 @@ bool SpellCheck::init()
         return false;
 
     _huns.clear();
+    _trigramsMap.clear();
     _externWords.clear();
     _ignoreWords.clear();
 
@@ -454,11 +455,19 @@ bool SpellCheck::init()
         //QString dictName = dict;
         dictName.chop(4);
 
+        QString tmapFile = QString(u8":/trigrams/%1.tmap").arg(dictName);
+        if (!QFile::exists(tmapFile))
+        {
+            log_warn_m << "Trigrams for dictionary " << dictName << " not found"
+                       << ". Dictionary will be skipped";
+            continue;
+        }
+
         QString affixFilePath = qgit::SPELL_CHECK_DIR + dictName + ".aff";
         if (!QFile::exists(affixFilePath))
         {
-            log_error_m << "File not found: " << affixFilePath
-                        << ". Dictionary " << dictName << " will be ignored";
+            log_error_m << "File not found " << affixFilePath
+                        << ". Dictionary " << dictName << " will be skipped";
             continue;
         }
 
@@ -515,14 +524,10 @@ bool SpellCheck::init()
                 dictFileEx.close();
             }
             else
-            {
-                log_error_m << "Unable open user dictionary: " << dictFilePathEx;
-                _initialized = 0;
-                return false;
-            }
+                log_error_m << "Unable open user dictionary " << dictFilePathEx;
         }
         else
-            log_warn_m << "User dictionary not found: " << dictFilePathEx;
+            log_warn_m << "User dictionary not found " << dictFilePathEx;
 
 //        QString ignoreFilePath = qgit::SPELL_CHECK_DIR_EX + dictName + ".ign";
 //        config::dirExpansion(ignoreFilePath);
@@ -553,22 +558,20 @@ bool SpellCheck::init()
     }
     _huns.sort();
 
+    QList<QString> langs;
+    config::base().getValue("spell_check.langs", langs);
+
     for (HunsItem* hun : _huns)
     {
-        QString tmapFile = QString(u8":/trigrams/%1.tmap").arg(hun->dictName);
-        if (!QFile::exists(tmapFile))
-        {
-            log_error_m << "Failed load trigrams from " << tmapFile;
-            _initialized = 0;
-            return false;
-        }
+        if (!langs.contains(hun->dictName))
+            continue;
 
+        QString tmapFile = QString(u8":/trigrams/%1.tmap").arg(hun->dictName);
         QFile file {tmapFile};
         if (!file.open(QIODevice::ReadOnly))
         {
-            log_error_m << "Unable to load trigram models from " << tmapFile;
-            _initialized = 0;
-            return false;
+            log_error_m << "Unable load trigram models from " << tmapFile;
+            continue;
         }
 
         //    trigram  weight
@@ -600,7 +603,11 @@ bool SpellCheck::init()
 
 void SpellCheck::deinit()
 {
+    _initialized = -1;
     _huns.clear();
+    _trigramsMap.clear();
+    _externWords.clear();
+    _ignoreWords.clear();
 }
 
 int SpellCheck::initialized() const

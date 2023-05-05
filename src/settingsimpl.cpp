@@ -116,8 +116,8 @@ SettingsImpl::SettingsImpl(QWidget* p, Git* g, int defTab) : QDialog(p), git(g) 
     userInfo();
     on_cboxGitConfigSource_activated(0);
 
-    if (spellCheck().initialized() == -1)
-        spellCheck().init();
+    spellCheck().deinit();
+    spellCheck().init();
 
     for (const QString& dict : spellCheck().dictNames())
     {
@@ -356,6 +356,7 @@ void SettingsImpl::done(int r)
     else
         config::base().rereadFile();
 
+    spellCheck().deinit();
     saveGeometry();
 }
 
