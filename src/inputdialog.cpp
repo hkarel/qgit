@@ -24,26 +24,34 @@ InputDialog::WidgetItem::WidgetItem() : widget(NULL)
 {
 }
 
-void InputDialog::WidgetItem::init(QWidget* w, const char *name) {
+void InputDialog::WidgetItem::init(QWidget* w, const char *name)
+{
     widget = w;
     prop_name = name;
 }
 
-QString parseString(const QString &value, const InputDialog::VariableMap &vars) {
-    if (value.startsWith('$')) return vars.value(value.mid(1), QString()).toString();
-    else return value;
+QString parseString(const QString &value, const InputDialog::VariableMap &vars)
+{
+    if (value.startsWith('$'))
+        return vars.value(value.mid(1), QString()).toString();
+
+    return value;
 }
-QStringList parseStringList(const QString &value, const InputDialog::VariableMap &vars) {
+QStringList parseStringList(const QString &value, const InputDialog::VariableMap &vars)
+{
     QStringList values = value.split(',');
     QStringList result;
-    for (QStringList::iterator it=values.begin(), end=values.end(); it!=end; ++it) {
-        if (it->startsWith('$')) result.append(vars.value(value.mid(1), QStringList()).toStringList());
-        else result.append(*it);
+    for (auto it = values.constBegin(); it != values.constEnd(); ++it) {
+        if (it->startsWith('$'))
+            result.append(vars.value(value.mid(1), QStringList()).toStringList());
+        else
+            result.append(*it);
     }
     return result;
 }
 
-class RefNameValidator : public QValidator {
+class RefNameValidator : public QValidator
+{
 public:
     RefNameValidator(bool allowEmpty=false, QObject *parent=0)
         : QValidator(parent)
@@ -53,6 +61,7 @@ public:
 
     void fixup(QString& input) const;
     State validate(QString & input, int & pos) const;
+
 private:
     const QRegExp invalid;
     bool allowEmpty;
@@ -84,9 +93,9 @@ QValidator::State RefNameValidator::validate(QString &input, int &pos) const
     // empty string or single @ are not allowed
     if ((input.isEmpty() && !allowEmpty) || input == "@")
         return Intermediate;
+
     return Acceptable;
 }
-
 
 InputDialog::InputDialog(const QString &cmd, const VariableMap &variables,
                          const QString &title, QWidget *parent, Qt::WindowFlags f)
@@ -197,13 +206,14 @@ QVariant InputDialog::value(const QString &token) const
 bool InputDialog::validate()
 {
     bool result = true;
-    for (QMap<QString, const QValidator*>::const_iterator
-         it = validators.begin(), end = validators.end(); result && it != end; ++it) {
+    for (auto it = validators.constBegin(); it != validators.constEnd(); ++it) {
 
         QString val = value(it.key()).toString();
         int pos = 0;
-        if (it.value()->validate(val, pos) != QValidator::Acceptable)
+        if (it.value()->validate(val, pos) != QValidator::Acceptable) {
             result = false;
+            break;
+        }
     }
     okButton->setEnabled(result);
     return result;
@@ -213,7 +223,7 @@ QString InputDialog::replace(const VariableMap &variables) const
 {
     QString result = cmd;
 	int shift = 0, start = 0, len = 0; // will keep track of position shifts during replacements
-    for (WidgetMap::const_iterator it = widgets.begin(), end = widgets.end(); it != end; ++it) {
+    for (auto it = widgets.constBegin(); it != widgets.constEnd(); ++it) {
         QString token = "%" + it.key() + "%";
         WidgetItemPtr item = it.value();
 		start = item->start - shift;
@@ -223,10 +233,11 @@ QString InputDialog::replace(const VariableMap &variables) const
 		shift += len - value.length();
         result.replace(token, value); // replace all other occurences of %name%
     }
-    for (VariableMap::const_iterator it=variables.begin(), end=variables.end(); it != end; ++it) {
+    for (auto it = variables.constBegin(); it != variables.constEnd(); ++it) {
         QString token = "$" + it.key();
-        QString val = it.value().type() == QVariant::StringList ? it.value().toStringList().join(" ")
-                                                                : it.value().toString();
+        QString val = (it.value().type() == QVariant::StringList)
+                      ? it.value().toStringList().join(" ")
+                      : it.value().toString();
         result.replace(token, val);
     }
     return result;
