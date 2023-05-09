@@ -193,7 +193,7 @@
   </widget>
   <action name="actOpenRepo">
    <property name="icon">
-    <iconset theme="document-open-folder" resource="icons.qrc">
+    <iconset theme="folder-open">
      <normaloff>:/icons/resources/folder_open.png</normaloff>:/icons/resources/folder_open.png</iconset>
    </property>
    <property name="text">
