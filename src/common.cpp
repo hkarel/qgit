@@ -118,8 +118,6 @@ const QColor PURPLE       = QColor(221, 221, 255);
 const QColor DARK_GREEN   = QColor(0, 205, 0);
 
 // initialized at startup according to system wide settings
-QColor  ODD_LINE_COL;
-QColor  EVEN_LINE_COL;
 //QString GIT_DIR;
 
 /*

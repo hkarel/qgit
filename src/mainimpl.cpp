@@ -84,10 +84,6 @@ MainImpl::MainImpl(const QString& cd, QWidget* p) : QMainWindow(p) {
     chk_connect_a(lineSHA, SIGNAL(returnPressed()), this, SLOT(lineSHA_returnPressed()));
     chk_connect_a(lineFilter, SIGNAL(returnPressed()), this, SLOT(lineFilter_returnPressed()));
 
-    // create light and dark colors for alternate background
-    ODD_LINE_COL = palette().color(QPalette::Base);
-    EVEN_LINE_COL = ODD_LINE_COL.darker(103);
-
     // our interface to git world
     git = new Git(this);
     setupShortcuts();

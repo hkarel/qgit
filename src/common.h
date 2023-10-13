@@ -137,8 +137,6 @@ extern const QColor PURPLE;
 extern const QColor DARK_GREEN;
 
 // initialized at startup according to system wide settings
-extern QColor  ODD_LINE_COL;
-extern QColor  EVEN_LINE_COL;
 extern QFont   STD_FONT;
 extern QFont   TYPE_WRITER_FONT;
 //extern QString GIT_DIR;
