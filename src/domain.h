@@ -34,7 +34,7 @@ private:
 class StateInfo {
 public:
     StateInfo() { clear(); }
-    StateInfo(const StateInfo&) = default;
+	StateInfo(const StateInfo& otherState);
     StateInfo& operator=(const StateInfo& newState);
     bool operator==(const StateInfo& newState) const;
     bool operator!=(const StateInfo& newState) const;
