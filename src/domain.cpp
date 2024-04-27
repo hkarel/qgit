@@ -53,10 +53,10 @@ void StateInfo::clear() {
 }
 
 StateInfo::StateInfo(const StateInfo& otherState) :
-	curS(otherState.curS),
-	prevS(otherState.prevS),
-	nextS(otherState.nextS),
-	isLocked(otherState.isLocked)
+    curS(otherState.curS),
+    prevS(otherState.prevS),
+    nextS(otherState.nextS),
+    isLocked(otherState.isLocked)
 {}
 
 StateInfo& StateInfo::operator=(const StateInfo& newState) {

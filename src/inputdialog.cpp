@@ -222,15 +222,15 @@ bool InputDialog::validate()
 QString InputDialog::replace(const VariableMap &variables) const
 {
     QString result = cmd;
-	int shift = 0, start = 0, len = 0; // will keep track of position shifts during replacements
+    int shift = 0, start = 0, len = 0; // will keep track of position shifts during replacements
     for (auto it = widgets.constBegin(); it != widgets.constEnd(); ++it) {
         QString token = "%" + it.key() + "%";
         WidgetItemPtr item = it.value();
-		start = item->start - shift;
-		len   = item->end - item->start;
+        start = item->start - shift;
+        len   = item->end - item->start;
         QString value = item->widget->property(item->prop_name).toString();
-		result.replace(start, len, value); // replace main token
-		shift += len - value.length();
+        result.replace(start, len, value); // replace main token
+        shift += len - value.length();
         result.replace(token, value); // replace all other occurences of %name%
     }
     for (auto it = variables.constBegin(); it != variables.constEnd(); ++it) {
