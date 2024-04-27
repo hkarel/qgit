@@ -2178,22 +2178,22 @@ void MainImpl::on_actFind_triggered(bool) {
     if (!ok || str.isEmpty())
         return;
 
-	// Highlight all occurrences.
-	const QTextCursor origCursor = te->textCursor();
-	te->moveCursor(QTextCursor::Start);
+    // Highlight all occurrences.
+    const QTextCursor origCursor = te->textCursor();
+    te->moveCursor(QTextCursor::Start);
 
-	QList<QTextEdit::ExtraSelection> extras;
-	while(te->find(str)) {
-		QTextEdit::ExtraSelection extra;
-		extra.format.setBackground(Qt::yellow);
-		extra.cursor = te->textCursor();
-		extras.append(extra);
-	}
-	te->setExtraSelections(extras);
+    QList<QTextEdit::ExtraSelection> extras;
+    while(te->find(str)) {
+        QTextEdit::ExtraSelection extra;
+        extra.format.setBackground(Qt::yellow);
+        extra.cursor = te->textCursor();
+        extras.append(extra);
+    }
+    te->setExtraSelections(extras);
 
-	te->setTextCursor(origCursor);
+    te->setTextCursor(origCursor);
 
-	// Do the normal find().
+    // Do the normal find().
     textToFind = str; // update with valid data only
     on_actFindNext_triggered(false);
 }
@@ -2220,8 +2220,8 @@ void MainImpl::on_actAbout_triggered(bool) {
 
     static const char* aboutMsg =
     "<p><b>QGit version " VERSION_PROJECT " (gitrev:&nbsp;" GIT_REVISION ") </b></p>"
-	"<p>Copyright (c) 2005-2008 Marco Costalba<br>"
-	"Copyright (c) 2011-2024 <a href='mailto:tibirna@kde.org'>Cristian Tibirna</a></p>"
+    "<p>Copyright (c) 2005-2008 Marco Costalba<br>"
+    "Copyright (c) 2011-2024 <a href='mailto:tibirna@kde.org'>Cristian Tibirna</a></p>"
     "<p>Use and redistribute under the terms of the<br>"
     "<a href=\"http://www.gnu.org/licenses/old-licenses/gpl-2.0.html\">GNU General Public License Version 2</a></p>"
     "<p>Contributors:<br>"
@@ -2253,9 +2253,9 @@ void MainImpl::on_actAbout_triggered(bool) {
     "<nobr>2018 <a href='mailto:asturm@gentoo.org'>Andreas Sturmlechner</a>,</nobr> "
     "<nobr>2018 <a href='mailto:kde@davidedmundson.co.uk'>David Edmundson</a>,</nobr> "
     "<nobr>2016-2018 <a href='mailto:rhaschke@techfak.uni-bielefeld.de'>Robert Haschke</a>,</nobr> "
-	"<nobr>2018-2024 <a href='mailto:filipe.rinaldi@gmail.com'>Filipe Rinaldi</a>,</nobr> "
+    "<nobr>2018-2024 <a href='mailto:filipe.rinaldi@gmail.com'>Filipe Rinaldi</a>,</nobr> "
     "<nobr>2018 <a href='mailto:balbusm@gmail.com'>Mateusz Balbus</a>,</nobr> "
-	"<nobr>2019-2022 <a href='mailto:sebastian@pipping.org'>Sebastian Pipping</a>,</nobr> "
+    "<nobr>2019-2022 <a href='mailto:sebastian@pipping.org'>Sebastian Pipping</a>,</nobr> "
     "<nobr>2019-2020 <a href='mailto:mvf@gmx.eu'>Matthias von Faber</a>,</nobr> "
     "<nobr>2019 <a href='mailto:Kevin@tigcc.ticalc.org'>Kevin Kofler</a>,</nobr> "
     "<nobr>2020 <a href='mailto:cortexspam-github@yahoo.fr'>Matthieu Muffato</a>,</nobr> "
