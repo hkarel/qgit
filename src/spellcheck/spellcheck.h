@@ -80,7 +80,7 @@ private:
     QHash<QString,  QSet<QString>> _externWords;
     QHash<QString,  QSet<QString>> _ignoreWords;
 
-    template<typename T, int> friend T& ::safe_singleton();
+    template<typename T, int> friend T& safe::singleton();
 };
 
 SpellCheck& spellCheck();

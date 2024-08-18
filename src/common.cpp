@@ -224,7 +224,7 @@ Flags::operator FlagType() const
 
 Flags& flags()
 {
-    return ::safe_singleton<Flags>();
+    return safe::singleton<Flags>();
 }
 
 // tree view icons helpers

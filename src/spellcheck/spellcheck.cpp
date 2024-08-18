@@ -424,5 +424,5 @@ QString SpellCheck::langDetect(const QString& word) const
 
 SpellCheck& spellCheck()
 {
-    return ::safe_singleton<SpellCheck>();
+    return safe::singleton<SpellCheck>();
 }
