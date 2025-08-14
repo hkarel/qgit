@@ -10,7 +10,7 @@ Product {
     destinationDirectory: "./bin"
 
     Depends { name: "cpp" }
-    Depends { name: "cppstdlib" }
+    //Depends { name: "cppstdlib" }
     Depends { name: "SharedLib" }
     Depends { name: "Yaml" }
     Depends { name: "Qt"; submodules: ["core", "widgets"] }
@@ -48,8 +48,8 @@ Product {
     cpp.systemIncludePaths: Qt.core.cpp.includePaths
 
     cpp.rpaths: QbsUtl.concatPaths(
-        cppstdlib.path
-       ,"$ORIGIN/../lib"
+        //cppstdlib.path
+        "$ORIGIN/../lib"
     )
 
     cpp.dynamicLibraries: {
