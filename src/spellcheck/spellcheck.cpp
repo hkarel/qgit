@@ -339,7 +339,7 @@ void SpellCheck::addWord(const QString& word, const QString& dictName)
             QTextStream stream {&dictFileEx};
             stream.setCodec("UTF-8");
             for (const QString& w : _externWords[dictName])
-                stream << w << endl;
+                stream << w << Qt::endl;
 
             dictFileEx.close();
         }

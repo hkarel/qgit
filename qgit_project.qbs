@@ -68,6 +68,6 @@ Project {
         "src/spellcheck/sonnet/gentrigrams.qbs",
         "src/spellcheck/sonnet/parsetrigrams.qbs",
         "src/yaml/yaml.qbs",
-        "setup/package_build.qbs",
+        //"setup/package_build.qbs",
     ]
 }

@@ -1750,7 +1750,7 @@ void MainImpl::doUpdateCustomActionMenu() {
 
             QAction* act = mnuActions->addAction(cad->name);
             act->setMenuRole(QAction::NoRole);
-            act->setData(qVariantFromValue(cad));
+            act->setData(QVariant::fromValue(cad));
         }
         return true;
     };

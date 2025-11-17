@@ -824,7 +824,7 @@ bool Git::getTree(const QString& treeSha, TreeInfo& ti, bool isWorkingDir, const
     if (!tree.isEmpty() && !run("git ls-tree " + tree, &runOutput))
         return false;
 
-    const QStringList sl {runOutput.split('\n', QString::SkipEmptyParts)};
+    const QStringList sl {runOutput.split('\n', Qt::SkipEmptyParts)};
     for (const QString& s : sl) {
 
         // append any not deleted file

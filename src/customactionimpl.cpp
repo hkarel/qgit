@@ -79,7 +79,7 @@ void CustomActionImpl::loadActions()
             conf->getValue(actions[i], "refresh", cad->refresh);
 
             QListWidgetItem* item = new QListWidgetItem(cad->name);
-            item->setData(Qt::UserRole, qVariantFromValue(cad));
+            item->setData(Qt::UserRole, QVariant::fromValue(cad));
             lstActionNames->addItem(item);
         }
         return true;
@@ -171,7 +171,7 @@ void CustomActionImpl::on_btnNew_clicked()
     cad->name = name;
 
     QListWidgetItem* item = new QListWidgetItem(cad->name);
-    item->setData(Qt::UserRole, qVariantFromValue(cad));
+    item->setData(Qt::UserRole, QVariant::fromValue(cad));
     lstActionNames->addItem(item);
     lstActionNames->setCurrentItem(item);
 
