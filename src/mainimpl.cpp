@@ -2221,7 +2221,7 @@ void MainImpl::on_actAbout_triggered(bool) {
     static const char* aboutMsg =
     "<p><b>QGit version " VERSION_PROJECT " (gitrev:&nbsp;" GIT_REVISION ") </b></p>"
     "<p>Copyright (c) 2005-2008 Marco Costalba<br>"
-    "Copyright (c) 2011-2024 <a href='mailto:tibirna@kde.org'>Cristian Tibirna</a></p>"
+	"Copyright (c) 2011-2025 <a href='mailto:tibirna@kde.org'>Cristian Tibirna</a></p>"
     "<p>Use and redistribute under the terms of the<br>"
     "<a href=\"http://www.gnu.org/licenses/old-licenses/gpl-2.0.html\">GNU General Public License Version 2</a></p>"
     "<p>Contributors:<br>"
@@ -2267,6 +2267,7 @@ void MainImpl::on_actAbout_triggered(bool) {
     "<nobr>2022 <a href='mailto:bits_n_bytes@gmx.de'>Frank Dietrich</a></nobr> "
     "<nobr>2023 <a href='mailto:urban82@gmail.com'>Danilo Treffiletti</a></nobr> "
     "<nobr>2023 <a href='mailto:urban82@gmail.com'>Magnus Holmgren</a></nobr> "
+	"<nobr>2025 <a href='mailto:tim@siosm.fr'>Thimoth&eacute;e Ravier</a></nobr> "
     "</p>"
     "<p>This version was compiled against Qt " QT_VERSION_STR "</p>";
 
