@@ -172,7 +172,11 @@ InputDialog::InputDialog(const QString &cmd, const VariableMap &variables,
             layout->addWidget(item->widget, row, 1);
         }
         else {
-            layout->addWidget(new QLabel(name + ":"), row, 0);
+            QString name2 = name + ":";
+            name2[0] = name2[0].toUpper();
+            QLabel *label = new QLabel(name2);
+            //label->setAlignment(Qt::AlignLeft | Qt::AlignTop);
+            layout->addWidget(label, row, 0);
             layout->addWidget(item->widget, row, 1);
         }
         ++row;
