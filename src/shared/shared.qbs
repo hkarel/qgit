@@ -1,25 +1,22 @@
 import qbs
+import qbs.FileInfo
 import QbsUtl
 
 Product {
     name: "SharedLib"
     targetName: "shared"
 
-    type: "staticlibrary"
+    type: ["staticlibrary"]
 
     Depends { name: "cpp" }
     Depends { name: "Yaml" }
-    Depends { name: "Qt"; submodules: ["core", "network", "sql"] }
+    Depends { name: "Qt"; submodules: ["core"] }
 
     cpp.defines: project.cppDefines
     cpp.cxxFlags: project.cxxFlags //.concat(["-Wpedantic"]);
-    cpp.cxxLanguageVersion: project.cxxLanguageVersion
 
-    property var includePaths: [
-        "./",
-        "./shared",
-    ]
-    cpp.includePaths: includePaths
+    cpp.includePaths: ["shared"]
+    cpp.cxxLanguageVersion: project.cxxLanguageVersion
 
     // This declaration is needed to suppress Qt warnings
     cpp.systemIncludePaths: Qt.core.cpp.includePaths
@@ -69,6 +66,9 @@ Product {
 
     Export {
         Depends { name: "cpp" }
-        cpp.includePaths: exportingProduct.includePaths
+        cpp.includePaths: [
+            FileInfo.joinPaths(exportingProduct.sourceDirectory, "."),
+            FileInfo.joinPaths(exportingProduct.sourceDirectory, "shared")
+        ]
     }
 }

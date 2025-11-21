@@ -6,8 +6,8 @@ Product {
     name: "QGit"
     targetName: "qgit"
 
-    type: "application"
-    destinationDirectory: "./bin"
+    type: ["application"]
+    destinationDirectory: "bin"
 
     Depends { name: "cpp" }
     Depends { name: "SharedLib" }
