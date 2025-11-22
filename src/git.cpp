@@ -427,9 +427,6 @@ const QString Git::getTagMsg(const QString& sha) {
     if (!rf.tagMsg.isEmpty())
         return rf.tagMsg;
 
-    // QRegularExpression pgp("-----BEGIN PGP SIGNATURE*END PGP SIGNATURE-----",
-    //             Qt::CaseSensitive, QRegularExpression::Wildcard);
-
     QRegularExpression pgp {"-----BEGIN PGP SIGNATURE.*END PGP SIGNATURE-----",
                             QRegularExpression::DotMatchesEverythingOption};
 
@@ -1047,9 +1044,6 @@ QString Git::colorMatch(const QString& txt, QRegularExpression& regExp) {
 
     QString text = qt4and5escaping(txt);
 
-    // if (regExp.isEmpty())
-    //     return text;
-
     if (regExp.pattern().isEmpty())
         return text;
 
@@ -1058,9 +1052,6 @@ QString Git::colorMatch(const QString& txt, QRegularExpression& regExp) {
     int pos = 0;
     QRegularExpressionMatch regExpMatch;
     while ((pos = text.indexOf(regExp, pos, &regExpMatch)) != -1) {
-    //while ((pos = text.indexOf(regExp, pos)) != -1) {
-
-        //const QString& match(regExp.cap(0));
         const QString& match(regExpMatch.captured(0));
         const QString coloredText(startCol + match + endCol);
         text.replace(pos, match.length(), coloredText);
@@ -1155,9 +1146,6 @@ const QString Git::getDesc(const QString& sha, QRegularExpression& shortLogRE, Q
     int pos = 0;
     QRegularExpressionMatch match;
     while ((pos = text.indexOf(reSHA, pos, &match)) != -1) {
-    //while ((pos = text.indexOf(reSHA, pos)) != -1) {
-
-        //const QString& ref = reSHA.cap(0).mid(2);
         const QString& ref = match.captured(0).mid(2);
         const Rev* r = (ref.length() == 40 ? revLookup(ref) : revLookup(getRefSha(ref)));
         if (r && r->sha() != ZERO_SHA) {

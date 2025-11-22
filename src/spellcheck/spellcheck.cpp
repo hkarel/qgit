@@ -152,15 +152,9 @@ bool SpellCheck::init()
                 const QRegularExpressionMatch match = encDetector.match(line);
                 if (match.hasMatch())
                 {
-                    encoding = match.captured(0);
+                    encoding = match.captured(1);
                     break;
                 }
-
-                // if (encDetector.indexIn(line) > -1)
-                // {
-                //     encoding = encDetector.cap(1);
-                //     break;
-                // }
             }
             affixFile.close();
         }

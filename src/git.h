@@ -13,7 +13,6 @@
 class QRegularExpression;
 class QTextCodec;
 class Annotate;
-//class DataLoader;
 class Domain;
 class FileHistory;
 class Lanes;

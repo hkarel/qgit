@@ -99,12 +99,6 @@ void RangeSelectImpl::orderRefs(const QStringList& src, QStringList& dst) {
     for (const QString& s : src) {
 
         QString tmpStr = s;
-
-        // if (re.indexIn(tmpStr) != -1)
-        //     tmpStr.insert(re.pos(1), rcMark);
-        // else
-        //     tmpStr += noRcMark;
-
         QRegularExpressionMatch match;
         if (tmpStr.indexOf(re, 0, &match) != -1)
             tmpStr.insert(match.capturedStart(1), rcMark);
