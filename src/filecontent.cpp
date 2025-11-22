@@ -21,7 +21,6 @@
 #include <QTextCharFormat>
 #include <QTextCursor>
 #include <QScrollBar>
-#include <QMessageBox>
 #include <QApplication>
 #include <QClipboard>
 #include <QTemporaryFile>

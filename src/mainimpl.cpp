@@ -1656,20 +1656,36 @@ void MainImpl::on_actMailFormatPatch_triggered(bool) {
 
 bool MainImpl::askApplyPatchParameters(bool* workDirOnly, bool* fold) {
 
-    int ret = 0;
+    bool applied = false;
     if (!git->isStGITStack()) {
-        ret = QMessageBox::question(this, "Apply Patch",
-              "Do you want to commit or just to apply changes to "
-                      "working directory?", "&Cancel", "&Working directory", "&Commit", 0, 0);
-        *workDirOnly = (ret == 1);
+        QMessageBox qmb(QMessageBox::Question,
+            "Apply Patch",
+            "Do you want to commit or just to apply changes to "
+            "working directory?",
+            {}, this);
+        QAbstractButton* cbtn = qmb.addButton("&Cancel", QMessageBox::ButtonRole::RejectRole);
+        QAbstractButton* wdbtn = qmb.addButton(
+                    "&Working directory", QMessageBox::ButtonRole::AcceptRole);
+        qmb.addButton("Commm&it", QMessageBox::ButtonRole::AcceptRole);
+        qmb.exec();
+        *workDirOnly = (qmb.clickedButton() == wdbtn);
         *fold = false;
+        applied = qmb.clickedButton() != cbtn;
     } else {
-        ret = QMessageBox::question(this, "Apply Patch", "Do you want to "
-              "import or fold the patch?", "&Cancel", "&Fold", "&Import", 0, 0);
+        QMessageBox qmb(QMessageBox::Question,
+            "Apply Patch",
+            "Do you want to import or fold the patch?",
+            {}, this);
+        QAbstractButton* cbtn = qmb.addButton("&Cancel", QMessageBox::ButtonRole::RejectRole);
+        QAbstractButton* fbtn = qmb.addButton(
+                    "&Fold", QMessageBox::ButtonRole::AcceptRole);
+        qmb.addButton("&Import", QMessageBox::ButtonRole::AcceptRole);
+        qmb.exec();
         *workDirOnly = false;
-        *fold = (ret == 1);
+        *fold = (qmb.clickedButton() == fbtn);
+        applied = qmb.clickedButton() != cbtn;
     }
-    return (ret != 0);
+    return applied;
 }
 
 void MainImpl::on_actMailApplyPatch_triggered(bool) {

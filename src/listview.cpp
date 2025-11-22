@@ -1219,17 +1219,22 @@ void ListViewDelegate::addTextPixmap(QPixmap** pp, const QString& txt, const QSt
     QPainter p;
     p.begin(newPm);
 
-    if (!pm->isNull()) {
-        newPm->fill(opt.palette.base().color());
-        p.drawPixmap(0, 0, *pm);
-    }
+	// TODO base palette color is not necessarily the background color of the
+	//  listview row this pixmap will be pasted into, e.g. in Qt themes that use
+	//  alternating backgrounds for listview rows.
+	newPm->fill(opt.palette.base().color());
+
+	// Add back what was there before.
+	if (!pm->isNull()) p.drawPixmap(0, 0, *pm);
 
     p.setPen(opt.palette.color(QPalette::WindowText));
     p.setBrush(opt.palette.color(QPalette::Window));
     p.setFont(opt.font);
 
+	// Paint the new tag.
     p.drawRect(offset, 0, text_width - 1, text_height - 1);
     p.drawText(offset + text_spacing, fm.ascent(), txt);
+
     p.end();
 
     delete pm;
