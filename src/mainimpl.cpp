@@ -343,7 +343,7 @@ void MainImpl::on_actExternalDiff_triggered(bool) {
     }
 }
 
-const QRegularExpression MainImpl::emptySha("0*");
+const QRegularExpression MainImpl::emptySha {R"(^0*$)"};
 
 QString MainImpl::copyFileToDiffIfNeeded(QStringList* filenames, QString sha) {
     //if (emptySha.exactMatch(sha))

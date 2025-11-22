@@ -25,7 +25,7 @@ RevDesc::RevDesc(QWidget* p) : QTextBrowser(p), d(NULL) {
 
 void RevDesc::on_anchorClicked(const QUrl& link) {
 
-    static const QRegularExpression re {R"([0-9a-f]{40})",
+    static const QRegularExpression re {R"(^[0-9a-f]{40}$)",
                                         QRegularExpression::CaseInsensitiveOption};
     if (re.match(link.toString()).hasMatch()) {
 
