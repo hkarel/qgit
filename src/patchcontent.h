@@ -70,7 +70,7 @@ private:
     bool diffLoaded;
     QByteArray patchRowData;
     QString halfLine;
-    bool isRegExp;
+    bool isRegExp = {false};
     QRegularExpression pickAxeRE;
     QString target;
     bool seekTarget;

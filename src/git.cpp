@@ -1710,8 +1710,8 @@ const QString Git::getLocalDate(const QString& gitDate) {
     // cache miss
     if (localDate.isEmpty()) {
         static QDateTime d;
-        d.setTime_t(gitDate.toUInt());
-                localDate = QLocale::system().toString(d, QLocale::ShortFormat);
+        d.setSecsSinceEpoch(gitDate.toUInt());
+        localDate = QLocale::system().toString(d, QLocale::ShortFormat);
 
         // save to cache
         localDates[gitDate] = localDate;

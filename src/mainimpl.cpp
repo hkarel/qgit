@@ -978,8 +978,8 @@ void MainImpl::filterList(bool isOn, bool onlyHighlight) {
         return;
 
     ShaSet shaSet;
-    bool patchNeedsUpdate, isRegExp;
-    patchNeedsUpdate = isRegExp = false;
+    bool isRegExp = false;
+    bool patchNeedsUpdate = false;
     int idx = cboxSearch->currentIndex(), colNum = 0;
     if (isOn) {
         switch (idx) {
