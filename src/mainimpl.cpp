@@ -76,7 +76,7 @@ MainImpl::MainImpl(const QString& cd, QWidget* p) : QMainWindow(p) {
     lineSHA = new QLineEdit(NULL);
     lineFilter = new QLineEdit(NULL);
     cboxSearch = new QComboBox(NULL);
-    QString list {"Short log,Log msg,Author,SHA1,File,Patch (-S),Patch (-G),Patch (regExp)"};
+    QString list {"Short log,Log msg,Author,SHA1,File,Patch (-S),Patch (-G),Patch (regex)"};
     cboxSearch->addItems(list.split(","));
     toolBar->addWidget(lineSHA);
     QAction* act = toolBar->insertWidget(actSearchAndFilter, lineFilter);
