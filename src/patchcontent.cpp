@@ -315,14 +315,6 @@ void PatchContent::procFinished() {
     }
 }
 
-int PatchContent::doSearch(const QString& txt, int pos) {
-
-    if (isRegExp)
-        return txt.indexOf(pickAxeRE, pos);
-
-    return txt.indexOf(pickAxeRE.pattern(), pos, Qt::CaseInsensitive);
-}
-
 bool PatchContent::computeMatches() {
 
     matches.clear();
@@ -330,7 +322,7 @@ bool PatchContent::computeMatches() {
         return false;
 
     const QString& txt = toPlainText();
-    int pos, lastPos = 0, lastPara = 0;
+    int pos = 0, lastPos = 0, lastPara = 0;
 
     // must be at the end to catch patterns across more the one chunk
     QRegularExpressionMatch match;

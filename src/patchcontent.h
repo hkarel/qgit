@@ -57,7 +57,6 @@ private:
     int positionToLineNum(int pos);
     int topToLineNum();
     void saveRestoreSizes(bool startup = false);
-    int doSearch(const QString& txt, int pos);
     bool computeMatches();
     bool getMatch(int para, int* indexFrom, int* indexTo);
     void centerMatch(int id = 0);
