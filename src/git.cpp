@@ -28,7 +28,7 @@
 #include <QFile>
 #include <QImageReader>
 #include <QPalette>
-#include <QRegExp>
+#include <QRegularExpression>
 //#include <QSet> //CT TODO remove
 #include <QTextCodec>
 #include <QTextDocument>
@@ -427,8 +427,11 @@ const QString Git::getTagMsg(const QString& sha) {
     if (!rf.tagMsg.isEmpty())
         return rf.tagMsg;
 
-    QRegExp pgp("-----BEGIN PGP SIGNATURE*END PGP SIGNATURE-----",
-                Qt::CaseSensitive, QRegExp::Wildcard);
+    // QRegularExpression pgp("-----BEGIN PGP SIGNATURE*END PGP SIGNATURE-----",
+    //             Qt::CaseSensitive, QRegularExpression::Wildcard);
+
+    QRegularExpression pgp {"-----BEGIN PGP SIGNATURE.*END PGP SIGNATURE-----",
+                            QRegularExpression::DotMatchesEverythingOption};
 
     if (!rf.tagObj.isEmpty()) {
         QString ro;
@@ -1020,7 +1023,7 @@ const QString Git::getNewCommitMsg() {
         return "";
     }
 
-    static const QRegExp re {R"(\n([^#\n]?))"};
+    static const QRegularExpression re {R"(\n([^#\n]?))"};
 
     QString status = c->longLog();
     status.prepend('\n').replace(re, "\n#\\1"); // comment all the lines
@@ -1040,19 +1043,25 @@ const QString Git::getNewCommitMsg() {
 }
 
 //CT TODO utility function; can go elsewhere
-QString Git::colorMatch(const QString& txt, QRegExp& regExp) {
+QString Git::colorMatch(const QString& txt, QRegularExpression& regExp) {
 
     QString text = qt4and5escaping(txt);
 
-    if (regExp.isEmpty())
+    // if (regExp.isEmpty())
+    //     return text;
+
+    if (regExp.pattern().isEmpty())
         return text;
 
     const QString& startCol(QString::fromLatin1("<b><font color=\"red\">"));
     const QString& endCol(QString::fromLatin1("</font></b>"));
     int pos = 0;
-    while ((pos = text.indexOf(regExp, pos)) != -1) {
+    QRegularExpressionMatch regExpMatch;
+    while ((pos = text.indexOf(regExp, pos, &regExpMatch)) != -1) {
+    //while ((pos = text.indexOf(regExp, pos)) != -1) {
 
-        const QString& match(regExp.cap(0));
+        //const QString& match(regExp.cap(0));
+        const QString& match(regExpMatch.captured(0));
         const QString coloredText(startCol + match + endCol);
         text.replace(pos, match.length(), coloredText);
         pos += coloredText.length();
@@ -1073,7 +1082,7 @@ const QString Git::formatList(const QStringList& sl, const QString& name, bool i
     return ls;
 }
 
-const QString Git::getDesc(const QString& sha, QRegExp& shortLogRE, QRegExp& longLogRE,
+const QString Git::getDesc(const QString& sha, QRegularExpression& shortLogRE, QRegularExpression& longLogRE,
                            bool showHeader, FileHistory* fh) {
 
     if (sha.isEmpty())
@@ -1138,13 +1147,18 @@ const QString Git::getDesc(const QString& sha, QRegExp& shortLogRE, QRegExp& lon
     // sha if there isn't a leading trailing space or an open parenthesis and,
     // in that case, before the space must not be a ':' character.
     // It's an ugly heuristic, but seems to work in most cases.
-    static QRegExp reSHA {R"(..[0-9a-f]{21,40}|[^:][\s(][0-9a-f]{6,20})", Qt::CaseInsensitive};
-    if (reSHA.isMinimal())
-        reSHA.setMinimal(false);
-    int pos = 0;
-    while ((pos = text.indexOf(reSHA, pos)) != -1) {
+    static QRegularExpression reSHA {R"(..[0-9a-f]{21,40}|[^:][\s(][0-9a-f]{6,20})",
+                                     QRegularExpression::CaseInsensitiveOption};
+    // if (reSHA.isMinimal())
+    //     reSHA.setMinimal(false);
 
-        const QString& ref = reSHA.cap(0).mid(2);
+    int pos = 0;
+    QRegularExpressionMatch match;
+    while ((pos = text.indexOf(reSHA, pos, &match)) != -1) {
+    //while ((pos = text.indexOf(reSHA, pos)) != -1) {
+
+        //const QString& ref = reSHA.cap(0).mid(2);
+        const QString& ref = match.captured(0).mid(2);
         const Rev* r = (ref.length() == 40 ? revLookup(ref) : revLookup(getRefSha(ref)));
         if (r && r->sha() != ZERO_SHA) {
             QString slog(r->shortLog());
@@ -1157,7 +1171,8 @@ const QString Git::getDesc(const QString& sha, QRegExp& shortLogRE, QRegExp& lon
             text.replace(pos + 2, ref.length(), link);
             pos += link.length();
         } else
-            pos += reSHA.cap(0).length();
+            //pos += reSHA.cap(0).length();
+            pos += match.captured(0).length();
     }
     return text;
 }
@@ -1316,7 +1331,8 @@ const QString Git::getNewestFileName(const QStringList& branches, const QString&
 void Git::getFileFilter(const QString& path, ShaSet& shaSet) const {
 
     shaSet.clear();
-    QRegExp rx {path, Qt::CaseInsensitive, QRegExp::Wildcard};
+    QString pathWld = QRegularExpression::wildcardToRegularExpression(path);
+    QRegularExpression rx {pathWld, QRegularExpression::CaseInsensitiveOption};
     for (const ShaString& sha : revData->revOrder) {
 
         if (!revsFiles.contains(sha))

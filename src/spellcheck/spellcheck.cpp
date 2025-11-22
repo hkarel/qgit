@@ -15,7 +15,7 @@
 #include "shared/config/appl_conf.h"
 #include "shared/qt/logger_operators.h"
 
-#include <QRegExp>
+#include <QRegularExpression>
 #include <map>
 #include <unordered_map>
 
@@ -146,13 +146,21 @@ bool SpellCheck::init()
                 if (line.isEmpty())
                     continue;
 
-                static QRegExp encDetector {R"(^\s*SET\s+([A-Z0-9\-]+)\s*)", Qt::CaseInsensitive};
+                static QRegularExpression encDetector {R"(^\s*SET\s+([A-Z0-9\-]+)\s*)",
+                                                       QRegularExpression::CaseInsensitiveOption};
 
-                if (encDetector.indexIn(line) > -1)
+                const QRegularExpressionMatch match = encDetector.match(line);
+                if (match.hasMatch())
                 {
-                    encoding = encDetector.cap(1);
+                    encoding = match.captured(0);
                     break;
                 }
+
+                // if (encDetector.indexIn(line) > -1)
+                // {
+                //     encoding = encDetector.cap(1);
+                //     break;
+                // }
             }
             affixFile.close();
         }

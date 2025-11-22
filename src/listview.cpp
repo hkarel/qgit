@@ -1297,7 +1297,11 @@ bool ListViewProxy::filterAcceptsRow(int source_row, const QModelIndex&) const {
 
 int ListViewProxy::setFilter(bool isOn, bool h, const QString& fl, int cn, ShaSet* s) {
 
-    filter = QRegExp(fl, Qt::CaseInsensitive, QRegExp::Wildcard);
+    //filter = QRegExp(fl, Qt::CaseInsensitive, QRegularExpression::Wildcard);
+
+    QString flwld = QRegularExpression::wildcardToRegularExpression(fl);
+    filter = QRegularExpression(flwld, QRegularExpression::CaseInsensitiveOption);
+
     colNum = cn;
     if (s)
         shaSet = *s;

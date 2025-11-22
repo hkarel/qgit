@@ -102,7 +102,7 @@ bool FileView::eventFilter(QObject* obj, QEvent* e) {
     if (e->type() == QEvent::ToolTip && obj == lw) {
         QHelpEvent* h = static_cast<QHelpEvent*>(e);
         int id = fileTab->textEditFile->itemAnnId(lw->itemAt(h->pos()));
-        QRegExp re;
+        QRegularExpression re;
         const QString& sha(fileTab->histListView->shaFromAnnId(id));
         const QString& d(git->getDesc(sha, re, re, false, model()));
         lw->setToolTip(d);

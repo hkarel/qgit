@@ -20,7 +20,7 @@
 
 #include <QTextCodec>
 #include <QMenu>
-#include <QRegExp>
+#include <QRegularExpression>
 #include <QDir>
 #include <QMessageBox>
 #include <QInputDialog>
@@ -236,8 +236,8 @@ bool CommitImpl::checkFiles(QStringList& selFiles) {
 
 bool CommitImpl::checkMsg(QString& msg) {
 
-    static const QRegExp re1 {R"((^|\n)\s*#[^\n]*)"};
-    static const QRegExp re2 {R"([ \t\r\f\v]+\n)"};
+    static const QRegularExpression re1 {R"((^|\n)\s*#[^\n]*)"};
+    static const QRegularExpression re2 {R"([ \t\r\f\v]+\n)"};
 
     msg = textMsg->toPlainText();
     msg.remove(re1);         // strip comments

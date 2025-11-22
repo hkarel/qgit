@@ -274,7 +274,8 @@ void SettingsImpl::setupCodecsCombo() {
         return;
     }
     const QString curCodec(tc != 0 ? tc->name() : "Latin1");
-    QRegExp re {"*" + curCodec + "*", Qt::CaseInsensitive, QRegExp::Wildcard};
+    QString curCodecWld = QRegularExpression::wildcardToRegularExpression("*" + curCodec + "*");
+    QRegularExpression re {curCodecWld, QRegularExpression::CaseInsensitiveOption};
     int idx = codecs.indexOf(re);
     if (idx == -1) {
         log_warn << log_format("Codec <%?> not available, using local codec", curCodec);

@@ -14,7 +14,7 @@
 #include "shared/defmac.h"
 
 #include <QProcess>
-#include <QRegExp>
+#include <QRegularExpression>
 #include <QDir>
 
 class QAction;
@@ -193,9 +193,9 @@ private:
     QString startUpDir;
     QString startUpFile;
     QString textToFind;
-    QRegExp shortLogRE;
-    QRegExp longLogRE;
-    static const QRegExp emptySha;
+    QRegularExpression shortLogRE;
+    QRegularExpression longLogRE;
+    static const QRegularExpression emptySha;
     QMap<QString, QVariant> revision_variables; // variables used in generic input dialogs
     bool setRepositoryBusy;
 };

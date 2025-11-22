@@ -11,7 +11,7 @@
 #include <QApplication>
 #include <QMenu>
 #include <QContextMenuEvent>
-#include <QRegExp>
+#include <QRegularExpression>
 #include <QClipboard>
 
 RevDesc::RevDesc(QWidget* p) : QTextBrowser(p), d(NULL) {
@@ -25,8 +25,9 @@ RevDesc::RevDesc(QWidget* p) : QTextBrowser(p), d(NULL) {
 
 void RevDesc::on_anchorClicked(const QUrl& link) {
 
-    static const QRegExp re {R"([0-9a-f]{40})", Qt::CaseInsensitive};
-    if (re.exactMatch(link.toString())) {
+    static const QRegularExpression re {R"([0-9a-f]{40})",
+                                        QRegularExpression::CaseInsensitiveOption};
+    if (re.match(link.toString()).hasMatch()) {
 
         setSource(QUrl()); // override default navigation behavior
         d->st.setSha(link.toString());

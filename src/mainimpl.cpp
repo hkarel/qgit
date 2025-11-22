@@ -93,10 +93,13 @@ MainImpl::MainImpl(const QString& cd, QWidget* p) : QMainWindow(p) {
     setRepositoryBusy = false;
 
     // init filter match highlighters
-    shortLogRE.setMinimal(true);
-    shortLogRE.setCaseSensitivity(Qt::CaseInsensitive);
-    longLogRE.setMinimal(true);
-    longLogRE.setCaseSensitivity(Qt::CaseInsensitive);
+    shortLogRE.setPatternOptions(QRegularExpression::CaseInsensitiveOption);
+    longLogRE.setPatternOptions(QRegularExpression::CaseInsensitiveOption);
+
+    // shortLogRE.setMinimal(true);
+    // shortLogRE.setCaseSensitivity(Qt::CaseInsensitive);
+    // longLogRE.setMinimal(true);
+    // longLogRE.setCaseSensitivity(Qt::CaseInsensitive);
 
     // set-up standard revisions and files list font
     QString fontDescr; // (settings.value(STD_FNT_KEY).toString());
@@ -340,10 +343,11 @@ void MainImpl::on_actExternalDiff_triggered(bool) {
     }
 }
 
-const QRegExp MainImpl::emptySha("0*");
+const QRegularExpression MainImpl::emptySha("0*");
 
 QString MainImpl::copyFileToDiffIfNeeded(QStringList* filenames, QString sha) {
-    if (emptySha.exactMatch(sha))
+    //if (emptySha.exactMatch(sha))
+    if (emptySha.match(sha).hasMatch())
     {
         return QString(curDir + "/" + rv->st.fileName());
     }
