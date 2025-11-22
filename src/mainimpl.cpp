@@ -2171,7 +2171,7 @@ void MainImpl::on_actFindNext_triggered(bool) {
             return;
         }
         if (QMessageBox::question(this, "Find text - QGit", "End of document "
-            "reached\n\nDo you want to continue from beginning?", QMessageBox::Yes,
+            "reached.\nDo you want to continue from beginning?", QMessageBox::Yes,
             QMessageBox::No | QMessageBox::Escape) == QMessageBox::No)
             return;
 
