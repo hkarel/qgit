@@ -121,7 +121,7 @@ void FileHistory::clear(bool complete) {
   //rowData.clear();
 
   if (qgit::flags().test(REL_DATE_F)) {
-    secs = QDateTime::currentDateTime().toTime_t();
+    secs = QDateTime::currentDateTime().toSecsSinceEpoch();
     headerInfo[ColumnType::TIME_COL] = "Last Change";
   } else {
     secs = 0;

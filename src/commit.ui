@@ -53,11 +53,11 @@
      <item>
       <widget class="QSplitter" name="splitter">
        <property name="orientation">
-        <enum>Qt::Vertical</enum>
+        <enum>Qt::Orientation::Vertical</enum>
        </property>
        <widget class="QTreeWidget" name="treeFiles">
         <property name="contextMenuPolicy">
-         <enum>Qt::CustomContextMenu</enum>
+         <enum>Qt::ContextMenuPolicy::CustomContextMenu</enum>
         </property>
         <property name="toolTip">
          <string>Check files to commit</string>
@@ -122,7 +122,7 @@
 Press &lt;Ctrl+Enter&gt; to commit changes</string>
            </property>
            <property name="lineWrapMode">
-            <enum>QTextEdit::NoWrap</enum>
+            <enum>QTextEdit::LineWrapMode::NoWrap</enum>
            </property>
           </widget>
          </item>
@@ -161,7 +161,7 @@ Press &lt;Ctrl+Enter&gt; to commit changes</string>
           </font>
          </property>
          <property name="frameShadow">
-          <enum>QFrame::Sunken</enum>
+          <enum>QFrame::Shadow::Sunken</enum>
          </property>
          <property name="text">
           <string>Line: %1 Col: %2</string>
@@ -174,10 +174,10 @@ Press &lt;Ctrl+Enter&gt; to commit changes</string>
        <item>
         <spacer>
          <property name="orientation">
-          <enum>Qt::Horizontal</enum>
+          <enum>Qt::Orientation::Horizontal</enum>
          </property>
          <property name="sizeType">
-          <enum>QSizePolicy::Expanding</enum>
+          <enum>QSizePolicy::Policy::Expanding</enum>
          </property>
          <property name="sizeHint" stdset="0">
           <size>

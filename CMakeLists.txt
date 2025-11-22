@@ -19,9 +19,9 @@ set(CMAKE_AUTOMOC ON)
 
 option(UseQt5 "Use Qt5?" ON)
  if (UseQt5)
-   set(QT_MIN_VERSION 5.11.0)
-   find_package(Qt5 ${QT_MIN_VERSION} REQUIRED COMPONENTS Core Gui Widgets)
-   set(QT_LIBRARIES Qt5::Widgets)
+set(QT_MIN_VERSION 6.6.0)
+find_package(Qt6 ${QT_MIN_VERSION} REQUIRED COMPONENTS Core Gui Widgets)
+add_compile_definitions(QT_DISABLE_DEPRECATED_UP_TO=0x050F00)
 
    macro(qt_wrap_ui)
      qt5_wrap_ui(${ARGN})
@@ -78,7 +78,7 @@ set(CPP_SOURCES
 )
 
 # UIS_HDRS will be used later in add_executable
-qt_wrap_ui(UIS_HDRS
+qt6_wrap_ui(UIS_HDRS
     src/commit.ui
     src/console.ui
     src/customaction.ui
@@ -98,10 +98,10 @@ set(RESOURCE_FILES
 
 # this command will generate rules that will run rcc on all files from SAMPLE_RCS
 # in result SAMPLE_RC_SRCS variable will contain paths to files produced by rcc
-qt_add_resources(RC_SRCS ${RESOURCE_FILES})
+qt6_add_resources(RC_SRCS ${RESOURCE_FILES})
 
 add_executable(qgit ${CPP_SOURCES} ${UIS_HDRS} ${RC_SRCS})
-target_link_libraries(qgit ${QT_LIBRARIES})
+target_link_libraries(qgit Qt6::Widgets)
 
 install(TARGETS qgit DESTINATION bin)
 

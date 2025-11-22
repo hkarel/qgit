@@ -72,7 +72,7 @@
          <string>...</string>
         </property>
         <property name="textFormat">
-         <enum>Qt::PlainText</enum>
+         <enum>Qt::TextFormat::PlainText</enum>
         </property>
         <property name="alignment">
          <set>Qt::AlignLeading|Qt::AlignLeft|Qt::AlignVCenter</set>
@@ -85,7 +85,7 @@
       <item>
        <spacer>
         <property name="orientation">
-         <enum>Qt::Horizontal</enum>
+         <enum>Qt::Orientation::Horizontal</enum>
         </property>
         <property name="sizeHint" stdset="0">
          <size>
