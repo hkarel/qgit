@@ -18,9 +18,6 @@ Product {
     cpp.cxxFlags: project.cxxFlags
     cpp.cxxLanguageVersion: project.cxxLanguageVersion
 
-    // This declaration is needed to suppress Qt warnings
-    cpp.systemIncludePaths: Qt.core.cpp.includePaths
-
     files: [
         "gentrigrams.cpp"
     ]

@@ -43,9 +43,6 @@ Product {
         "./",
     ]
 
-    // Suppression a Qt warnings
-    cpp.systemIncludePaths: Qt.core.cpp.includePaths
-
     cpp.rpaths: QbsUtl.concatPaths(
         "$ORIGIN/../lib"
     )
