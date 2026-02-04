@@ -92,9 +92,14 @@ MainImpl::MainImpl(const QString& cd, QWidget* p) : QMainWindow(p) {
     // init native types
     setRepositoryBusy = false;
 
+    QRegularExpression::PatternOptions patternOpt =
+        {QRegularExpression::DotMatchesEverythingOption
+        |QRegularExpression::UseUnicodePropertiesOption
+        |QRegularExpression::CaseInsensitiveOption};
+
     // init filter match highlighters
-    shortLogRE.setPatternOptions(QRegularExpression::CaseInsensitiveOption);
-    longLogRE.setPatternOptions(QRegularExpression::CaseInsensitiveOption);
+    shortLogRE.setPatternOptions(patternOpt);
+    longLogRE.setPatternOptions(patternOpt);
 
     // shortLogRE.setMinimal(true);
     // shortLogRE.setCaseSensitivity(Qt::CaseInsensitive);

@@ -1319,8 +1319,13 @@ const QString Git::getNewestFileName(const QStringList& branches, const QString&
 void Git::getFileFilter(const QString& path, ShaSet& shaSet) const {
 
     shaSet.clear();
-    QString pathWld = QRegularExpression::wildcardToRegularExpression(path);
-    QRegularExpression rx {pathWld, QRegularExpression::CaseInsensitiveOption};
+    QString pathWld = QRegularExpression::wildcardToRegularExpression("*" + path + "*");
+    pathWld.replace("[^/]", QChar('.'));
+
+    QRegularExpression rx {pathWld, {QRegularExpression::DotMatchesEverythingOption
+                                    |QRegularExpression::UseUnicodePropertiesOption
+                                    |QRegularExpression::CaseInsensitiveOption}};
+
     for (const ShaString& sha : revData->revOrder) {
 
         if (!revsFiles.contains(sha))
@@ -1328,11 +1333,13 @@ void Git::getFileFilter(const QString& path, ShaSet& shaSet) const {
 
         // case insensitive, wildcard search
         const RevFile* rf = revsFiles[sha];
-        for (int i = 0; i < rf->count(); ++i)
-            if (filePath(*rf, i).contains(rx)) {
+        for (int i = 0; i < rf->count(); ++i) {
+            QString fpath = filePath(*rf, i);
+            if (fpath.contains(rx)) {
                 shaSet.insert(sha);
                 break;
             }
+        }
     }
 }
 

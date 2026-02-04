@@ -274,7 +274,7 @@ void SettingsImpl::setupCodecsCombo() {
         return;
     }
     const QString curCodec(tc != 0 ? tc->name() : "Latin1");
-    QString curCodecWld = QRegularExpression::wildcardToRegularExpression("*" + curCodec + "*");
+    QString curCodecWld = ".*" + curCodec + ".*";
     QRegularExpression re {curCodecWld, QRegularExpression::CaseInsensitiveOption};
     int idx = codecs.indexOf(re);
     if (idx == -1) {

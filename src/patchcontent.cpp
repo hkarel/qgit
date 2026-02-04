@@ -96,7 +96,9 @@ PatchContent::PatchContent(QWidget* parent) : QTextEdit(parent) {
     diffLoaded = seekTarget = false;
     curFilter = prevFilter = VIEW_ALL;
 
-    pickAxeRE.setPatternOptions(QRegularExpression::CaseInsensitiveOption);
+    pickAxeRE.setPatternOptions({QRegularExpression::DotMatchesEverythingOption
+                                |QRegularExpression::UseUnicodePropertiesOption
+                                |QRegularExpression::CaseInsensitiveOption});
 
     setFont(qgit::TYPE_WRITER_FONT);
     diffHighlighter = new DiffHighlighter(this);

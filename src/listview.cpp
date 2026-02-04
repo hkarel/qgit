@@ -1302,9 +1302,12 @@ bool ListViewProxy::filterAcceptsRow(int source_row, const QModelIndex&) const {
 
 int ListViewProxy::setFilter(bool isOn, bool h, const QString& flt, int cn, ShaSet* s) {
 
-    QString filterWld = QRegularExpression::wildcardToRegularExpression(flt);
-    filter = QRegularExpression(filterWld, QRegularExpression::CaseInsensitiveOption);
+    QString filterWld = QRegularExpression::wildcardToRegularExpression("*" + flt + "*");
+    filterWld.replace("[^/]", QChar('.'));
 
+    filter = QRegularExpression(filterWld, {QRegularExpression::DotMatchesEverythingOption
+                                           |QRegularExpression::UseUnicodePropertiesOption
+                                           |QRegularExpression::CaseInsensitiveOption});
     colNum = cn;
     if (s)
         shaSet = *s;
