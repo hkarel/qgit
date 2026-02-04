@@ -1274,7 +1274,7 @@ bool ListViewProxy::isMatch(const QString& sha) const {
         target = sha;
 
     // wildcard search, case insensitive
-    return (target.contains(filter));
+    return target.contains(filter);
 }
 
 bool ListViewProxy::isMatch(int source_row) const {
@@ -1300,10 +1300,10 @@ bool ListViewProxy::filterAcceptsRow(int source_row, const QModelIndex&) const {
     return (isHighLight || isMatch(source_row));
 }
 
-int ListViewProxy::setFilter(bool isOn, bool h, const QString& fl, int cn, ShaSet* s) {
+int ListViewProxy::setFilter(bool isOn, bool h, const QString& flt, int cn, ShaSet* s) {
 
-    QString flwld = QRegularExpression::wildcardToRegularExpression(fl);
-    filter = QRegularExpression(flwld, QRegularExpression::CaseInsensitiveOption);
+    QString filterWld = QRegularExpression::wildcardToRegularExpression(flt);
+    filter = QRegularExpression(filterWld, QRegularExpression::CaseInsensitiveOption);
 
     colNum = cn;
     if (s)
