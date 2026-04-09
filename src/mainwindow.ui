@@ -208,8 +208,7 @@
   </action>
   <action name="actExit">
    <property name="icon">
-    <iconset theme="system-log-out">
-     <normaloff>.</normaloff>.</iconset>
+    <iconset theme="system-log-out"/>
    </property>
    <property name="text">
     <string>E&amp;xit</string>
@@ -310,8 +309,7 @@
     <bool>false</bool>
    </property>
    <property name="icon">
-    <iconset theme="tag">
-     <normaloff>.</normaloff>.</iconset>
+    <iconset theme="tag"/>
    </property>
    <property name="text">
     <string>Make &amp;tag...</string>
@@ -328,8 +326,7 @@
   </action>
   <action name="actOpenRepoNewWindow">
    <property name="icon">
-    <iconset theme="window-new">
-     <normaloff>.</normaloff>.</iconset>
+    <iconset theme="window-new"/>
    </property>
    <property name="text">
     <string>Open in a &amp;new window...</string>
@@ -343,8 +340,7 @@
   </action>
   <action name="actClose">
    <property name="icon">
-    <iconset theme="window-close">
-     <normaloff>.</normaloff>.</iconset>
+    <iconset theme="window-close"/>
    </property>
    <property name="text">
     <string>&amp;Close</string>
@@ -468,8 +464,7 @@
     <bool>false</bool>
    </property>
    <property name="icon">
-    <iconset theme="document-save-as">
-     <normaloff>.</normaloff>.</iconset>
+    <iconset theme="document-save-as"/>
    </property>
    <property name="text">
     <string>Save file &amp;as...</string>
@@ -534,8 +529,7 @@
     <bool>false</bool>
    </property>
    <property name="icon">
-    <iconset theme="edit-delete">
-     <normaloff>.</normaloff>.</iconset>
+    <iconset theme="edit-delete"/>
    </property>
    <property name="text">
     <string>&amp;Delete references...</string>
@@ -555,8 +549,7 @@
     <bool>false</bool>
    </property>
    <property name="icon">
-    <iconset theme="folder-sync">
-     <normaloff>.</normaloff>.</iconset>
+    <iconset theme="folder-sync"/>
    </property>
    <property name="text">
     <string>&amp;Check working directory</string>
@@ -644,8 +637,7 @@
   </action>
   <action name="actFind">
    <property name="icon">
-    <iconset theme="edit-find">
-     <normaloff>.</normaloff>.</iconset>
+    <iconset theme="edit-find"/>
    </property>
    <property name="text">
     <string>&amp;Find...</string>
@@ -727,8 +719,7 @@
     <bool>false</bool>
    </property>
    <property name="icon">
-    <iconset theme="tab-new">
-     <normaloff>.</normaloff>.</iconset>
+    <iconset theme="tab-new"/>
    </property>
    <property name="text">
     <string>View file in new tab</string>
@@ -745,8 +736,7 @@
     <bool>false</bool>
    </property>
    <property name="icon">
-    <iconset theme="tab-new">
-     <normaloff>.</normaloff>.</iconset>
+    <iconset theme="tab-new"/>
    </property>
    <property name="text">
     <string>View patch in new tab</string>
@@ -842,8 +832,7 @@
   </action>
   <action name="actAmend">
    <property name="icon">
-    <iconset theme="edit-entry">
-     <normaloff>.</normaloff>.</iconset>
+    <iconset theme="edit-entry"/>
    </property>
    <property name="text">
     <string>&amp;Amend commit...</string>
@@ -880,7 +869,7 @@
     <string>Checkout selected revision</string>
    </property>
    <property name="shortcut">
-    <string>Ctrl+C</string>
+    <string>C</string>
    </property>
   </action>
  </widget>
