@@ -21,3 +21,4 @@ ui_*.h
 qgit.pro.*
 src/release
 .qmake.stash
+.qtcreator
